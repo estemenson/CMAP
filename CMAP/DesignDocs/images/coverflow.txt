@@ -1,0 +1,22 @@
+participant StoryApp.__init__
+participant MTCoverflow
+loop 6 times - giving all the coverflows
+note left of MTCoverflow:
+  Each coverflow will contain a button to allow
+  creation of a new artefact of the type managed
+  by that coverflow
+end note
+StoryApp.__init__->MTCoverflow: Create a coverflow
+MTCoverflow-->StoryApp.__init__: Done
+end
+loop for each artefact in the backlog and each project in the artefacts
+StoryApp.__init__->ArtifactController: Create the MVC controller
+ArtifactController->BaseModel: Create the model
+BaseModel->BaseModel: Load the artefact XML template
+BaseModel-->ArtifactController: Done
+ArtifactController->BaseModel: Load the XML data for the artefact
+BaseModel-->ArtifactController: Done
+ArtifactController-->StoryApp.__init__: Done
+StoryApp.__init__->MTCoverflow: Add artefact to appropriate coverflow
+MTCoverflow-->StoryApp.__init__: Done
+end

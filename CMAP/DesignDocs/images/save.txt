@@ -1,0 +1,29 @@
+User->ArtifactController: Touch save buton
+ArtifactController->BaseModel: Invoke save operation
+opt File name has changed
+alt Local repository enabled
+BaseModel->LocalRepository: Rename file
+note right of LocalRepository:
+ Local repository initially
+ implemented using Git
+end note
+LocalRepository-->BaseModel: Done
+else No local repository
+BaseModel->Platform: Rename file
+Platform-->BaseModel: Done
+end
+end
+BaseModel->DOM: Write artefact as XML file
+DOM-->BaseModel: Done
+alt Unsaved direct parents exist
+BaseModel->BaseModel: Save direct parents
+note right of BaseModel: Applies recursively
+end
+alt Unsaved direct children exist
+BaseModel->BaseModel: Save direct children
+note right of BaseModel: Applies recursively
+end
+opt Local repository enabled
+BaseModel->LocalRepository: Commit all changes to local repository
+LocalRepository-->BaseModel: Done
+BaseModel-->ArtifactController: Done

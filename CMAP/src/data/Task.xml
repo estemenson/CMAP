@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Task>
+    <Id> </Id>
+    <Name> </Name>
+    <Description> </Description>
+    <Assigned> </Assigned>
+    <Items> </Items>
+    <Children List=""></Children>
+    <Parent></Parent>
+	<EstimateFinishDate> </EstimateFinishDate>
+	<EstimateHours> </EstimateHours>
+	<ActualHours> </ActualHours>
+	<ActualFinish> </ActualFinish>
+    <Scribbles><Scribble Id="" Color="[1.0,1.0,1.0,1.0]"><![CDATA[]]></Scribble></Scribbles>
+    <TextFields>
+        <TextArea Id="" Font-Size="" size="" pos="" Color="[1.0,1.0,1.0,1.0]"><![CDATA[]]></TextArea>
+    </TextFields>
+</Task>

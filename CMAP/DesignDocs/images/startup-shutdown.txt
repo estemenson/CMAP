@@ -1,0 +1,22 @@
+Storyboot->ConsoleLogger: Create Python Logger
+ConsoleLogger-->Storyboot: Return a logger
+Storyboot->AgiConfig: Load the configuration files
+AgiConfig->Async: Setup the asynchronous services
+Async-->AgiConfig: Provides access to asynchronous services
+AgiConfig-->Storyboot: provides access to the configuration
+Storyboot->PyMT: Create main PyMT window
+PyMT-->Storyboot: Return MTWindow object
+Storyboot->StoryApp: Create main application window
+StoryApp-->Storyboot: Return reference to application window
+Storyboot->MTWindow: Add application window to main window (will make it visible)
+MTWindow-->Storyboot: Done
+Storyboot->PyMT: Start PyMT event loop (runtouchapp)
+alt successful case
+PyMT-->Storyboot: PyMT shutdown cleanly
+else Uncaught exception occurred
+PyMT-->Storyboot: Application failed
+Storyboot->PyMT: Shutdown PyMT (stoptouchapp)
+PyMT-->Storyboot: Done
+Storyboot->Async: Shutdown asynchronous services
+Async-->Storyboot: Done
+end

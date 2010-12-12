@@ -1,0 +1,81 @@
+participant AgileConfig
+participant StoryApp
+participant BaseModel
+AgileConfig->Async: Setup asynchronous services
+Async->GitManager: Initialize asynchronous Git manager
+GitManager-->Async: Done
+Async->ServerManager: Initialize asynchronous HTTP server
+note right of ServerManager
+  Handles asynchronous notifications
+  from Google about updated files
+end note
+ServerManager-->Async: Done
+Async->ToCollaboration: Initialize asynchronous channel to Google for subscribe/unsubscribe
+ToCollaboration-->Async: Done
+opt Collaboration Server available
+Async->ToCollaboration: Send subscription request fot this user
+ToCollaboration->CollaborationServer: send subscription message
+CollaborationServer-->ToCollaboration: Done
+ToCollaboration-->Async: Done
+end
+Async-->AgileConfig: Done
+
+StoryApp->Async: Shutdown asynchronous services
+opt Collaboration Server available
+Async->ToCollaboration: Send unsubscribe request
+ToCollaboration->CollaborationServer: Send unsubscribe request
+CollaborationServer->ToCollaboration: Done
+ToCollaboration-->Async: Done
+end
+Async->Async: Flush all pending operations
+Async->FromCollaboration: Shutdown HTTP server
+FromCollaboration-->Async: Done
+Async->ToCollaboration: Shutdown subscription channel
+ToCollaboration-->Async: Done
+Async->GitManager: Shutdown GitManager
+GitManager->Async: Done
+Async-->StoryApp: Asynchronous services shutdown complete
+
+note right of GitManager:
+  All activity after here
+  happens asynchronously
+  to normal operation by user
+end note
+opt Shared remote repository enabled
+BaseModel->Async: Request to push changes to SharedRepsitry
+Async->GitManager: Request to push changes to SharedRepository
+GitManager->SharedRepository: Push changes to shared repository
+note right of SharedRepository:
+  Shared repository initially
+  implemented using github.com
+end note
+SharedRepository-->GitManager: Done
+SharedRepository->CollaborationServer: Push contents message
+note right of CollaborationServer
+  Initial implementation using
+  Google App Engine at google.com
+end note
+note left of CollaborationServer
+  Uses Github web hooks notification mechanism to send files changed message
+end note
+CollaborationServer-->SharedRepository: Done
+end
+loop for each user connected to CollaborationServer
+CollaborationServer->Async: Send Github push contents message
+Async-->CollaborationServer: Done
+Async->StoryApp: Send Github push contents message
+StoryApp-->Async: Done
+opt SharedRepository enabled
+StoryApp->GitManager: Request pull from SharedRepository
+GitManager->SharedRepository: Send pull command
+SharedRepository-->GitManager: Return updated files
+GitManager-->StoryApp: Done
+loop for each updated file currently loaded
+StoryApp->ArtifactController: Reload file contents from XML data
+ArtifactController->BaseModel: Reload file contents from XML file
+BaseModel-->ArtifactController: Done
+ArtifactController-->StoryApp: Done
+end
+end
+GitManager-->BaseModel: Done
+end

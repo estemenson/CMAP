@@ -1,0 +1,10 @@
+.metadata
+*.pyc
+/.settings/
+/tito_pymt/
+/.project
+/.pydevproject
+/workstation
+/workstation1
+/wiki
+/.settings/

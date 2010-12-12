@@ -1,0 +1,80 @@
+# CMAP supports three levels on configuration file
+# 1. Site configuration
+#    This file is used to store site wide configuration information
+#    On Windows the file will be found at
+#    %ALLUSERSPROFILE%(%PROGRAMDATA%)\agiconfig
+#    and on Linux the file will be found at /etc/agiconfig
+# 2. Personal configuration
+#    This file is used to store configuration data that is unique to
+#    a particular user.
+#    On Windows the file will be found at %HOMEDRIVE%%HOMEPATH\.agiconfig
+#    and on Linux at ~/.agiconfig
+# 3. Invocation configuration
+#    This file is used to store configuration data that is unique to
+#    a given invocation of CMAP. You could use this to support invocation
+#    of CMAP for different teams each with their own project repository.
+#    This file should be stored in the directory CMAP is launched from
+#    and is named .agiconfig
+#
+# Entries in the personal configuration file override entries in the
+# site configuration file. Entries in the invocation configuration file
+# override entries in the personal configuration and site configuration files.
+# Finally, command line arguments may be used to override all configuration
+# files for a particular launch of CMAP.
+#
+#
+# The configuration file is divided into sections corresponding to major areas
+# of functionality that can be configured and evironnmental information needed
+# to find resources needed for CMAP operation. Each section is marked by a
+# header [Section]. A section is terminated by the next section or by end
+# of file.
+[Repository]
+# Currently Git is the only software supported for versioned file system
+# support. If Git is not found than no versioned file support will be provided.
+Type: git
+#
+# The path to the local repository
+#This entry is required even if not using Git as it defines the path where the
+# XML files for each artefact are stored.
+LocalRepo: C:\Users\jonathan\EclipseWorkspaces\Repositories\Agile\test\src\Storyapp
+# This is a shorthand to an entry in your SSH configuration file that defines
+# the URL of the shared repository if it is being used. Note that using
+# a shared repository is optional but if it is not used you will need to find
+# alternative means of providing updated data to your team members.
+RepoUrl: github
+[Libraries]
+# Entries in this section are only required if resources are installed in
+# non-standard locations. This item is most likely to be used by developers
+# who may need to use non-standard versions of libraries. Currently, PyMT is
+# the only supported library in this category
+PyMT: C:\Users\jonathan\EclipseWorkspaces\Repositories\pymt
+[Collaboration]
+# This section contains entries related to the Collaboration Server. To use the
+# Collaboration Server you will need to create an account for your team with
+# Google App Engine and upload the Petaapan collaboration server code to Google
+# App Engine.
+# You will also have to set a web hook in the account for your CMAP repository
+# specifying a URL something like this:
+# http://teamserver.appspot.com/github
+#
+# The ServerUrl item specifies the URL to the Collaboration Server
+# subscribe/unsubscribe service of the Collaboration
+ServerUrl: http://teamserver.appspot.com/subscribe
+# The server port specifies the access port for the Collaboration Server.
+# Defaults to port 80
+ServerPort: 80
+# Each user workstation needs a URL to allow the Collaboration Server to talk
+# asynchronously with CMAP on the user workstation to pass on data related to
+# updated files. The ResponseUrl specifies this URL. It is the responsibility
+# of each user to find a way to configure their environment so that this
+# becomes possible.
+ResponseUrl: http://lysander.petaapan.org
+# This is the port on the user's workstation through which the Collaboration
+# server accesses CMAP. The port is user chosen.
+LocalPort: 16260
+[LogConfiguration]
+#This section allows the user to configure the Python logger. Currently, the
+# logging level is the only item that can be configured.
+LogLevel: debug
+[Testing]
+fullscreen: 
