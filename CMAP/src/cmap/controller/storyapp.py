@@ -279,6 +279,7 @@ class StoryApp(MyInnerWindow):
         
     def on_github_notification(self, ret):
         msg = ret[1]
+        print("GOOGLE APP HOOK CCALLED ***************************************************************************")
         for c in msg['commits']:
             for a in c['added']:
                 Log.debug('%s added by %s' % (a, c['author']['name']))
@@ -430,6 +431,7 @@ class StoryApp(MyInnerWindow):
     def get_new_random_position(self):
         return (choice(self._x_range),choice(self._y_range))
     def enable_gestures(self):
+        print("enabling gestures")
         gdb = myGestures()
         s = os.path.split(os.path.split(os.path.split(__file__)[0])[0])[0]
         defn =  os.path.join(s, 'NewGestures\\xmlGestures\\gestures.xml')
@@ -450,13 +452,17 @@ class StoryApp(MyInnerWindow):
             get_and_or_store_gesture(gdb, 'Square', 'square',defn)
             get_and_or_store_gesture(gdb, 'X', 'x',defn)
         except Exception: #IGNORE:W0703
-            pass
+            print("Some exception in gestures")
         self.canvas = MTScatter(cls='gesturecss') 
         self.canvas.size = self.root_window.size
         self.canvas.pos = (0,0)
         super(StoryApp,self).add_widget(self.canvas)
+        if not self.canvas:
+            print("No canvas in gestures ")
         capture = MyCaptureWidget(gdb, self)
         capture.size = self.canvas.size
+        if not capture:
+            print("No capture device in gestures")
         self.canvas.add_widget(capture)
     def get_local_artifacts(self):
         '''
