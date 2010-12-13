@@ -25,10 +25,10 @@ class myGestures(GestureDatabase):
         try:
             _gdb = 'gesturesDB'
             Log.debug('current directory: %s' % path.abspath(path.curdir))
-            _file = path.join(path.abspath(path.curdir),_gdb)
-            if not path.exists(_file):
-                _file = path.join(path.join(path.join(\
-                        path.abspath(path.curdir),'steve'),'gestures'),_gdb)
+            _file = path.join(Config().gestures, _gdb)
+#            if not path.exists(_file):
+#                _file = path.join(path.join(path.join(\
+#                        path.abspath(path.curdir),'cmap'),'gestures'),_gdb)
             db = shelve.open(_file)
             if name in db.keys():
                 return db[str(name)]

@@ -433,8 +433,7 @@ class StoryApp(MyInnerWindow):
     def enable_gestures(self):
         print("enabling gestures")
         gdb = myGestures()
-        s = os.path.split(os.path.split(os.path.split(__file__)[0])[0])[0]
-        defn =  os.path.join(s, 'NewGestures\\xmlGestures\\gestures.xml')
+        defn =  os.path.join(Config().gestures,'xmlGestures','gestures.xml')
         #import S for New Story
         try:
             get_and_or_store_gesture(gdb, 'New Story', 'New_Story',defn)
