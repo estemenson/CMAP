@@ -548,6 +548,10 @@ class AgiConfig(object):
     @property
     def xmlTemplates(self):
         return join(self.baseDirectory,'Data')
+    
+    @property
+    def gestures(self):
+        return join(self.baseDirectory, 'cmap', 'gestures')
         
     
         
