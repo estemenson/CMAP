@@ -1,0 +1,20 @@
+C:\Users\hotsoft\workspace\CMAP\CMAP\src>mklink /J pymt pymt.git\pymt
+Junction created for pymt <<===>> pymt.git\pymt
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src\pymt>mklink /J examples ..\pymt.git\examples
+Junction created for examples <<===>> ..\pymt.git\examples
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src\pymt>cd ..
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src>mkdir petaapan
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src>cd petaapan
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src\petaapan>mklink /J publishsubscribeclient ..\..\..\..\Petaapan\PublishSubscribeClient\src\petaapan\publishsubscribeclient
+Junction created for publishsubscribeclient <<===>> ..\..\..\..\Petaapan\PublishSubscribeClient\src\petaapan\publishsubscribeclient
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src\petaapan>mklink /J publishsubscribeserver ..\..\..\..\Petaapan\PublishSubscribeServer\src\petaapan\publishsubscribeserver
+Junction created for publishsubscribeserver <<===>> ..\..\..\..\Petaapan\PublishSubscribeServer\src\petaapan\publishsubscribeserver
+
+C:\Users\hotsoft\workspace\CMAP\CMAP\src\petaapan>mklink /J utilities ..\..\..\..\Petaapan\Utilities\src\petaapan\utilities
+Junction created for utilities <<===>> ..\..\..\..\Petaapan\Utilities\src\petaapan\utilities
