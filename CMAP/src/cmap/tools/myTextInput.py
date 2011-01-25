@@ -47,6 +47,9 @@ class MyTextArea(MTTextArea):
 #                self.pos[1] - (self.height / 2) - (self.keyboard.height / 2)) #position of the text input field
             self.keyboard.pos = self.to_window(self.pos[0],\
                 self.pos[1] - self.height  - self.keyboard.height) #position of the text input field
+        if(self.keyboard_to_root):
+            self.keyboard.pos = self.to_window(self.pos[0], self.pos[1] - self.height  - self.keyboard.height) #position of the text input field
+
         if(self.get_initial_keyboard_rotation_from != None):
             self.keyboard.rotation = \
                                 self.get_initial_keyboard_rotation_from.rotation

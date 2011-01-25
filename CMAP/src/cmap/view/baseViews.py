@@ -15,7 +15,8 @@ try:
 except Exception: #IGNORE:W0703
     from petaapan.utilities.console_logger import ConsoleLogger
     Log = ConsoleLogger('CMAP')
-from cmap.tools.borders import MyInnerWindowWithSaveAndTrash
+from cmap.tools.borders import MyInnerWindowWithSaveAndTrash,\
+    MyInnerWindowWithKeyboard
 from cmap.tools.myTools import scale_tuple, get_min_screen_size
 from pymt.ui.widgets.layout.gridlayout import MTGridLayout
 from cmap.tools.myTextInput import MyTextArea, MyTextInput
@@ -33,7 +34,7 @@ minimal_size = (600,400)
 pixels = 9
 
 
-class MinView(MyInnerWindowWithSaveAndTrash):
+class MinView(MyInnerWindowWithKeyboard):#MyInnerWindowWithSaveAndTrash):
     def __init__(self,wnd,ctrl, **kwargs):
         if ctrl is None:
             ctrl = TestController(wnd,'minimal' if self.isMinimal else 'full')

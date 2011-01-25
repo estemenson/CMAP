@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 from agileConfig import Config
 from cmap.tools.decorators import MyDragableContainer
 from cmap import AGILE_ICONS
+from pymt.ui.widgets.composed.vkeyboard import MTVKeyboard
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -278,6 +279,42 @@ class MyInnerWindowWithSaveAndTrash(MyInnerWindowWithTrash):
         self.controls.add_widget(self.btn_save)
         self.update_controls()
        
+    def save(self, touch=None):
+        pass
+
+class MyInnerWindowWithKeyboard(MyInnerWindowWithSaveAndTrash):
+    def update_controls(self):
+        scaled_border = self.get_scaled_border()
+        center_x = self.width/ 2
+        center_y = - scaled_border 
+        if self.isMinimized:
+            center_y = scaled_border
+        ctrls  = self.controls.children
+        pos =(center_x-self.ctrls_buttons_size[0]/2 -
+              (scaled_border/2*self.scale),# if self.scale != 1 else scaled_border,
+                   center_y)
+        start_pos_x = pos[0]
+        keyboard = None
+        for button in ctrls:
+            if (isinstance(button, MTVKeyboard)):
+                keyboard = button 
+                continue
+            button.scale = self.control_scale / self.scale
+            #button.scale = self.scale * self.control_scale
+            button.pos = start_pos_x,center_y - (button.height / (2*self.scale))
+            try:
+                my_padding = button.my_padding
+            except Exception: #IGNORE:W0703
+                my_padding = button.my_padding = 5 # set a default
+            start_pos_x += (button.width + my_padding)
+        if(keyboard):
+            keyboard.pos = (pos[0], pos[1] - 55)
+    def show_keyboard(self,keyboard):
+        self.ctrls_buttons_size = (self.ctrls_buttons_size[0],self.ctrls_buttons_size[1] + keyboard.height) 
+        self.controls.add_widget(keyboard)
+    def hide_keyboard(self, keyboard):
+        self.ctrls_buttons_size = (self.ctrls_buttons_size[0],self.ctrls_buttons_size[1] - keyboard.height) 
+        self.controls.remove_widget(keyboard)
     def save(self, touch=None):
         pass
     

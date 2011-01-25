@@ -178,11 +178,31 @@ class ScribbleText(MyTextArea):
                 self.parent.disable_all() #IGNORE:E1101
                 self._can_deactive = True
             super(ScribbleText, self).on_release(touch)
+    def show_keyboard(self):
+        super(MyTextArea,self).show_keyboard()
+        to_root = self.keyboard_to_root
+        if(to_root):
+            w = self.get_root_window() if to_root else self.get_parent_window()
+            w.remove_widget(self.keyboard)
+            #we want to add this keyboard to the innerwindow border
+            self.parent.parent.parent.parent.show_keyboard(self.keyboard)
+            #self.keyboard.pos = self.to_window(self.pos[0], self.pos[1] - self.height  - self.keyboard.height) #position of the text input field
+
+
                                 
     def hide_keyboard(self):
         if self._is_active_input:
             self.parent.parent.parent.parent.set_button_image() 
         super(ScribbleText, self).hide_keyboard()
+        p = self.parent
+        if(p):
+            pp = p.parent
+            if(pp):
+                ppp = pp.parent
+                if(ppp):
+                    p4 = ppp.parent
+                    if(p4):
+                        p4.hide_keyboard(self.keyboard)
 
     def on_touch_down(self, touch):
         super(ScribbleText, self).on_touch_down(touch)
@@ -194,6 +214,7 @@ class ScribbleTextWidget(MTScatter):
         kwargs.setdefault('size',(20,20))
         kwargs.setdefault('pos',(0,0))
         self.Id = kwargs.get('Id',uuid())
+        kwargs.setdefault('keyboard_to_root', True)
         super(ScribbleTextWidget, self).__init__(**kwargs)
         self.editmode = True
         kwargs.setdefault('color',[1.0,1.0,1.0,1.0])
