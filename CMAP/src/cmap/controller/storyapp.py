@@ -117,8 +117,9 @@ class StoryApp(MyInnerWindow):
 
         self.main_ctlrs_container = MTSidePanel(\
                                         corner=MTToggleButton(padding=5,
-                                                        label='File...',
-                                                        size=(60,45)),
+                                                                           label='File',
+                                                                           size=(0,0)),
+                                        hide=False,
                                         layout=MTGridLayout(rows=1),
                                         align='left',
                                         side='top') 
@@ -565,8 +566,8 @@ class StoryApp(MyInnerWindow):
     def new_release_pressed(self, *largs): #IGNORE:W0613
         project = None if self.current_project is None \
                                         else self.current_project[0].Id
-        if not project:
-            return # Do not support releases in backlog now
+#        if not project:
+#            return # Do not support releases in backlog now
         _r = self.new_artifact_pressed(ReleaseController,
                                        'currentReleaseView',
                                        project=project if project else None,
@@ -589,8 +590,8 @@ class StoryApp(MyInnerWindow):
                                         else self.current_project[0]
         release = None if self.current_release is None \
                         else self.current_release[0].Id
-        if not release:
-            return # No appropriate parent
+#        if not release:
+#            return # No appropriate parent
         _s = self.new_artifact_pressed(SprintController,
                                        'currentSprintView',
                                        p_artifact=release,
@@ -647,8 +648,8 @@ class StoryApp(MyInnerWindow):
             parent = story
         elif sprint:
             parent = sprint
-        if not parent:
-            return # No appropriate parent
+#        if not parent:
+#            return # No appropriate parent
         _t = self.new_artifact_pressed(TaskController,
                                        'currentTaskView',
                                        p_artifact=parent,
@@ -803,15 +804,15 @@ class StoryApp(MyInnerWindow):
     def addMainControls(self):
         self.main_ctlrs_container.add_widget(self.createNewProjectButton())
         self.main_ctlrs_container.add_widget(self.createNewReleaseButton())
-        self.main_ctlrs_container.add_widget(self.createNewSprintButton())
+#        self.main_ctlrs_container.add_widget(self.createNewSprintButton())
         self.main_ctlrs_container.add_widget(self.createNewStoryButton())
         self.main_ctlrs_container.add_widget(self.createNewTaskButton())
-        self.main_ctlrs_container.add_widget(self.createNewBacklogFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewProjectFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewReleasesFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewSprintFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
+#        self.main_ctlrs_container.add_widget(self.createNewBacklogFlowButton())
+#        self.main_ctlrs_container.add_widget(self.createNewProjectFlowButton())
+#        self.main_ctlrs_container.add_widget(self.createNewReleasesFlowButton())
+#        self.main_ctlrs_container.add_widget(self.createNewSprintFlowButton())
+#        self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
+#        self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
         self.canvas.add_widget(self.main_ctlrs_container)
     def createNewBacklogFlowButton(self):
         return self.create_button('Browse\nBacklog...',
