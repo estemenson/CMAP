@@ -1,0 +1,7 @@
+[Repository]
+Type: git
+LocalRepo: C:\Users\jonathan\EclipseWorkspaces\Repositories\CMAP-Data
+[Libraries]
+PyMT: C:\Users\jonathan\EclipseWorkspaces\Repositories\pymt
+[LogConfiguration]
+LogLevel: debug
