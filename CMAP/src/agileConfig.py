@@ -201,7 +201,8 @@ class AgiConfig(object):
                    }
         config = ConfigParser.SafeConfigParser(defaults)
         # Get everything possible from the configuration files if present
-        config.read([join(self._base_directory, _CFG_FILE),
+        cpath = join(self._base_directory, _CFG_FILE)
+        config.read([cpath,
                      join(expanduser('~'), _CFG_FILE),
                      expandvars(join('%ALLUSERSPROFILE%(%PROGRAMDATA%)',
                                      _CFG_FILE)
