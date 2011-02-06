@@ -108,7 +108,7 @@ class MyInnerWindow(MTInnerWindow):
             start_pos_x += (button.width + my_padding)
                 
        
-    def minimize(self):
+    def minimize(self, touch=[]):
         if self.isMinimized:
             self.restore()
         else: 
@@ -158,12 +158,17 @@ class MyInnerWindow(MTInnerWindow):
                 set_color(*border_color) #IGNORE:W0142
 
             # draw border
+            pos = (-scaled_border, -scaled_border*2*self.scale)
             drawRoundedRectangle(
-                pos=(-scaled_border, -scaled_border*2*self.scale),
+                pos=pos,
                 size=(self.width+scaled_border*2, self.height+scaled_border*3*self.scale),
                 #size=(self.width+scaled_border*2, self.height+control_height*2),
                 radius=15. / self.scale
             )
+            # draw title
+            l_pos = ( 40, self.height + 15)
+            drawLabel(label=self.minimized_label, pos=l_pos,
+                           color=parse_color('rgba(255,0,0,255)'), font_size=18)
 #            pos = ((self.width/2 - control_width/2),
 #                   -scaled_border * 2)
 #            size=(control_width, 
@@ -174,16 +179,19 @@ class MyInnerWindow(MTInnerWindow):
             size=scale_tuple(self.size,-.1,-.5)
             l_pos = (size[0]/2, size[1] - 15 - scaled_border)
             corners=(True, True, True, True)
-            drawLabel(label=self.minimized_label, pos=l_pos, 
-                      color=self.style.get('font-color'))
-            border_color=parse_color(self.style.get('min-border-color'))
+            c = self.style.get('min-border-color') 
+            border_color=parse_color(c if c is not None else 'rgba(192,192,192,255)')
             # draw control background
             drawRoundedRectangle(
-                pos=pos,
+               pos=pos,
                 size=size,
                 radius=15. / self.scale,
                 corners=corners, color=border_color
             )
+            c = self.style.get('font-color')
+            drawLabel(label=self.minimized_label, pos=l_pos, 
+                      color=parse_color(c if c is not None else 'rgba(255,0,0,255)'),
+                      font_size=14)
         #self.update_controls()
         
 
