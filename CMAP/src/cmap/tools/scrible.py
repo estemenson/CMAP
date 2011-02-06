@@ -178,11 +178,31 @@ class ScribbleText(MyTextArea):
                 self.parent.disable_all() #IGNORE:E1101
                 self._can_deactive = True
             super(ScribbleText, self).on_release(touch)
+    def show_keyboard(self):
+        super(MyTextArea,self).show_keyboard()
+        to_root = self.keyboard_to_root
+        if(to_root):
+            w = self.get_root_window() if to_root else self.get_parent_window()
+            w.remove_widget(self.keyboard)
+            #we want to add this keyboard to the innerwindow border
+            self.parent.parent.parent.parent.show_keyboard(self.keyboard)
+            #self.keyboard.pos = self.to_window(self.pos[0], self.pos[1] - self.height  - self.keyboard.height) #position of the text input field
+
+
                                 
     def hide_keyboard(self):
         if self._is_active_input:
             self.parent.parent.parent.parent.set_button_image() 
         super(ScribbleText, self).hide_keyboard()
+        p = self.parent
+        if(p):
+            pp = p.parent
+            if(pp):
+                ppp = pp.parent
+                if(ppp):
+                    p4 = ppp.parent
+                    if(p4):
+                        p4.hide_keyboard(self.keyboard)
 
     def on_touch_down(self, touch):
         super(ScribbleText, self).on_touch_down(touch)
@@ -194,6 +214,7 @@ class ScribbleTextWidget(MTScatter):
         kwargs.setdefault('size',(20,20))
         kwargs.setdefault('pos',(0,0))
         self.Id = kwargs.get('Id',uuid())
+        kwargs.setdefault('keyboard_to_root', True)
         super(ScribbleTextWidget, self).__init__(**kwargs)
         self.editmode = True
         kwargs.setdefault('color',[1.0,1.0,1.0,1.0])
@@ -262,6 +283,7 @@ class MyScribbleWidget(MTWidget):
         self.touch_positions = {}
         self.touch_keys = {}
         self.touch_positions = kwargs.get('scribbles',{})
+        self.travel_limit = 5
         self.keyboard = MTVKeyboard()
         tf = kwargs.get('TextFields', {})
         if tf:
@@ -351,6 +373,7 @@ class MyScribbleWidget(MTWidget):
             idu = self.touch_keys[touch.id] = uuid()
             self.touch_positions[idu]= {'Id':idu, 'Color':self.current_color,
                                        'Cdata':[touch.pos]}
+            self.touch_positions[idu]['moved'] = 0
             return True
     def on_touch_move(self, touch):
         if touch.grab_current == self:# or touch.id in self.touch_positions:
@@ -368,6 +391,7 @@ class MyScribbleWidget(MTWidget):
                     return True
                 self.dispatch_event('on_change', #IGNORE:W0142
                                     *(idu,self.touch_positions))
+                self.touch_positions[idu]['moved'] += 1
                 return True
 
     def on_touch_up(self, touch):
@@ -394,11 +418,19 @@ class MyScribbleWidget(MTWidget):
         start = start if start else time.time() 
         elaspsed_time = time.time() -  start
         idu = self.touch_keys[touch.id]
-        if elaspsed_time >= .5:
+        Log.debug('Elapsed time:%s' % elaspsed_time)
+        if elaspsed_time >= 1:
             distance = Vector.distance( Vector(pos.sx, pos.sy),
                                         Vector(touch.osxpos, touch.osypos))
+            Log.debug('Screen coordinate Distance:%f vs %f' % (distance,self.press_and_hold_distance))
+            _l = len(self.touch_positions[idu]['Cdata'])
+            Log.debug('Num points:%d' % _l)
+            _vd = Vector.distance(\
+                            Vector(*self.touch_positions[idu]['Cdata'][0]),\
+                            Vector(*self.touch_positions[idu]['Cdata'][_l-1]))
+            Log.debug('touch distance :%f and %d' % (_vd, int(_vd)))
             if distance <= self.press_and_hold_distance and\
-                                        len(self.touch_positions[idu]['Cdata']) < 4:
+                        (_l < self.travel_limit or int(_vd) < self.travel_limit):                                            
                 
                 txt = ScribbleTextWidget(pos=touch.pos, group=self.session,
                                                    keyboard=self.keyboard,
