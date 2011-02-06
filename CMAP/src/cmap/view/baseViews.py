@@ -45,7 +45,8 @@ class MinView(MyInnerWindowWithKeyboard):#MyInnerWindowWithSaveAndTrash):
             self.isMinimal = True
         self._type_name = kwargs['type_name']
         self._name = kwargs.setdefault('name',self.ctrl.Name)
-        kwargs.setdefault('minimized_label', self._name)
+        kwargs.setdefault('minimized_label',
+                                  self._name if self._name != '' else self._type_name)
         self._id = self.ctrl.Id
         kwargs['size'] = self.grid_size = minimal_size
         super(MinView,self).__init__(**kwargs)

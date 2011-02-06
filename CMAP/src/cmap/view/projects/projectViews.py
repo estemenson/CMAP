@@ -25,7 +25,6 @@ from pymt.ui.window import MTWindow
 class ProjectMinView(MinView):   
     def __init__(self,wnd,ctrl, **kwargs):
         kwargs.setdefault('name','')
-        kwargs.setdefault('minimized_label', kwargs['name'])
         super(ProjectMinView,self).__init__(wnd,ctrl,**kwargs)
 #class ProjectMinViewOld(MyInnerWindowWithSaveAndTrash):   
 #    def __init__(self,wnd,ctrl, **kwargs):
