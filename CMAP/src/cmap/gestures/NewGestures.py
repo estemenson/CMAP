@@ -18,8 +18,12 @@ try:
     from agileConfig import Config
     Log = Config().log.logger
 except:
-    Log = logging.getLogger()
-    Log.setLevel(logging.DEBUG)
+    from petaapan.utilities.console_logger import ConsoleLogger
+    Log = ConsoleLogger('Gestures')
+    from agileConfig import AgiConfig    
+    AgiConfig(Log)
+#    Log = logging.getLogger()
+#    Log.setLevel(logging.DEBUG)
 IS_PYMT_PLUGIN = True
 PLUGIN_TITLE = 'NewGesture tester'
 PLUGIN_AUTHOR = 'Stevenson Gossage'
@@ -354,22 +358,36 @@ def pymt_plugin_activate(root, ctx):
 #    get_and_or_store_gesture(gdb, 'X', 'x')
 #    #S draw an S
 #    get_and_or_store_gesture(gdb, 'New Story', 'New_Story')
-    try:
-        get_and_or_store_gesture(gdb, 'New Story', 'New_Story')
-        get_and_or_store_gesture(gdb, 'Projects', 'Projects')
-        get_and_or_store_gesture(gdb, 'Projects1', 'Projects1')
-        get_and_or_store_gesture(gdb, 'Releases', 'Releases')
-        get_and_or_store_gesture(gdb, 'Releases1', 'Releases1')
-        #get_and_or_store_gesture(gdb, 'Sprints', 'Sprints')
-        #get_and_or_store_gesture(gdb, 'Sprints1', 'Sprints1')
-        get_and_or_store_gesture(gdb, 'Sprints2', 'Sprints2')
-        get_and_or_store_gesture(gdb, 'Tasks', 'Tasks')
-        get_and_or_store_gesture(gdb, 'Tasks1', 'Tasks1')
-        #get_and_or_store_gesture(gdb, 'Tasks2', 'Tasks2')
-        get_and_or_store_gesture(gdb, 'Square', 'square')
-        get_and_or_store_gesture(gdb, 'X', 'x')
-    except:
-        pass
+#        get_and_or_store_gesture(gdb, 'New Story', 'New_Story')
+#        get_and_or_store_gesture(gdb, 'Projects', 'Projects')
+#        get_and_or_store_gesture(gdb, 'Projects1', 'Projects1')
+#        get_and_or_store_gesture(gdb, 'Releases', 'Releases')
+#        get_and_or_store_gesture(gdb, 'Releases1', 'Releases1')
+#        #get_and_or_store_gesture(gdb, 'Sprints', 'Sprints')
+#        #get_and_or_store_gesture(gdb, 'Sprints1', 'Sprints1')
+#        get_and_or_store_gesture(gdb, 'Sprints2', 'Sprints2')
+#        get_and_or_store_gesture(gdb, 'Tasks', 'Tasks')
+#        get_and_or_store_gesture(gdb, 'Tasks1', 'Tasks1')
+#        #get_and_or_store_gesture(gdb, 'Tasks2', 'Tasks2')
+    _g = Config().gestures
+    _file =  path.join(_g,'xmlGestures','gestures.xml')
+    if _g.endswith('\\cmap\\gestures\\cmap\\gestures'):
+        _file = path.join(path.abspath(path.curdir),'xmlGestures','gestures.xml')
+    
+
+    get_and_or_store_gesture(gdb, 'Square', 'square',_file)
+    get_and_or_store_gesture(gdb, 'X', 'x', _file)
+    for _g in ['New Story','Stories','Stories1','Projects',
+                 'Projects1','Projects2','Projects3','Releases',
+                 'Releases1','Releases2','Releases3','Sprints',
+                 'Sprints1','Sprints2','Tasks','Tasks1','Tasks2',
+                 'Tasks3','Tasks4','Tasks5','Tasks6','Tasks7','Backlog',
+                 'Backlog1', 'Backlog2','Backlog3','x','x1','x2','x3']:
+        try:
+            get_and_or_store_gesture(gdb, _g, _g,_file)
+        except Exception: #IGNORE:W0703
+            #Log.debug('Failed to load the %s gesture' % _g)
+            print('Failed to load the %s gesture' % _g)
     
     canvas = MTScatterPlane() 
     canvas._set_size(root._get_size())

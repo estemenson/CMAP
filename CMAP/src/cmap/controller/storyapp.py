@@ -434,23 +434,18 @@ class StoryApp(MyInnerWindow):
         gdb = myGestures()
         defn =  os.path.join(Config().gestures,'xmlGestures','gestures.xml')
         #import S for New Story
-        try:
-            get_and_or_store_gesture(gdb, 'New Story', 'New_Story',defn)
-            get_and_or_store_gesture(gdb, 'Projects', 'Projects',defn)
-            get_and_or_store_gesture(gdb, 'Projects1', 'Projects1',defn)
-            get_and_or_store_gesture(gdb, 'Releases', 'Releases',defn)
-            get_and_or_store_gesture(gdb, 'Releases1', 'Releases1',defn)
-            get_and_or_store_gesture(gdb, 'Sprints', 'Sprints',defn)
-            get_and_or_store_gesture(gdb, 'Sprints1', 'Sprints1',defn)
-            get_and_or_store_gesture(gdb, 'Sprints2', 'Sprints2',defn)
-            get_and_or_store_gesture(gdb, 'Tasks', 'Tasks',defn)
-            get_and_or_store_gesture(gdb, 'Tasks1', 'Tasks1',defn)
-            get_and_or_store_gesture(gdb, 'Backlog', 'Backlog',defn)
-            get_and_or_store_gesture(gdb, 'Backlog1', 'Backlog1',defn)
-            get_and_or_store_gesture(gdb, 'Square', 'square',defn)
-            get_and_or_store_gesture(gdb, 'X', 'x',defn)
-        except Exception: #IGNORE:W0703
-            pass
+        get_and_or_store_gesture(gdb, 'Square', 'square',defn)
+        get_and_or_store_gesture(gdb, 'X', 'x',defn)
+        for _g in ['New Story','Stories','Stories1','Projects',
+                 'Projects1','Projects2','Projects3','Releases',
+                 'Releases1','Releases2','Releases3','Sprints',
+                 'Sprints1','Sprints2','Tasks','Tasks1','Tasks2',
+                 'Tasks3','Tasks4','Tasks5','Tasks6','Tasks7','Backlog',
+                 'Backlog1', 'Backlog2','Backlog3','x','x1','x2','x3']:
+            try:
+                get_and_or_store_gesture(gdb, _g, _g,defn)
+            except Exception: #IGNORE:W0703
+                Log.info('Failed to load the %s gesture' % _g)
         self.canvas = MTScatter(cls='gesturecss') 
         self.canvas.size = self.root_window.size
         self.canvas.pos = (0,0)

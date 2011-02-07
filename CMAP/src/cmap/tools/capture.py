@@ -29,35 +29,46 @@ class MyCaptureWidget(CaptureGesture):
         return True
     def on_gesture(self, gesture, touch):
         # try to find gesture from database
-        best = self.gdb.find(gesture, minscore=0.8)
+        best = self.gdb.find(gesture, minscore=0.9)
         if best:
-            Log.debug('Gesture detected %s:%s' %\
+            Log.info('Gesture detected %s:%s' %\
                       (best[0],best[1].label))
             self.lastbest = best
-            if best[1].label in ['Backlog','Backlog1', 'Backlog2']:
-                self.StoryApp._flow_pressed('backlog_flow_open',
-                                        self.StoryApp.dragable_backlog_flow)
-            elif best[1].label in ['Projects','Projects1', 'Projects2']:
-                self.StoryApp._flow_pressed('projects_flow_open',
-                                        self.StoryApp.dragable_project_flow)
+            if best[1].label in ['Backlog','Backlog1', 'Backlog2','Backlog3']:
+                self.lastbest = None
+                #self.points = []
+#                self.StoryApp._flow_pressed('backlog_flow_open',
+#                                        self.StoryApp.dragable_backlog_flow)
+            elif best[1].label in ['Projects','Projects1', 'Projects2', 'Projects3']:
+                self.StoryApp.new_project_pressed(None)
+#                _flow_pressed('projects_flow_open',
+#                                        self.StoryApp.dragable_project_flow)
             elif best[1].label in ['Sprints','Sprints1', 'Sprints2']:
-                self.StoryApp._flow_pressed('sprint_flow_open',
-                                        self.StoryApp.dragable_sprint_flow)
-            elif best[1].label in ['New Story']:
+                self.lastbest = None
+                #self.points = []
+#                self.StoryApp._flow_pressed('sprint_flow_open',
+#                                        self.StoryApp.dragable_sprint_flow)
+            elif best[1].label in ['New Story','Stories','Stories1']:
                 self.StoryApp.new_story_pressed(None)
-            elif best[1].label in ['Releases','Releases1', 'Releases2']:
-                self.StoryApp._flow_pressed('releases_flow_open',
-                                        self.StoryApp.dragable_release_flow)
-            elif best[1].label in ['Tasks','Tasks1', 'Tasks2']:
-                self.StoryApp._flow_pressed('task_flow_open',
-                                            self.StoryApp.dragable_task_flow)
-            elif best[1].label in ['Square', 'square']:
-                self.StoryApp._flow_pressed('story_flow_open',
-                                            self.StoryApp.dragable_story_flow)
-            elif best[1].label in ['X', 'x']:
+            elif best[1].label in ['Releases','Releases1', 'Releases2', 'Releases3']:
+                self.StoryApp.new_release_pressed(None)
+#                _flow_pressed('releases_flow_open',
+#                                        self.StoryApp.dragable_release_flow)
+            elif best[1].label in ['Tasks','Tasks1', 'Tasks2','Tasks3','Tasks4',
+                                   'Tasks5', 'Tasks6', 'Tasks7']:
+                self.StoryApp.new_task_pressed(None)
+#                _flow_pressed('task_flow_open',
+#                                            self.StoryApp.dragable_task_flow)
+            elif best[1].label in ['Square', 'square','Square1']:
+                self.lastbest = None
+                #self.points = []
+#                self.StoryApp._flow_pressed('story_flow_open',
+#                                            self.StoryApp.dragable_story_flow)
+            elif best[1].label in ['X', 'x','x1','x2','x3']:
                 self.StoryApp.unfullscreen()
         else:
             self.lastbest = None
+            #self.points = []
     def draw(self):
         # draw background
         set_color(*self.bgcolor)

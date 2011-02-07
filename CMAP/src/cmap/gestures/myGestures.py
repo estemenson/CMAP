@@ -16,16 +16,25 @@ try:
     from agileConfig import Config
     Log = Config().log.logger
 except:
-    Log = logging.getLogger()
-    Log.setLevel(logging.DEBUG)
+    from petaapan.utilities.console_logger import ConsoleLogger
+    Log = ConsoleLogger('Gestures')
+    from agileConfig import AgiConfig    
+    config = AgiConfig(Log)
+    Log.level = 'debug'
+#    Log = logging.getLogger()
+#    Log.setLevel(logging.DEBUG)
 from pymt.gesture import GestureDatabase
 
 class myGestures(GestureDatabase):
     def pull_gesture_from_shelf(self, name):
         try:
             _gdb = 'gesturesDB'
-            Log.debug('current directory: %s' % path.abspath(path.curdir))
-            _file = path.join(Config().gestures, _gdb)
+            _cd = path.abspath(path.curdir)
+            Log.debug('current directory: %s' % _cd)
+            _g = Config().gestures
+            if _g.endswith('\\cmap\\gestures\\cmap\\gestures'):
+                _g = _cd
+            _file = path.join(_g, _gdb)
 #            if not path.exists(_file):
 #                _file = path.join(path.join(path.join(\
 #                        path.abspath(path.curdir),'cmap'),'gestures'),_gdb)
