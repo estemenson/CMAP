@@ -13,6 +13,10 @@ from agileConfig import Config
 from cmap.tools.decorators import MyDragableContainer
 from cmap import AGILE_ICONS
 from pymt.ui.widgets.composed.vkeyboard import MTVKeyboard
+from pymt.ui.widgets.composed.textinput import MTTextInput
+from pymt.core.clipboard import Clipboard
+from cmap.tools.myTextInput import MyTextArea
+from pymt.ui.widgets.widget import MTWidget
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -22,7 +26,7 @@ except Exception: #IGNORE:W0703
 
 from pymt.ui.widgets.composed.innerwindow import MTInnerWindow
 from pymt.ui.window import MTWindow
-from pymt.base import runTouchApp
+from pymt.base import runTouchApp, getWindow
 from pymt.ui.colors import css_add_sheet
 from pymt.graphx.colors import set_color
 from pymt.graphx.draw import drawRoundedRectangle, drawLabel
@@ -41,6 +45,7 @@ InnerWindowCSS = '''
     draw-border: True;    
     bg-color-move: rgb(45 ,150 ,150);
     bg-color-full: rgb(145 ,180 ,150);
+    padding: 10;
 }
 .type2css {
     bg-color: rgba(211, 211, 211, 255);
@@ -282,45 +287,62 @@ class MyInnerWindowWithSaveAndTrash(MyInnerWindowWithTrash):
     def save(self, touch=None):
         pass
 
-class MyInnerWindowWithKeyboard(MyInnerWindowWithSaveAndTrash):
-    def update_controls(self):
-        scaled_border = self.get_scaled_border()
-        center_x = self.width/ 2
-        center_y = - scaled_border 
-        if self.isMinimized:
-            center_y = scaled_border
-        ctrls  = self.controls.children
-        pos =(center_x-self.ctrls_buttons_size[0]/2 -
-              (scaled_border/2*self.scale),# if self.scale != 1 else scaled_border,
-                   center_y)
-        start_pos_x = pos[0]
-        keyboard = None
-        for button in ctrls:
-            if (isinstance(button, MTVKeyboard)):
-                keyboard = button 
-                continue
-            button.scale = self.control_scale / self.scale
-            #button.scale = self.scale * self.control_scale
-            button.pos = start_pos_x,center_y - (button.height / (2*self.scale))
-            try:
-                my_padding = button.my_padding
-            except Exception: #IGNORE:W0703
-                my_padding = button.my_padding = 5 # set a default
-            start_pos_x += (button.width + my_padding)
-        if(keyboard):
-            keyboard.pos = (pos[0], pos[1] - 55)
-    def show_keyboard(self,keyboard):
-        self.ctrls_buttons_size = (self.ctrls_buttons_size[0],self.ctrls_buttons_size[1] + keyboard.height) 
-        self.controls.add_widget(keyboard)
-    def hide_keyboard(self, keyboard):
-        self.ctrls_buttons_size = (self.ctrls_buttons_size[0],self.ctrls_buttons_size[1] - keyboard.height) 
-        self.controls.remove_widget(keyboard)
-    def save(self, touch=None):
-        pass
-    
+#class MyInnerWindowWithKeyboard(MyInnerWindowWithSaveAndTrash):
+#    def __init__(self,**kwargs):
+#        self._keyboard = MTVKeyboard()
+#        self._keyboard.hide()
+#        self._hidden = True
+#        self._text_widget = None
+#        super(MyInnerWindowWithKeyboard,self).__init__(**kwargs)
+#        self.add_widget(self._keyboard)
+#    def update_controls(self):
+#        scaled_border = self.get_scaled_border()
+#        center_x = self.width/ 2
+#        center_y = - scaled_border 
+#        if self.isMinimized:
+#            center_y = scaled_border
+#        ctrls  = self.controls.children
+#        pos =(center_x-self.ctrls_buttons_size[0]/2 -
+#              (scaled_border/2*self.scale),# if self.scale != 1 else scaled_border,
+#                   center_y)
+#        start_pos_x = pos[0]
+#        keyboard = None
+#        for button in ctrls:
+#            if (isinstance(button, MTVKeyboard)):
+#                keyboard = button 
+#                continue
+#            button.scale = self.control_scale / self.scale
+#            #button.scale = self.scale * self.control_scale
+#            button.pos = start_pos_x,center_y - (button.height / (2*self.scale))
+#            try:
+#                my_padding = button.my_padding
+#            except Exception: #IGNORE:W0703
+#                my_padding = button.my_padding = 5 # set a default
+#            start_pos_x += (button.width + my_padding)
+#        if(self._keyboard and not self._hidden):
+#            self._keyboard.pos = self.to_window(pos[0], pos[1] - 55)
+#    def show_keyboard(self,txtw=None):
+##        self.text_widget = txtw
+#        self.ctrls_buttons_size = (self.ctrls_buttons_size[0],self.ctrls_buttons_size[1] + self._keyboard.height)
+#        self.controls.height = self.ctrls_buttons_size[1]
+#        self._keyboard.show() 
+#    def hide_keyboard(self):
+##        if self.text_widget:
+#        #keyboard = self.text_widget.keyboard
+#        #self.text_widget.hide_keyboard()
+#        self.ctrls_buttons_size = (self.ctrls_buttons_size[0],48) 
+#        self._keyboard.hide()
+#    def save(self, touch=None):
+#        if self._hidden:
+#            print('about to show keyboard')
+#            self.show_keyboard()
+#        else:
+#            print('about to hide keyboard')
+#            self.hide_keyboard()
+#        self._hidden = not self._hidden
 if __name__ == '__main__':
     w = MTWindow()
-    w.size = (1100,800)
+    w.size = (1800,980)
 #    b = MyInnerWindow(size=(600,600), pos=(100,150), control_scale=0.7, \
 #                      cls='type1css')
 #    w.add_widget(b)
@@ -332,7 +354,16 @@ if __name__ == '__main__':
 #    w.add_widget(t)
     cw = MyInnerWindowWithSaveAndTrash(size=(600,600), pos=(100,100), 
                                       control_scale=1, cls='type1css')
+    #k = MTVKeyboard()
+    #w.add_widget(k)
+#    cw = MyInnerWindowWithKeyboard(size=(600,600), pos=(100,100),
+#                               control_scale=1, cls='type1css')
+    #cw = MTWidget()
+    #keyboard = MTVKeyboard()
+    #cw.add_widget(keyboard) 
+    
     w.add_widget(cw)
+
 #    d = MyDragebleInnerWindow(size=(300,300), pos=(100,200), control_scale=0.7,
 #                                        cls='type1css')
 #    d1 = MyDragableContainer(d,False)
