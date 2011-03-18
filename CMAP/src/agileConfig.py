@@ -94,6 +94,11 @@ _STORYCARD = 'Storycard'
 _GIT = 'git'
 _HG = 'hg'
 _USERID = 'UserId'
+logLevelMap = {_CRITICAL: logging.CRITICAL,
+               _ERROR: logging.ERROR,
+               _WARNING: logging.WARNING,
+               _INFO: logging.INFO,
+               _DEBUG: logging.DEBUG}
  
             
             
@@ -135,12 +140,7 @@ class PymtChecker(petaapan.utilities.argparse.Action):
             
 class LogLevelChecker(petaapan.utilities.argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None):
-                
-        logLevelMap = {_CRITICAL: logging.CRITICAL,
-                       _ERROR: logging.ERROR,
-                       _WARNING: logging.WARNING,
-                       _INFO: logging.INFO,
-                       _DEBUG: logging.DEBUG}
+        global logLevelMap        
 
         setattr(namespace, self.dest, logLevelMap[value])
         Config().log.level = logLevelMap[value]
@@ -190,15 +190,9 @@ class AgiConfig(object):
         
         # Load the configuration
         self._base_directory, base_app = split(realpath(sys.argv[0]))
-        defaults = {_REPOSITORY: {_TYPE: _GIT},
-                    _COLLABORATION: {_SERVER_PORT:8080,
-                                     _LOCAL_PORT: 16160,
-                                     _RESPONSE_URL: 'localhost'},
-                    _LOG: {_CONSOLELOG: True,
-                           _LOGLEVEL: _ERROR},
-                    _TESTING: {_TEST_SERVER: False,
-                               _FULLSCREEN: False}
-                   }
+        defaults = {_TYPE:_GIT, _SERVER_PORT:'8080', _LOCAL_PORT:'16160',
+                    _RESPONSE_URL:'localhost', _CONSOLELOG:True,
+                    _LOGLEVEL:_ERROR, _TEST_SERVER: False, _FULLSCREEN:False}
         config = ConfigParser.SafeConfigParser(defaults)
         # Get everything possible from the configuration files if present
         config.read([join(self._base_directory, _CFG_FILE),
@@ -257,7 +251,7 @@ class AgiConfig(object):
                                         else False,
                             loglevel=config.get(_LOG, _LOGLEVEL)\
                                      if config.has_option(_LOG,_LOGLEVEL)\
-                                     else _ERROR,
+                                     else logLevelMap[_ERROR],
                             storycard=config.get(_TESTING, _STORYCARD)\
                                     if config.has_option(_TESTING, _STORYCARD) \
                                     else None,

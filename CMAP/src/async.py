@@ -15,13 +15,13 @@ import httplib
 
 import pymt.base
 import pymt.event
-from petaapan.publishsubscribeserver.pssDef import GITHUB_NOTIFICATION
 from petaapan.utilities.gitmanager import GitManager, SAVE, COMMIT, MV, RM,\
                                           GIT_RESPONSE, SHUTDOWN
 from petaapan.publishsubscribeclient.fromCollaboration\
                import FROM_COLLABORATION, ServerManager
 from petaapan.publishsubscribeclient.toCollaboration\
                import TO_COLLABORATION, SUBSCRIPTION_RESPONSE, ToCollaboration
+from petaapan.publishsubscribeserver.pssDef import GITHUB_NOTIFICATION
 from agileConfig import Config
 Log = Config().log.logger
 
