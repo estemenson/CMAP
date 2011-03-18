@@ -12,11 +12,6 @@ from __future__ import unicode_literals
 from agileConfig import Config
 from cmap.tools.decorators import MyDragableContainer
 from cmap import AGILE_ICONS
-from pymt.ui.widgets.composed.vkeyboard import MTVKeyboard
-from pymt.ui.widgets.composed.textinput import MTTextInput
-from pymt.core.clipboard import Clipboard
-from cmap.tools.myTextInput import MyTextArea
-from pymt.ui.widgets.widget import MTWidget
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -26,7 +21,7 @@ except Exception: #IGNORE:W0703
 
 from pymt.ui.widgets.composed.innerwindow import MTInnerWindow
 from pymt.ui.window import MTWindow
-from pymt.base import runTouchApp, getWindow
+from pymt.base import runTouchApp
 from pymt.ui.colors import css_add_sheet
 from pymt.graphx.colors import set_color
 from pymt.graphx.draw import drawRoundedRectangle, drawLabel

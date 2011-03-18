@@ -18,6 +18,7 @@ except Exception:
     Log = ConsoleLogger('CMAP')
 from cmap.tools.myTools import get_min_screen_size, scale_tuple
 from cmap.tools.uniqueID import uuid
+from cmap.tools.myTextInput import MyTextInput, MyTextArea
 from pymt.ui.window import MTWindow
 from pymt.base import runTouchApp
 from cmap.view.baseViews import minimal_size, pixels, MinView
