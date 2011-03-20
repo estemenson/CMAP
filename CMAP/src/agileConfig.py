@@ -82,8 +82,6 @@ _LOCAL_REPO = 'LocalRepo'
 _PYMT = 'PyMT'
 _SERVER_PORT = 'ServerPort'
 _LOCAL_PORT = 'LocalPort'
-_SERVER_URL = 'ServerUrl'
-_RESPONSE_URL = 'ResponseUrl'
 _LOGPATH = 'ConfigurationPath'
 _CONSOLELOG = 'ConsoleLog'
 _LOGLEVEL = 'LogLevel'
@@ -190,7 +188,7 @@ class AgiConfig(object):
         
         # Load the configuration
         self._base_directory, base_app = split(realpath(sys.argv[0]))
-        defaults = {_TYPE: _GIT, _SERVER_PORT: '8080', _LOCAL_PORT: '16160',
+        defaults = {_TYPE: _GIT, _SERVER_PORT: '80', _LOCAL_PORT: '80',
                     _RESPONSE_URL: 'localhost', _CONSOLELOG: True,
                     _LOGLEVEL: _ERROR, _TEST_SERVER: False,
                     _FULLSCREEN: False
