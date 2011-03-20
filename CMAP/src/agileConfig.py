@@ -197,8 +197,8 @@ class AgiConfig(object):
         # Get everything possible from the configuration files if present
         config.read([join(self._base_directory, _CFG_FILE),
                      join(expanduser('~'), _CFG_FILE),
-                     expandvars(join('%ALLUSERSPROFILE%(%PROGRAMDATA%)',
-                                     _CFG_FILE)
+                     expandvars(join('%ALLUSERSPROFILE%',
+                                     _CFG_SYS_FILE)
                                 if sys.platform == 'win32'
                                 else join('/etc', _CFG_SYS_FILE))])
         
