@@ -451,7 +451,8 @@ class BaseModel(Observer, Subject):
             if closing:
                 AsyncHandler().save(fn, 'changes made to %s' % self.Id)
             else:
-                AsyncHandler().commit(fn, 'changes made to %s' % self.Id)
+#                AsyncHandler().commit(fn, 'changes made to %s' % self.Id)
+                AsyncHandler().save(fn, 'changes made to %s' % self.Id)
             
     def internalSave(self, fnp):
         if self.dirty:
