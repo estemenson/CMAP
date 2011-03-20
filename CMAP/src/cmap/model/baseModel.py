@@ -304,7 +304,7 @@ class BaseModel(Observer, Subject):
         else:
             scrib.appendChild(self.dom.createCDATASection(s))
         try:
-            print('changes:%s' % self._dom.toxml())
+            Log.debug('changes:%s' % self._dom.toxml())
         except Exception: #IGNORE:W0703
             pass
     def _set_text_widgets(self,value):
@@ -346,7 +346,7 @@ class BaseModel(Observer, Subject):
         else:
             scrib.appendChild(self.dom.createCDATASection(s))
         try:
-            print('changes:%s' % self._dom.toxml())
+            Log.debug('changes:%s' % self._dom.toxml())
         except Exception: #IGNORE:W0703
             pass
     def removeTextWidget(self,idu):
