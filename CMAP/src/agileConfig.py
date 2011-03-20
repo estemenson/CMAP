@@ -3,8 +3,10 @@
 Get configuration information from configuration files and from the command
 line.
 
-The following configuration file locations are supported and are searched in
-the order given below. The first definition found for a particular entry wins:
+The following configuration data/file locations are supported and are searched
+in the order given below. The first definition found for a particular entry
+wins:
+    - The command line
     - The application working directory. This is where the application
       bootstrap script is loaded from
       File name: <path>/.agiconfig
