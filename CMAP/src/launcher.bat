@@ -1,1 +1,1 @@
-ssh-agent bash -c "ssh-add ~/.ssh/*_rsa; python storyboot.py %*"
+ssh-agent bash -c "ssh-add ~/.ssh/*_rsa; ./launcher %*"
