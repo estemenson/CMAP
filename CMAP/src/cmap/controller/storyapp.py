@@ -476,36 +476,52 @@ class StoryApp(MyInnerWindow):
         for f in self.xmlFiles[artifact_types[PROJECTS]]:
             Log.debug('load only xmlFile: %s' % f)
             
-            p = self.getProject(f,model=ProjectModel,
-                    get_artifact='newProject',
-                    name=os.path.splitext(os.path.basename(f))[0])
-            self.artifacts[p.Id] = (p,{})
-            self.newProject(p)
+            try:
+                p = self.getProject(f,model=ProjectModel,
+                        get_artifact='newProject',
+                        name=os.path.splitext(os.path.basename(f))[0])
+                self.artifacts[p.Id] = (p,{})
+                self.newProject(p)
+            except Exception as ex:
+                Log.error('Error loading project object '
+                          + f + '\n\t' + str(ex))
     def load_releases(self):
         if self.checked_for_releases: return
         self.checked_for_releases = True
         for f in self.xmlFiles[artifact_types[RELEASES]]:
             Log.debug('only loading release %s' % f)
-            r = self.getRelease(f, model=ReleaseModel,
-                    get_artifact='newRelease',name=\
-                os.path.splitext(os.path.basename(f))[0])
-            self.artifacts[r.Id] = (r,{})
-            self.newRelease(r)
+            try:
+                r = self.getRelease(f, model=ReleaseModel,
+                        get_artifact='newRelease',name=\
+                    os.path.splitext(os.path.basename(f))[0])
+                self.artifacts[r.Id] = (r,{})
+                self.newRelease(r)
+            except Exception as ex:
+                Log.error('Error loading release object '
+                          + f + '\n\t' + str(ex))
     def load_sprints(self):
         if self.checked_for_sprints: return
         self.checked_for_sprints = True
         for f in self.xmlFiles[artifact_types[SPRINTS]]:
             Log.debug('only loading sprint %s' % f)
-            s = self.getSprint(f, model=SprintModel, name=\
-                os.path.splitext(os.path.basename(f))[0])
-            self.artifacts[s.Id] = (s, {})
-            self.newSprint(s)
+            try:
+                s = self.getSprint(f, model=SprintModel, name=\
+                    os.path.splitext(os.path.basename(f))[0])
+                self.artifacts[s.Id] = (s, {})
+                self.newSprint(s)
+            except Exception as ex:
+                Log.error('Error loading sprint object '
+                          + f + '\n\t' + str(ex))
     def load_backlog(self):
         Log.debug('BackLog loading:')
         for f in self.xmlFiles[artifact_types[BACKLOG]]:
-            b = self.getBacklog(f)
-            self.backlog[b.Id] = (b,{})
-            self.newBacklog(b)
+            try:
+                b = self.getBacklog(f)
+                self.backlog[b.Id] = (b,{})
+                self.newBacklog(b)
+            except Exception as ex:
+                Log.error('Error loading backlog object '
+                          + f + '\n\t' + str(ex))
         Log.debug('Backlog Done loading')
     def load_stories(self):
         if self.checked_for_stories: return
@@ -513,19 +529,27 @@ class StoryApp(MyInnerWindow):
         Log.debug('Stories loading: ')
         for f in self.xmlFiles[artifact_types[STORIES]]:
             Log.debug('only loading story %s' % f)
-            s = self.getStory(f)
-            self.artifacts[s.Id] = (s ,{})
-            self.newStory(s)
+            try:
+                s = self.getStory(f)
+                self.artifacts[s.Id] = (s ,{})
+                self.newStory(s)
+            except Exception as ex:
+                Log.error('Error loading story object '
+                          + f + '\n\t' + str(ex))
         Log.debug('Stories Done loading')
     def load_tasks(self):
         if self.checked_for_tasks: return
         self.checked_for_tasks = True
         for f in self.xmlFiles[artifact_types[TASKS]]:
             Log.debug('%s' % f)
-            t = self.getTask(f, name=\
-                os.path.splitext(os.path.basename(f))[0])
-            self.artifacts[t.Id] = (t, {})
-            self.newTask(t)
+            try:
+                t = self.getTask(f, name=\
+                    os.path.splitext(os.path.basename(f))[0])
+                self.artifacts[t.Id] = (t, {})
+                self.newTask(t)
+            except Exception as ex:
+                Log.error('Error loading task object '
+                          + f + '\n\t' + str(ex))
 
 
     def createNewProjectButton(self):
