@@ -71,7 +71,7 @@ _TESTING = 'Testing'
 _FULLSCREEN = 'fullscreen'
 _AWAY = 'Away'
 _STARTDIR = 'Startdir'
-_REPO_URL = 'RepoUrl'
+_SHARED_REPO = 'SharedRepo'
 _SERVER_URL = 'ServerUrl'
 _RESPONSE_URL = 'ResponseUrl'
 _GIT_SUBSCRIPTION = 'GitSubscription'
@@ -94,6 +94,11 @@ _STORYCARD = 'Storycard'
 _GIT = 'git'
 _HG = 'hg'
 _USERID = 'UserId'
+logLevelMap = {_CRITICAL: logging.CRITICAL,
+               _ERROR: logging.ERROR,
+               _WARNING: logging.WARNING,
+               _INFO: logging.INFO,
+               _DEBUG: logging.DEBUG}
  
             
             
@@ -135,13 +140,6 @@ class PymtChecker(petaapan.utilities.argparse.Action):
             
 class LogLevelChecker(petaapan.utilities.argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None):
-                
-        logLevelMap = {_CRITICAL: logging.CRITICAL,
-                       _ERROR: logging.ERROR,
-                       _WARNING: logging.WARNING,
-                       _INFO: logging.INFO,
-                       _DEBUG: logging.DEBUG}
-
         setattr(namespace, self.dest, logLevelMap[value])
         Config().log.level = logLevelMap[value]
         Log.info('Log level explicitly set to %s' % value)
@@ -190,14 +188,10 @@ class AgiConfig(object):
         
         # Load the configuration
         self._base_directory, base_app = split(realpath(sys.argv[0]))
-        defaults = {_REPOSITORY: {_TYPE: _GIT},
-                    _COLLABORATION: {_SERVER_PORT:8080,
-                                     _LOCAL_PORT: 16160,
-                                     _RESPONSE_URL: 'localhost'},
-                    _LOG: {_CONSOLELOG: True,
-                           _LOGLEVEL: _ERROR},
-                    _TESTING: {_TEST_SERVER: False,
-                               _FULLSCREEN: False}
+        defaults = {_TYPE: _GIT, _SERVER_PORT: '8080', _LOCAL_PORT: '16160',
+                    _RESPONSE_URL: 'localhost', _CONSOLELOG: True,
+                    _LOGLEVEL: _ERROR, _TEST_SERVER: False,
+                    _FULLSCREEN: False
                    }
         config = ConfigParser.SafeConfigParser(defaults)
         # Get everything possible from the configuration files if present
@@ -218,10 +212,10 @@ class AgiConfig(object):
         parser.set_defaults(repotype=config.get(_REPOSITORY, _TYPE)\
                                     if config.has_option(_REPOSITORY, _TYPE)\
                                     else None,
-                            repourl=config.get(_REPOSITORY, _REPO_URL)\
-                                        if config.has_option(_REPOSITORY,
-                                                             _REPO_URL)\
-                                        else None,
+                            sharedrepo=config.get(_REPOSITORY, _SHARED_REPO)\
+                                if config.has_option(_REPOSITORY,
+                                                     _SHARED_REPO)\
+                                else False,
                             repopath=config.get(_REPOSITORY, _LOCAL_REPO)\
                                 if config.has_option(_REPOSITORY, _LOCAL_REPO)\
                                 else None,
@@ -257,7 +251,7 @@ class AgiConfig(object):
                                         else False,
                             loglevel=config.get(_LOG, _LOGLEVEL)\
                                      if config.has_option(_LOG,_LOGLEVEL)\
-                                     else _ERROR,
+                                     else logLevelMap[_ERROR],
                             storycard=config.get(_TESTING, _STORYCARD)\
                                     if config.has_option(_TESTING, _STORYCARD) \
                                     else None,
@@ -275,9 +269,9 @@ class AgiConfig(object):
         parser.add_argument('-t', '--type', dest='repotype',
                             choices=(_GIT, _HG), help=\
                       'repository type that implements versioned data storage')
-        parser.add_argument('-r', '--repourl',
-                            action='store', help=\
-'url to the shared repository that implements the shared versioned data store')
+        parser.add_argument('-r', '--sharedrepo',
+                            action='store_true', help=\
+                           'a shared repository is available and will be used')
         parser.add_argument('-p', '--repopath',
                             action=RepopathChecker, help=\
        'path to the local repository that implements the versioned data store')
@@ -374,11 +368,15 @@ class AgiConfig(object):
         else:                   
             # Finish validating the remote repository if necessary
             if self._shared_repo_not_available and not self._repoUrlChecked:
-                if config.has_option(_REPOSITORY, _REPO_URL):
+                if self._args.sharedrepo:
                     self._shared_repo_not_available = False
                     self._repoUrlChecked = True
                 else:
                     self._repoUrlChecked = True
+            else:
+                self._shared_repo_not_available = False
+                self._repoUrlChecked = True
+                
                  
         # Finish validating the collaboration location if necessary
         if self._args and self._args.collaburl:
