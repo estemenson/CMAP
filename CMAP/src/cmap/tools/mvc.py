@@ -20,7 +20,7 @@ class Events:
     def __len__(self): return NotImplemented
     def __iter__(self):
         def gen(dictitems=self.__dict__.items()):
-            for attr, val in dictitems:
+            for _, val in dictitems:
                 if isinstance(val, _EventSlot):
                     yield val
             return gen()
