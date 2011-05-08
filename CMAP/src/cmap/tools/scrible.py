@@ -531,15 +531,23 @@ class MyScribbleWidget(MTWidget):
                 b_col = d_txt.style['bg-color'] 
                 d_txt.style['bg-color'] = d_txt.style['border-color'] 
                 d_txt.style['border-color'] = b_col
+        _del_list = []
         for k in self.touch_positions.keys():
+            _points = self.touch_positions[k]['Cdata']
+            if not len(_points):
+                _del_list.append(k)
+                continue
+            _colour = self.touch_positions[k]['Color'] 
             if self.potential_deleted_lines == k:
                 x = int(time.time()) % 2
                 if x == 0: 
-                    self.touch_positions[k]['Color'] = DELETED_LINE 
+                     _colour = DELETED_LINE 
                 else:
                     self.touch_positions[k]['Color'] = RED 
-            set_color(*self.touch_positions[k]['Color'])
-            drawLine(self.touch_positions[k]['Cdata'])
+            set_color(*_colour)
+            drawLine(_points)
+        for k in _del_list:
+            del self.touch_positions[k]
 if __name__ == '__main__':
     
     from pymt.ui.window import MTWindow
