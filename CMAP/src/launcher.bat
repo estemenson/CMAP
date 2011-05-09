@@ -1,1 +1,1 @@
-ssh-agent bash -c "ssh-add ~/.ssh/*_rsa; python storyboot.py %*"
+C:\pymt-0.5.1-win32\Python\python storyboot.py
