@@ -82,6 +82,17 @@ css_add_sheet(GestureCSS)
 BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 0,1,2,3,4,5
 artifact_types = {BACKLOG:'backlog',PROJECTS:'projects',RELEASES:'releases',
                   SPRINTS:'sprints',STORIES:'stories',TASKS:'tasks'}
+LABEL_NEW_PROJECT  = 'New\nProject...'
+LABEL_NEW_RELEASE  = 'New\nRelease...'
+LABEL_NEW_SPRINT   = 'New\nSprint...'
+LABEL_NEW_STORY    = 'New\nStory...'
+LABEL_NEW_TASK     = 'New\nTask...'
+CONTAINERS_BACKLOG = ['backlog_list_layout', 'backlog_flow']
+CONTAINERS_PROJECT = ['projects_flow']
+CONTAINERS_RELEASE = ['release_flow']
+CONTAINERS_SPRINT  = ['sprint_flow']
+CONTAINERS_STORY   = ['story_flow']
+CONTAINERS_TASK    = ['task_flow']
 
 class StoryApp(MyInnerWindow):
     def __init__(self, **kwargs):
@@ -97,18 +108,34 @@ class StoryApp(MyInnerWindow):
             AsyncHandler().save([],
                                 'Cleanup any outstanding uncommitted edits')
         self.root_window = kwargs['root_window']
-        #x and y ranges are used when calculating random positions for artefacts
-        self._x_range = range(self.root_window.x, self.root_window.x + \
-                              self.root_window.width - minimal_size[0])
-        self._y_range = range(self.root_window.y, self.root_window.y + \
-                              self.root_window.height - minimal_size[1])
-
+        self.canvas = None
+        self.backlog_list_layout = MTGridLayout(rows=1)
+        self.main_ctlrs_container = MTSidePanel(\
+                                        corner=MTToggleButton(padding=5,
+                                                        label='File...',
+                                                        size=(60,45)),
+                                        layout=MTGridLayout(rows=1),
+                                        align='left',
+                                        side='top') 
+        self.backlog_container = MTSidePanel(\
+                                        corner=MTToggleButton(padding=5,
+                                                        label='Backlog...',
+                                                        size=(100,45)),
+                                        align='middle',
+                                        side='bottom',
+                                        pos=(0,self.root_window.height-100)) 
         self.buttons = {}
         self.labels = {}
         self.backlog = {}
         self.artifacts = {}
         self.story_files = []
         self.tasks = {}
+        self.backlog_flow_open = True
+        self.projects_flow_open = True
+        self.releases_flow_open = True
+        self.story_flow_open = True
+        self.sprint_flow_open = True
+        self.task_flow_open = True
         self.current_backlog = None
         self.current_project = None
         self.current_release = None
@@ -128,12 +155,119 @@ class StoryApp(MyInnerWindow):
         
         # Load the default image for buttons and cover flows
         path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
-        self.datastore = Config().datastore
-        Log.debug('Path to repository: %s' % self.datastore)
+        self._default_button_size = (100, 100)
+        self._default_image = Loader.image(path)
+        _sf_pos = (200,200)
+        try:
+            self.backlog_flow = MTCoverFlow(
+                                      layout=MTGridLayout(spacing=10,rows=1),
+                                      pos=_sf_pos,
+                                      size=self._default_button_size,
+                                      cover_spacing=20,
+                                      cover_distance=115,
+                                      thumbnail_size=self._default_button_size)
+            self.backlog_flow.push_handlers(on_select=self.flow_backlog_select)
+            self.backlog_flow.add_widget(self.createNewStoryButton())
+        except Exception: #IGNORE:W0703
+            Log.exception("Unable to create backlog cover flow")
+            self.backlog_flow = MTGridLayout(rows=1, pos=_sf_pos)
+            self.backlog_flow.add_widget(self.createNewStoryButton())
+        try:
+            self.projects_flow = MTCoverFlow(\
+                                      layout=MTGridLayout(spacing=10,rows=1),
+                                      pos=_sf_pos,
+                                      size=self._default_button_size,
+                                      cover_spacing=20,
+                                      cover_distance=115,
+                                      thumbnail_size=self._default_button_size)
+            self.projects_flow.push_handlers(\
+                                           on_select=self.flow_projects_select)
+            self.projects_flow.add_widget(self.createNewProjectButton())
+        except Exception: #IGNORE:W0703
+            Log.exception("Unable to create project cover flow")
+            self.projects_flow = MTGridLayout(rows=1, pos=_sf_pos)
+        try:
+            self.release_flow = MTCoverFlow(\
+                                      layout=MTGridLayout(spacing=10,rows=1),
+                                      pos=_sf_pos,
+                                      size=self._default_button_size,
+                                      cover_spacing=20,
+                                      cover_distance=115,
+                                      thumbnail_size=self._default_button_size)
+            self.release_flow.push_handlers(\
+                                            on_select=self.flow_release_select)
+            self.release_flow.add_widget(self.createNewReleaseButton())
+        except Exception: #IGNORE:W0703
+            Log.exception("Unable to create release cover flow")
+            self.release_flow = MTGridLayout(rows=1, pos=_sf_pos)
+        try:
+            self.sprint_flow = MTCoverFlow(\
+                                      layout=MTGridLayout(spacing=10,rows=1),
+                                      pos=_sf_pos,
+                                      size=self._default_button_size,
+                                      cover_spacing=20,
+                                      cover_distance=115,
+                                      thumbnail_size=self._default_button_size)
+            self.sprint_flow.push_handlers(\
+                                            on_select=self.flow_sprint_select)
+            self.sprint_flow.add_widget(self.createNewSprintButton())
+        except Exception: #IGNORE:W0703
+            Log.exception("Unable to create sprint cover flow")
+            self.sprint_flow = MTGridLayout(rows=1, pos=_sf_pos)
+        try:
+            self.story_flow = MTCoverFlow(\
+                                      layout=MTGridLayout(spacing=10,rows=1),
+                                      pos=_sf_pos,
+                                      size=self._default_button_size,
+                                      cover_spacing=20,
+                                      cover_distance=115,
+                                      thumbnail_size=self._default_button_size)
+            self.story_flow.push_handlers(on_select=self.flow_story_select)
+            self.story_flow.add_widget(self.createNewStoryButton())
+        except Exception: #IGNORE:W0703
+            Log.exception("Unable to create story cover flow")
+            self.story_flow = MTGridLayout(rows=1, pos=_sf_pos)
+        try:
+            self.task_flow = MTCoverFlow(\
+                                      layout=MTGridLayout(spacing=10,rows=1),
+                                      pos=_sf_pos,
+                                      size=self._default_button_size,
+                                      cover_spacing=20,
+                                      cover_distance=115,
+                                      thumbnail_size=self._default_button_size)
+            self.task_flow.push_handlers(on_select=self.flow_task_select)
+            self.task_flow.add_widget(self.createNewTaskButton())
+        except Exception: #IGNORE:W0703
+            Log.exception("Unable to create task coverflow")
+            self.task_flow = MTGridLayout(rows=1, pos=_sf_pos)
+        #dragable containers for the flow objects so we can move them around 
+        #the screen
+        self.dragable_backlog_flow = MyDragableContainer(self.backlog_flow,
+                                    True, size_scaler=(-.1,-.1), cls='dragcss',
+                                    use_widget_size=False)
+        self.dragable_project_flow = MyDragableContainer(self.projects_flow,
+                                    True, size_scaler=(-.2,-.2), cls='dragcss')
+        self.dragable_release_flow = MyDragableContainer(self.release_flow,
+                                    True, size_scaler=(-.2,-.2), cls='dragcss')
+        self.dragable_sprint_flow = MyDragableContainer(self.sprint_flow,
+                                    True, size_scaler=(-.2,-.2), cls='dragcss')
+        self.dragable_story_flow = MyDragableContainer(self.story_flow,
+                                    True, size_scaler=(-.2,-.2), cls='dragcss')
+        self.dragable_task_flow = MyDragableContainer(self.task_flow,
+                                                          True)
+        self.backlog_list = MTList(size=(self.root_window.width,100),pos=(0,0))
+        self.backlog_list.add_widget(self.backlog_list_layout)
+        self.backlog_container.add_widget(self.backlog_list)
+        self.path = Config().datastore
+        Log.debug('Path to repository: %s' % self.path)
 
         #enable gesture detection
         self.enable_gestures()
+        self.canvas.add_widget(self.backlog_container)
+        self.addMainControls()
         self.xmlFiles = self.get_local_artifacts()
+        self.load_backlog()
+        self.load_projects()
         #make sure no projects or stories are set as the current ones
         self.current_project = None
         self.current_story = None
@@ -329,16 +463,14 @@ class StoryApp(MyInnerWindow):
         Loads the file names of all local artifacts into a dictionary
         keyed on artifact type
         '''
-        Log.debug('path: %s' % self.datastore)
+        Log.debug('path: %s' % self.path)
         xmlFiles = {}
         for atype in artifact_types.values():
-             xmlFiles[atype].append(file for f in glob(
-                                os.path.join(self.datastore, atype, '*.xml')))
-#            xmlFiles[atype] = []
-#            files = glob(os.path.join(self.datastore, atype, '*.xml'))
-#            for f in files:
-#                Log.debug('xmlFile: %s' % f)
-#                xmlFiles[atype].append(f)
+            xmlFiles[atype] = []
+            files = glob(os.path.join(self.path, atype, '*.xml'))
+            for f in files:
+                Log.debug('xmlFile: %s' % f)
+                xmlFiles[atype].append(f)
         return xmlFiles
         
     def load_projects(self):

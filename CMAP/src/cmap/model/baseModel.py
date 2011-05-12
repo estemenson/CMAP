@@ -39,9 +39,9 @@ class BaseModel(Observer, Subject):
         self._ActualFinish = None
         self._ActualHours = None
         self._schema = kwargs['model_str']
-        self.path = abspath(join(Config().datastore,kwargs['folder']))
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
+        self.datapath = abspath(join(Config().datastore,kwargs['folder']))
+        if not os.path.exists(self.datapath):
+            os.mkdir(self.datapath)
         Log.debug('Creating skeleton %s' % self._schema)
         self.processXml(self.create_model(self._schema))
         self.Id = uuid()
@@ -61,7 +61,7 @@ class BaseModel(Observer, Subject):
         self.dirty = False
         self.file = basename(xmlFile)
         _path = dirname(xmlFile)
-        if self.path != _path:
+        if self.datapath != _path:
             Log.info('Importing: %s from: %s' % (self.file,_path))
             self.dirty = True
         else: 
@@ -432,12 +432,12 @@ class BaseModel(Observer, Subject):
         return ret
     def trash(self):
         if self.file is None: return
-        f = join(self.path, self.file)
+        f = join(self.datapath, self.file)
         if exists(f):
             AsyncHandler().rm(f)
             
     def close(self):
-        Log.debug('closing: %s' % join(self.path, self.file))
+        Log.debug('closing: %s' % join(self.datapath, self.file))
         self.save(True)
     def createFileName(self):
         self.file = '%s.xml' % self.Id
@@ -464,12 +464,12 @@ class BaseModel(Observer, Subject):
                 #of the xml file holding the data, if the original file does not
                 #exist then we can simply create a new file, and commit it to 
                 #the repository otherwise we use git to rename the file
-                of = join(self.path, self.file)
+                of = join(self.datapath, self.file)
                 self.createFileName()
-                nf = join(self.path, self.file)
+                nf = join(self.datapath, self.file)
                 if exists(of):
                     AsyncHandler().mv(of, nf)
-            fn = join(self.path, self.file)
+            fn = join(self.datapath, self.file)
             with open(fn, 'w') as f:
                 self._dom.writexml(f)
             fnp.append(fn)
