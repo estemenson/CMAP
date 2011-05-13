@@ -27,7 +27,7 @@ except Exception: #IGNORE:W0703
 _storyapp_singleton = None 
 def Storyapp(): return _storyapp_singleton
 
-from cmap.tools.decorators import MyDragableContainer
+#from cmap.tools.decorators import MyDragableContainer
 from cmap.controller.sprintController import SprintController
 from cmap.controller.taskController import TaskController
 from cmap.model.projectModel import ProjectModel
@@ -40,34 +40,32 @@ from cmap.model.taskModel import TaskModel
 from cmap.view.tasks.taskViews import TaskView, TaskMinView
 from cmap.model.storyModel import StoryModel
 from cmap.tools.classTools import Dummy
-from pymt.ui.widgets.sidepanel import MTSidePanel
-from pymt.ui.widgets.coverflow import MTCoverFlow
+#from pymt.ui.widgets.sidepanel import MTSidePanel
+#from pymt.ui.widgets.coverflow import MTCoverFlow
 from cmap.view.projects.projectViews import ProjectMinView, ProjectView
 from glob import glob
-from cmap.tools.myTools import get_min_screen_size, scale_tuple
-from pymt.ui.widgets.klist import MTList
+from cmap.tools.myTools import get_min_screen_size#, scale_tuple
+#from pymt.ui.widgets.klist import MTList
 from cmap.controller.storyController import StoryController
 from cmap.controller.projectController import ProjectController
 from cmap.controller.releaseController import ReleaseController
 from cmap.controller.basicControllers import ArtifactController
-from pymt.ui.widgets.button import MTToggleButton, MTButton 
-from cmap.tools.my_buttons import MyImageButton
-from pymt.loader import Loader
-from pymt.ui.widgets.layout.gridlayout import MTGridLayout
+#from pymt.ui.widgets.button import MTToggleButton, MTButton 
+#from cmap.tools.my_buttons import MyImageButton
+#from pymt.loader import Loader
+#from pymt.ui.widgets.layout.gridlayout import MTGridLayout
 from pymt.utils import curry
 from cmap.view.stories.storyViews import pixels, minimal_size, StoryView, \
         MinStoryView
 import os.path
 from cmap.gestures.myGestures import myGestures
 from cmap.gestures.NewGestures import get_and_or_store_gesture
-from pymt.ui.widgets.scatter import MTScatter
+#from pymt.ui.widgets.scatter import MTScatter
 from pymt.ui.colors import css_add_sheet
 from cmap.tools.capture import MyCaptureWidget
 size = get_min_screen_size()
 
-from cmap.tools.borders import MyInnerWindow
-from pymt.ui.window import MTWindow
-from pymt.base import runTouchApp, stopTouchApp
+#from cmap.tools.borders import MyInnerWindow
 from pygame.display import set_caption
 
 GestureCSS = '''
@@ -127,7 +125,7 @@ class StoryApp(MyInnerWindow):
         self.checked_for_tasks = False
         
         # Load the default image for buttons and cover flows
-        path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
+        #path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
         self.datastore = Config().datastore
         Log.debug('Path to repository: %s' % self.datastore)
 
@@ -332,7 +330,8 @@ class StoryApp(MyInnerWindow):
         Log.debug('path: %s' % self.datastore)
         xmlFiles = {}
         for atype in artifact_types.values():
-             xmlFiles[atype].append(file for f in glob(
+            xmlFiles[atype] = []
+            xmlFiles[atype].append(f for f in glob(
                                 os.path.join(self.datastore, atype, '*.xml')))
 #            xmlFiles[atype] = []
 #            files = glob(os.path.join(self.datastore, atype, '*.xml'))
@@ -797,6 +796,8 @@ class StoryApp(MyInnerWindow):
     
         
 if __name__ == '__main__':
+from pymt.ui.window import MTWindow
+from pymt.base import runTouchApp, stopTouchApp
     mw = MTWindow()
     mw.size = scale_tuple(size,0.045)
     scale = .13
