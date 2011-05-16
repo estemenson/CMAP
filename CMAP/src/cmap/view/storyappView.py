@@ -94,7 +94,7 @@ CONTAINERS_SPRINT  = ['sprint_flow']
 CONTAINERS_STORY   = ['story_flow']
 CONTAINERS_TASK    = ['task_flow']
 
-class StoryApp(MyInnerWindow):
+class StoryAppView(MyInnerWindow):
     def __init__(self, **kwargs):
         global _storyapp_singleton #IGNORE:W0603
         # Make ourself globally known

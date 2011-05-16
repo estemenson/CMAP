@@ -5,21 +5,22 @@ Created on Aug 9, 2010
 @author: stevenson
 '''
 
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__                         import division
+from __future__                         import absolute_import
+from __future__                         import print_function
+from __future__                         import unicode_literals
 
 # This will cause the configuration to be established from the
 # configuration files and the command line. It will also setup
 # the asynchronous handling systems for communication with the
 # repository and the collaboration server
-from agileConfig import Config, AsyncHandler
-from async import ON_GITHUBNOTIFICATION
+from agileConfig                        import Config, AsyncHandler
+from async                              import ON_GITHUBNOTIFICATION
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
-    from petaapan.utilities.console_logger import ConsoleLogger
+    from petaapan.utilities.console_logger\
+                                        import ConsoleLogger
     Log = ConsoleLogger('AgiMan')
     
     
@@ -27,46 +28,42 @@ except Exception: #IGNORE:W0703
 _storyapp_singleton = None 
 def Storyapp(): return _storyapp_singleton
 
-#from cmap.tools.decorators import MyDragableContainer
-from cmap.controller.sprintController import SprintController
-from cmap.controller.taskController import TaskController
-from cmap.model.projectModel import ProjectModel
-from cmap.model.releaseModel import ReleaseModel
-from cmap.view.releases.releaseViews import ReleaseMinView, ReleaseView
-from random import choice
-from cmap.model.sprintModel import SprintModel
-from cmap.view.sprints.sprintViews import SprintView, SprintMinView
-from cmap.model.taskModel import TaskModel
-from cmap.view.tasks.taskViews import TaskView, TaskMinView
-from cmap.model.storyModel import StoryModel
-from cmap.tools.classTools import Dummy
-#from pymt.ui.widgets.sidepanel import MTSidePanel
-#from pymt.ui.widgets.coverflow import MTCoverFlow
-from cmap.view.projects.projectViews import ProjectMinView, ProjectView
-from glob import glob
-from cmap.tools.myTools import get_min_screen_size#, scale_tuple
-#from pymt.ui.widgets.klist import MTList
-from cmap.controller.storyController import StoryController
-from cmap.controller.projectController import ProjectController
-from cmap.controller.releaseController import ReleaseController
-from cmap.controller.basicControllers import ArtifactController
-#from pymt.ui.widgets.button import MTToggleButton, MTButton 
-#from cmap.tools.my_buttons import MyImageButton
-#from pymt.loader import Loader
-#from pymt.ui.widgets.layout.gridlayout import MTGridLayout
-from pymt.utils import curry
-from cmap.view.stories.storyViews import pixels, minimal_size, StoryView, \
-        MinStoryView
 import os.path
-from cmap.gestures.myGestures import myGestures
-from cmap.gestures.NewGestures import get_and_or_store_gesture
-#from pymt.ui.widgets.scatter import MTScatter
-from pymt.ui.colors import css_add_sheet
-from cmap.tools.capture import MyCaptureWidget
+
+
+from random                             import choice
+from glob                               import glob
+from cmap.tools.classTools              import Dummy
+from cmap.tools.myTools                 import get_min_screen_size#, scale_tuple
+from pymt.utils                         import curry
+from cmap.view.stories.storyViews       import pixels, minimal_size
+from cmap.gestures.myGestures           import myGestures
+from cmap.gestures.NewGestures          import get_and_or_store_gesture
+from pymt.ui.colors                     import css_add_sheet
+from cmap.tools.capture                 import MyCaptureWidget
+from pygame.display                     import set_caption
+
+from cmap.model.projectModel            import ProjectModel
+from cmap.model.releaseModel            import ReleaseModel
+from cmap.model.sprintModel             import SprintModel
+from cmap.model.storyModel              import StoryModel
+from cmap.model.taskModel               import TaskModel
+
+from cmap.view.projects.projectViews    import ProjectMinView, ProjectView
+from cmap.view.releases.releaseViews    import ReleaseMinView, ReleaseView
+from cmap.view.sprints.sprintViews      import SprintView, SprintMinView
+from cmap.view.stories.storyViews       import StoryView, MinStoryView
+from cmap.view.tasks.taskViews          import TaskView, TaskMinView
+
+from cmap.controller.basicControllers   import ArtifactController
+from cmap.controller.projectController  import ProjectController
+from cmap.controller.releaseController  import ReleaseController
+from cmap.controller.sprintController   import SprintController
+from cmap.controller.storyController    import StoryController
+from cmap.controller.taskController     import TaskController
+
 size = get_min_screen_size()
 
-#from cmap.tools.borders import MyInnerWindow
-from pygame.display import set_caption
 
 GestureCSS = '''
 .gesturecss {
@@ -81,19 +78,22 @@ BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 0,1,2,3,4,5
 artifact_types = {BACKLOG:'backlog',PROJECTS:'projects',RELEASES:'releases',
                   SPRINTS:'sprints',STORIES:'stories',TASKS:'tasks'}
 
-class StoryApp(MyInnerWindow):
+class StoryApp(object):
     def __init__(self, **kwargs):
         global _storyapp_singleton #IGNORE:W0603
         # Make ourself globally known
         _storyapp_singleton = self
-        super(StoryApp, self).__init__(**kwargs)
+        
         set_caption("Collaborative Multitouch Agile Planner")
+        
+        #call back for repository notifications
         AsyncHandler().set_handler(ON_GITHUBNOTIFICATION,
                                    self.on_github_notification)
         self.no_local_repo = Config().localRepoNotAvailable
         if not self.no_local_repo:
             AsyncHandler().save([],
                                 'Cleanup any outstanding uncommitted edits')
+        
         self.root_window = kwargs['root_window']
         #x and y ranges are used when calculating random positions for artefacts
         self._x_range = range(self.root_window.x, self.root_window.x + \
@@ -101,18 +101,18 @@ class StoryApp(MyInnerWindow):
         self._y_range = range(self.root_window.y, self.root_window.y + \
                               self.root_window.height - minimal_size[1])
 
-        self.buttons = {}
-        self.labels = {}
-        self.backlog = {}
+        #self.backlog = {}
         self.artifacts = {}
         self.story_files = []
-        self.tasks = {}
+        #self.tasks = {}
+
         self.current_backlog = None
         self.current_project = None
         self.current_release = None
         self.current_sprint = None
         self.current_story = None
         self.current_task = None
+
         self.currentProjectView = None
         self.currentReleaseView = None
         self.currentSprintView = None
@@ -124,17 +124,15 @@ class StoryApp(MyInnerWindow):
         self.checked_for_stories = False
         self.checked_for_tasks = False
         
-        # Load the default image for buttons and cover flows
-        #path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
         self.datastore = Config().datastore
         Log.debug('Path to repository: %s' % self.datastore)
 
         #enable gesture detection
         self.enable_gestures()
         self.xmlFiles = self.get_local_artifacts()
-        #make sure no projects or stories are set as the current ones
-        self.current_project = None
-        self.current_story = None
+        
+        #create the storyapp model and view
+        
         
     def on_github_notification(self, ret):
         msg = ret[1]
@@ -322,24 +320,6 @@ class StoryApp(MyInnerWindow):
         if not capture:
             print("No capture device in gestures")
         self.canvas.add_widget(capture)
-    def get_local_artifacts(self):
-        '''
-        Loads the file names of all local artifacts into a dictionary
-        keyed on artifact type
-        '''
-        Log.debug('path: %s' % self.datastore)
-        xmlFiles = {}
-        for atype in artifact_types.values():
-            xmlFiles[atype] = []
-            xmlFiles[atype].append(f for f in glob(
-                                os.path.join(self.datastore, atype, '*.xml')))
-#            xmlFiles[atype] = []
-#            files = glob(os.path.join(self.datastore, atype, '*.xml'))
-#            for f in files:
-#                Log.debug('xmlFile: %s' % f)
-#                xmlFiles[atype].append(f)
-        return xmlFiles
-        
     def load_projects(self):
         for f in self.xmlFiles[artifact_types[PROJECTS]]:
             Log.debug('load only xmlFile: %s' % f)
@@ -668,19 +648,6 @@ class StoryApp(MyInnerWindow):
             super(StoryApp,self).remove_widget(_view)
         else:
             super(StoryApp,self).add_widget(_view)
-    def addMainControls(self):
-        self.main_ctlrs_container.add_widget(self.createNewProjectButton())
-        self.main_ctlrs_container.add_widget(self.createNewReleaseButton())
-        self.main_ctlrs_container.add_widget(self.createNewSprintButton())
-        self.main_ctlrs_container.add_widget(self.createNewStoryButton())
-        self.main_ctlrs_container.add_widget(self.createNewTaskButton())
-        self.main_ctlrs_container.add_widget(self.createNewBacklogFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewProjectFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewReleasesFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewSprintFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
-        self.canvas.add_widget(self.main_ctlrs_container)
     def createNewBacklogFlowButton(self):
         return self.create_button('Browse\nBacklog...',
                                   curry(self._flow_pressed,\
@@ -739,13 +706,6 @@ class StoryApp(MyInnerWindow):
                 del self.Artifacts[artifact.Id]
                 super(StoryApp,self).remove_widget(artifact.view)
         return
-    def check_btn_width(self,btn):
-        _label = btn.label
-        _w = int(len(_label) *pixels)
-        if _w > btn.width:
-            if not btn.multiline:
-                btn.multiline = True
-            btn.label = '\n'.join(_label.split('-'))
     def list_button_pressed(self, btn):
         ctrl = self.backlog[btn.id][0]
         view = ctrl.view
@@ -796,8 +756,8 @@ class StoryApp(MyInnerWindow):
     
         
 if __name__ == '__main__':
-from pymt.ui.window import MTWindow
-from pymt.base import runTouchApp, stopTouchApp
+    from pymt.ui.window import MTWindow
+    from pymt.base import runTouchApp, stopTouchApp
     mw = MTWindow()
     mw.size = scale_tuple(size,0.045)
     scale = .13
