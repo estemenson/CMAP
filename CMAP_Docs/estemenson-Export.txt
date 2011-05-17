@@ -1,0 +1,25 @@
+
+
+
+@book{RefWorks:1,
+	author={Myles Brand and Robert M. Harnish},
+	year={1986},
+	title={The Representation of knowledge and belief},
+	publisher={University of Arizona Press},
+	address={Tucson},
+	keywords={Belief and doubt Congresses.; Knowledge representation (Information theory) Congresses.; Cognition Congresses.},
+	isbn={0816509719},
+	language={eng}
+}
+
+@book{Helander:1988:HandbookOfHumanComputerInteraction,
+	author={Martin Helander},
+	year={1988},
+	title={Handbook of human-computer interaction},
+	publisher={North-Holland ; Sole distributors for the U.S.A. and Canada, Elsevier Science Pub. Co},
+	address={Amsterdam ; New York : New York, N.Y., U.S.A},
+	keywords={Human-computer interaction.},
+	isbn={0444705368},
+	language={eng}
+}
+

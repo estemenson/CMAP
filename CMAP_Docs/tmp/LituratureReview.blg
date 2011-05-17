@@ -1,0 +1,15 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: LituratureReview.aux
+The style file: abbrv.bst
+Database file #1: litReview.bib
+A bad cross reference---entry "Rips:MentalMuddles"
+refers to entry "Brand:RepresentationOfknowledge", which doesn't exist
+A bad cross reference---entry "Nardi:90:TheSpreadsheetInterface"
+refers to entry "DBLP:conf/interact/1990", which doesn't exist
+Warning--I didn't find a database entry for "Brand:RepresentationOfknowledge"
+Warning--I didn't find a database entry for "DBLP:conf/interact/1990"
+Warning--to sort, need author or key in HistoryOfWriting
+Warning--to sort, need author or key in HistoryMapsCartography
+Warning--empty publisher in Carroll:1988:InterfaceMetaphorsAndUserInterfaceDesign
+Warning--empty journal in Endsley:1988:DesignEvaluationSituationAwarenessEnhancement
+Warning--empty title in Rips:MentalMuddles
+(There were 2 error messages)

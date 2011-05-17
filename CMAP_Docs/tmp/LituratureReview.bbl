@@ -1,0 +1,184 @@
+\begin{thebibliography}{10}
+
+\bibitem{HistoryMapsCartography}
+Brief history of maps and cartography.
+\newblock \url{http://academic.emporia.edu/aberjame/map/h_map/h_map.htm}, April
+  2011.
+
+\bibitem{HistoryOfWriting}
+History of writing.
+\newblock \url{http://en.wikipedia.org/wiki/history_of_writing}, April 2011.
+
+\bibitem{Blackwell:NotationalSystems}
+A.~Blackwell and T.~Green.
+\newblock {\em Notational systems�the cognitive dimensions of notations
+  framework}, pages 103--134.
+\newblock Morgan Kaufmann, 2003.
+
+\bibitem{Bresciani:ACollaborativeDimensionsFramework}
+S.~Bresciani, A.~Blackwell, and M.~Eppler.
+\newblock A collaborative dimensions framework: Understanding the mediating
+  role of conceptual visualizations in collaborative knowledge work.
+\newblock In {\em Hawaii International Conference on System Sciences,
+  Proceedings of the 41st Annual}, page 364, jan. 2008.
+
+\bibitem{Carroll:1988:InterfaceMetaphorsAndUserInterfaceDesign}
+J.~M. Carroll, R.~L. Mack, and W.~A. Kellogg.
+\newblock {\em Interface Metaphors And User Interface Design}, pages 67--85.
+\newblock 1988.
+
+\bibitem{Carroll:MetaphorAndTheCognitiveRepresentation}
+J.~M. Carroll and J.~C. Thomas.
+\newblock Metaphor and the cognitive representation of computing systems.
+\newblock {\em Systems, Man and Cybernetics, IEEE Transactions on},
+  12(2):107--116, march 1982.
+
+\bibitem{Ciccarelli:1990:BrowsingSchematics}
+E.~Ciccarelli and B.~Nardi.
+\newblock Browsing schematics: Query-filtered graphs with context nodes.
+\newblock {\em Expert Systems with Applications}, 1(1):88 -- 88, 1990.
+
+\bibitem{Craft:2005:VisualInformationSeekingMantra}
+B.~Craft and P.~Cairns.
+\newblock Beyond guidelines: what can we learn from the visual information
+  seeking mantra?
+\newblock In {\em Information Visualisation, 2005. Proceedings. Ninth
+  International Conference on}, pages 110 -- 118, july 2005.
+
+\bibitem{Endsley:1988:DesignEvaluationSituationAwarenessEnhancement}
+M.~R. Endsley.
+\newblock Design and evaluation for situation awareness enhancement.
+\newblock 1988.
+
+\bibitem{Endsley:2000:SituationAwarenessAircraftMaintenance}
+M.~R. Endsley and M.~M. Robertson.
+\newblock Situation awareness in aircraft maintenance teams.
+\newblock {\em International Journal of Industrial Ergonomics}, 26(2):301 --
+  325, 2000.
+
+\bibitem{Eppler:2004:FacilitatingKnowledgeCommunication}
+M.~J. Eppler.
+\newblock Facilitating knowledge communication through joint interactive
+  visualization.
+\newblock {\em Journal of Universal Computer Science}, 10:683--690, 2004.
+
+\bibitem{Forsell:2010:AnHeuristicSetForEvaluationInInformationVisualization}
+C.~Forsell and J.~Johansson.
+\newblock An heuristic set for evaluation in information visualization.
+\newblock In {\em Proceedings of the International Conference on Advanced
+  Visual Interfaces}, AVI '10, pages 199--206, New York, NY, USA, 2010. ACM.
+
+\bibitem{Furnas:1986:GeneralizedFisheyeViews}
+G.~W. Furnas.
+\newblock Generalized fisheye views.
+\newblock In {\em Proceedings of the SIGCHI conference on Human factors in
+  computing systems}, CHI '86, pages 16--23, New York, NY, USA, 1986. ACM.
+
+\bibitem{Gershon:1998:Informationvisualization}
+N.~Gershon, S.~G. Eick, and S.~Card.
+\newblock Information visualization.
+\newblock {\em interactions}, 5:9--15, March 1998.
+
+\bibitem{Green:1996:UsabilityAnalysisOfVisualProgrammingEnvironments}
+T.~R.~G. Green and M.~Petre.
+\newblock Usability analysis of visual programming environments: A cognitive
+  dimensions framework.
+\newblock {\em Journal of Visual Languages and Computing}, 7(2):131--174, 1996.
+
+\bibitem{Halverson:2002:ActivityTheory}
+C.~A. Halverson.
+\newblock Activity theory and distributed cognition: Or what does cscw need to
+  do with theories?. computer supported cooperative work (cscw, 2002.
+
+\bibitem{Harel:1988:VisualFormalisms}
+D.~Harel.
+\newblock On visual formalisms.
+\newblock {\em Commun. ACM}, 31:514--530, May 1988.
+
+\bibitem{Hundhausen:CommunicativeDimensionsFramework}
+C.~D. Hundhausen.
+\newblock Using end-user visualization environments to mediate conversations: a
+  'communicative dimensions' framework.
+\newblock {\em Journal of Visual Languages and Computing}, 16:153--185, 2005.
+
+\bibitem{Hutchins:1985:DirectManipulationIinterfaces}
+E.~L. Hutchins, J.~D. Hollan, and D.~A. Norman.
+\newblock Direct manipulation interfaces.
+\newblock {\em Hum.-Comput. Interact.}, 1:311--338, December 1985.
+
+\bibitem{Kintsch:88:TheRoleOfKnowledge}
+W.~Kintsch.
+\newblock The role of knowledge in discourse comprehension: A
+  construction-integration model.
+\newblock {\em Psychological Review}, 95:163--182, 1988.
+
+\bibitem{Kulyk:2008:SituationalAwareness}
+O.~Kulyk, G.~van~der Veer, and B.~van Dijk.
+\newblock Situational awareness support to enhance teamwork in collaborative
+  environments.
+\newblock In {\em Proceedings of the 15th European conference on Cognitive
+  ergonomics: the ergonomics of cool interaction}, ECCE '08, pages 1--5, New
+  York, NY, USA, 2008. ACM.
+
+\bibitem{Nardi:BeyondModels}
+B.~Nardi and C.~Zarmer.
+\newblock Beyond models and metaphors: visual formalisms in user interface
+  design.
+\newblock In {\em System Sciences, 1991. Proceedings of the Twenty-Fourth
+  Annual Hawaii International Conference on}, volume~ii, pages 478--493 vol.2,
+  Jan. 1991.
+
+\bibitem{Nardi:90:TheSpreadsheetInterface}
+B.~A. Nardi and J.~R. Miller.
+\newblock The spreadsheet interface: A basis for end user programming.
+\newblock In {\em INTERACT}, pages 977--983, 1990.
+
+\bibitem{Nielsen:1994:HeuristicEvaluation}
+J.~Nielsen.
+\newblock {\em Heuristic evaluation}, pages 25--62.
+\newblock John Wiley \& Sons, Inc., New York, NY, USA, 1994.
+
+\bibitem{Reisberg:ExternalRepresentations}
+D.~Reisberg.
+\newblock External representations and the advantages of externalizing one's
+  thoughts.
+\newblock In {\em Proceedings of the 9th Annual Conference of the Cognitive
+  Science Society}, pages 281--293. Hillsdale, N.J.: Erlbaum Associates, 1987.
+
+\bibitem{Rips:MentalMuddles}
+L.~Rips.
+\newblock chapter Mental Muddles, pages 258--286.
+\newblock University of Arizona Press, Tucson, AZ, 1986.
+
+\bibitem{Shneiderman:1997:DirectManipulation}
+B.~Shneiderman.
+\newblock Direct manipulation for comprehensible, predictable and controllable
+  user interfaces.
+\newblock In {\em Proceedings of the 2nd international conference on
+  Intelligent user interfaces}, IUI '97, pages 33--39, New York, NY, USA, 1997.
+  ACM.
+
+\bibitem{Star:BoundaryObjects}
+S.~L. Star and J.~R. Griesemer.
+\newblock Institutional ecology, `translations' and boundary objects: Amateurs
+  and professionals in berkeley's museum of vertebrate zoology, 1907-39.
+\newblock {\em Social Studies of Science}, 19(3):387--420, 1989.
+
+\bibitem{Suthers:2005:CollaborativeKnowledgeConstruction}
+D.~D. Suthers.
+\newblock Collaborative knowledge construction through shared representations.
+\newblock In {\em Hawaii International Conference on System Sciences}, 2005.
+
+\bibitem{Tory:2005:EvaluatingVisualizations}
+M.~Tory and T.~Moller.
+\newblock Evaluating visualizations: Do expert reviews work?
+\newblock {\em IEEE Comput. Graph. Appl.}, 25:8--11, September 2005.
+
+\bibitem{Zuk:2006:HeuristicsForInformationVisualizationEvaluation}
+T.~Zuk, L.~Schlesier, P.~Neumann, M.~S. Hancock, and S.~Carpendale.
+\newblock Heuristics for information visualization evaluation.
+\newblock In {\em Proceedings of the 2006 AVI workshop on BEyond time and
+  errors: novel evaluation methods for information visualization}, BELIV '06,
+  pages 1--6, New York, NY, USA, 2006. ACM.
+
+\end{thebibliography}

@@ -1,0 +1,372 @@
+\documentclass{sig-alternate}
+\begin{document}
+\title{Visual Formalism, Liturature Review}
+\numberofauthors{1}
+\author{ \alignauthor
+Stevenson Gossage\\
+       \affaddr{School of Computer Science, Carleton University}\\
+       \affaddr{1125 Colonel By Drive, Ottawa, ON K1S 5B6}\\
+       \affaddr{Ottawa, Canada}\\
+       \email{sgossage@connect.carleton.ca}
+}
+\date{21 April 2011}
+
+\maketitle
+
+\terms{Visual Formalism, Distributed Collaboration}
+
+\keywords{Visual Formalism, Distributed Collaboration}
+
+\section{Introduction}
+\subsection{Motivation}
+\section{Summary of the reviewed Papers}
+\subsection{Summary: Information Visualization\cite{Gershon:1998:Informationvisualization}}
+This paper explains that a visualization is a technique used to display
+information in a graphical or visual manner with the intent of leveraging our
+natural visual capabilities. Visualization allows us to process, analyse and
+understands massive amounts of data very quickly. The problem with
+visualizations is that we are trying to use them, to quickly understand more and
+more abstract data, that does not always have an immediately obvious mapping to
+the real world. This presents a challenge in trying to develop reusable
+meaningful visualisations. There is ongoing research to try and leverage
+metaphors and to try understand what type of analytic tasks could be enhance by
+visualizations based on those metaphors.
+
+The paper talks about visualization developments in several areas including,
+document and software visualization, distortion techniques, hierarchies, data
+integration (including data warehousing and data mining) and the world wide web.
+At the time of publication of this paper in the late 90's there was also some
+real world commercial applications including applications based on work done at
+Xerox PARC including Perspective Wall, Cone Tree and Wide Widgets.
+
+The author suggests that, at the time, there was still much work to be done in
+terms of understanding the potential and usefulness of the technology but it was
+clear that visualizations would play a huge role in the future of computing.
+Gershon describes visualization as an emerging discipline which must progress
+through four fundamental stages and suggests that visualization is progressing
+at an accelerated pace because many of the step are happening in parallel; ``An
+emerging discipline progresses through four stages. First, it starts as a craft,
+practiced by artisans using heuristics. Second, researchers formulate scientific
+principles and theories to gain insights about the processes. Third, engineers
+eventually refine these principles and insights into production rules. Fourth,
+the technology becomes widely available.''
+
+The paper suggests that widespread usefulness of visualizations will be directly
+influenced by the content providers' (software design and developers) ability to
+create visualizations that are accessible and easily understood by a wide range
+of end users, making them equally useful for users of diverse backgrounds. In
+order to create these meaningful visualizations in real world applications the
+systems being modeled and the processes involved must be understood. This
+understanding in itself could lead to the correct visualization for any
+particular task.
+
+There are many areas that we need to learn more about in order to better support
+human learning through visualizations such as what types of interactions make
+sense for any particular visualization, how we perceive and understand
+information both visually and non-visually as well as how we search for
+information and how we adapt those searches based on previous knowledge. A
+better understanding of these issues and how they relate to specific analytic
+tasks will inform the creation of more useful, meaningful visualisations that
+that can truly help end users process more data more accurately and quickly. The
+ability to create more flexible task oriented user interfaces can also aid in
+the development of more useful visualizations.
+
+An important point that Gershon makes in the paper is that we also need to
+understand when graphic visualization may, in fact, be less appropriate.
+Sometimes a visualization may be harder to understand than words; we need to
+weigh the options and choose the representation that is most appropriate to
+allow the users to accomplish the required task.
+
+In conclusion the paper re-iterates that there is great need for the evolution
+of this emerging technology especially in ``The development of scientific and
+engineering principles for the generation of visualizations  (to users with
+diverse needs and capabilities) and a methodology for solving problems with
+information visualization are badly needed.''
+
+\subsubsection{Key Contributions}
+\subsection{Summary: Situational Awareness Support to Enhance Teamwork in
+Collaborative Environments \cite{Kulyk:2008:SituationalAwareness}} This paper
+was motivated by that fact that today, many modern teams are collaborating using
+a multitude of visualizations on multiple large format displays. During these
+activities the situational awareness of the teams is not always ideal. This
+paper attempts to develop some guidelines to help design better co-located
+collaborative systems for use with multiple large format displays with
+affordance for situational awareness.
+
+There were several concepts developed to help support situational awareness on
+large shared displays including an interface the authors called ``Memory Board
+is an interface that automatically stores and visualizes the activity history''.
+It provides participants access to historical annotations made on other views or
+visualizations and allows them to be aware of which member is controlling a
+particular visualisation or display. They also developed the \emph{Highlighting
+on Demand} interface which allows individuals to highlight or fade out any part
+of any display using a personal interaction device.
+
+The paper argues that simply providing complex visualizations across or using
+multiple displays may, in fact, increase the cognitive load and have a negative
+impact on the collaborative activity. Designing situational awareness into these
+applications is necessary to properly coordinate team decision making and truly
+support the collaborative process. One reason is that the participants can be
+easily distracted by sub-tasks that should in fact be transparent to the
+activity but in reality are not, like who is in control of a shared artifact or
+which display or visualisation is the one currently of interest. Shared
+awareness of these types of interactions are essential and can ''leads to
+informal social interactions and development of shared working cultures which
+are essential aspects of group cohesion''.
+
+Kulyk states that situated awareness is concerned with the individuals knowledge
+and understanding of the events, information and environment as well as the
+shared understanding of the team as a whole and their understanding of the past
+and present and even its impact on future events. Kulyk's work focuses on the
+following three main aspects which directly relate to and extend Endsley's three
+levels of situated awareness:
+\begin{itemize}
+\item A person's previous knowledge and understanding which includes the
+source and nature of relevant events and information.
+\item Detection and comprehension of the relevant perceptual cues and
+information from the environment including the comprehension of multiple
+visualizations and their context.
+\item Interpretation of theses visualizations and the continuous reconfiguring of
+understanding and knowledge during collaboration. This support the
+awareness of changes in the environment as well as the ability to
+keep track of work in progress.\end{itemize} 
+Kulyks is actually interested in the impact of situational awareness on team
+collaboration and specifically what she refers to as \emph{shared situational
+awareness}. She defines it as the level of the group or team's awareness of
+individual situational awareness based the above three points. With respect to
+shared situational awareness, the paper is mainly concerned with answering the
+following questions:
+\begin{itemize}
+\item To understand the impact of situational awareness on
+collaboration.
+\item Understand how to support shared situational awareness in collaborative
+environments.
+\item Understand how to leverage the usage of shared large format monitors to 
+support shared situational awareness.
+\item How can new interactive systems and visualisations be designed and
+evaluated based on their support for situational awareness and how might these
+systems actually stimulate new and existing forms of collaboration.
+\end{itemize}
+The paper points outs that the level of support for situational awareness
+varies depending on the collaborative activity. For example a collaborative team
+that supports emergency dispatch would need a higher level of support when
+compared to a team working on scientific collaboration. In the long run,
+whatever the reason for the collaboration, mistakes cost and better situational
+awareness support can help reduce mistakes. 
+Next the paper talks specifically about situational awareness and scientific
+collaboration and in particular how large shared displays could be used to 
+better support situational awareness in current omics experimentation in 
+molecular biology. The following key points were made:
+\begin{itemize}
+  \item Visualizations on a shared display encourages group discussions.
+  \item The visualization of data on a shared display allows users to quickly
+  determine the quality of the information or data-set.
+  \item Multiple visualizations may be needed and when used there must be a
+  clear visual relationship between these visualizations so as to avoid
+  participants from getting lost, from being distracted and from change blindness
+  which occurs when the participants to do not realize that the focus of the
+  discussion has changed from one visualization to  another.
+  \item When multiple shared displays are being used with multiple
+  co-related visualizations then changes in one visualization should also trigger
+  changes in the other related visualizations.
+  \item Difficulties arise when team members from diverse disciplines need to 
+  use the same visualizations that may have been designed to be understood by
+  people with a specific background or skill-set as is the case in many
+  scientific visualizations.
+\end{itemize}
+To address some of the problems related to situational awareness for shared
+displays the authors implemented Highlighting on demand interface which allowed
+the person currently controlling the shared display to highlight or fade out
+certain visualizations or areas of the shared display(s). This would increase
+awareness among the team as to the relevant visualization at that moment. A
+second solution was the memory board interface which stores and visualizes the 
+changes in real-time during team collaboration. This ensures that the entire
+collaborative process is recorded and all intermediate visualizations,
+annotations etc. can be retrieved and reviewed. A control interface is
+suggested as a means of controlling the shared displays and visualizations and
+giving access information about the visualizations and displays. This
+was envisioned to run on a shared touch screen as well on the team members
+individual interaction devices. Knowing who is making changes and what changes
+are being made is critical to any collaborative effort and the control interface
+attempt to address this problem.
+\subsubsection{Key Contributions}
+\subsection{Sumary: Beyond Models and Metaphors: Visual Formalisms in User
+Interface Design\cite{Nardi:BeyondModels}}
+\subsubsection{Sumary}
+In this paper they argue that the user interface can be designed to support
+the visual representation of the underlying program's semantics and can help
+offload cognitive load to facilitate problem solving. Nardi postulates that at
+the time this paper was published in the early 90's it was time to start
+focusing more attention on the semantic interface rather then the also
+important but less interesting supply of user commands to the underlying
+application. She claims that design and analysis tasks are complex and software
+designed to support these activities needs to be enhanced with well designed
+visual interfaces from which the semantics of the application could be easily
+inferred by the users. The designers of this type of complex application would
+be well served to have a toolkit of computational building blocks, such that
+they could piece together the appropriate blocks which could support this
+visual transfer of application semantics.
+
+Nardi argues that neither Mental models nor Metaphors are appropriate
+theoretical foundations to support such  building blocks but that these blocks
+could be developed by leveraging the power of visual formalisms. She argues that
+different visual formalisms can be used as the building blocks for semantic
+interfaces and showed how a table or grid visual formalism was implemented and
+explains the potential for it to be used as a building block.
+\subsubsection{Key Contributions}
+\subsection{Summary: Heuristics for Information Visualization Evaluation}
+This paper defines heuristic evaluation as a quick and lightweight method to
+predict and spot issues related to the usability of an applications' user
+interface. The heuristic approach involves a small  group testing the system
+based on the heuristics or guidelines that are relevant to the system.
+Heuristics can often be used to teach novice users and as a method of
+identifying design patterns. Like design patterns heuristics help by providing
+an over arching language from from which the system can be talked about and
+promote reuse especially through the evolution of design patterns. Zuk describes
+heuristic evaluation as commonplace in the field of HCI but, its application to 
+information visualization is still emerging.  The author states that we are at a
+point where there is a need to create a small set of general  overarching
+heuristics that could be applied to most information visualization system, 
+similar to Neilson's 10 usability heuristics for the design of user interfaces.
+The paper describes this as an exciting and open area for future study. Zuk
+suggests  that a hierarchical grouping of existing heuristics combined with
+different tree searching algorithms could help in selecting a core set of
+heuristics. Otherwise,  one could follow Neilson's method of reducing a large
+set of problems into a small set of easily understandable heuristics. Next the
+paper describes the process of heuristic evaluation as something that is apt to
+evolve but nonetheless describes that an iterative approach using five
+evaluators has been found to be effective. In the first pass the evaluators try
+and get a general sense of the application and a second pass is used to focus on
+applying the heuristics to  specific elements of the user interface. The exact
+number of evaluators will most likely be application specific and dependant on
+the complexity of the visualizations. The paper refers to work by Tory and
+Moller  /cite{} who suggest using a combination of traditional usability experts
+and visualization or data display experts. It is still to be determined what the
+exact characteristics of  information visualization evaluator should be.  The
+paper describes work done by Craft and Cairns \cite{} as determining that there
+is still much work to be done in this area, "They conclude by calling for a more
+rigorous design methodology that: takes into account the useful techniques that
+guidelines and patterns suggest, has measurable validity, is based upon a
+user-centred development framework, provides step-by-step approach, and is
+useful for both novices and experts." The paper also warns that there could be
+problems if we blindly apply existing knowledge and methods of usability
+heuristics to information visualization and suggest that caution should be used
+and further study is needed. Zuk noted in the case study that the evaluators had
+problems with the heuristics that were too specific and felt a more general
+vocabulary would increase its usefulness. It is was also noted that in general
+more precise, clear and understandable descriptions of each heuristics would
+facilitate their use and help ensure that they are used as intended and it
+leaves less room for misinterpretation. The case study revealed that some
+problems were detected by distinct heuristics which the author suggested could
+be used as way to see the problem from distinct points of views and possibly
+could lead to multiple solutions.  It was also found that assigned priorities
+could help resolve issues when conflicting heuristics were found. Another
+suggestion was to let domain experts resolve heuristic conflicts. The authors
+also identified some problems that may be common among visualizations in
+general. Some of these issue include: \begin{itemize} \item Poor contrast can
+produce hidden or difficult to see visual components. \item Poor choice of
+colors could lead to confusion in terms of understanding or misinterpreting the
+relationships between visualizations. \item Tool tips lack the detail required
+to make them useful.
+\end{itemize}
+The paper notes that some heuristics would be better used as guidelines for the
+designers and or developers of the system and other might be better for
+heuristic evaluation of the visualization. Zuk suggests that paired evaluator
+teams could be comprised of evaluators paired with domain experts, this could
+help in a more accurate application of the heuristics. It was also noted that
+usability heuristics could could be useful in combination with the visualization
+ones but note that this requires further study. Another open research are would
+be to discover if tools could be used to support the evaluation of
+visualizations.
+\subsubsection{Key Contributions}
+\subsection{Summary: A Collaborative Dimensions Framework: Understanding the Mediating Role of Conceptual Visualizations in Collaborative Knowledge Work}
+The goal as stated in the paper "is to identify the factors that contribute to
+the choice of an effective visual representation for collaborative knowledge
+work to support distributed cognition, and to organize them in a conceptual
+framework".  Bresciani  focuses on visualizations as artefacts and claims that
+this focus allows for decision factors to be expressed in terms of dimension
+that either support  or interfere  with certain kinds of visualization uses.
+These dimensions are not independent and often, supporting one dimension will
+have a negative impact on the support for another. Understanding the
+relationships between dimension allows designers of collaborative visualizations
+to pick and leverage those dimension that make the most sense for the
+application being developed. The author suggests  that this approach will help
+build better support for collaborative activities then could be achieved using
+general guidelines that should apply to all visualizations as might be the case
+using a heuristic approach. This paper leverages research from three main fields
+including:
+\begin{itemize}
+\item Blackwell's work on the cognitive dimensions of notations framework
+\cite{Blackwell:NotationalSystems} and Hunhausen's work on communicative dimensions framwork \cite{Hundhausen:CommunicativeDimensionsFramework}
+\item Star's research on the boundary object paradigm \cite{Star:BoundaryObjects} 
+\item  Thirdly a literature review on visualization technologies, in particular the information visualization work of Shneiderman and Karabeg as well as the knowledge visualization work of Eppler and Suthers.
+\end{itemize}
+
+Informed by  this theoretical foundation and a combination of techniques used to
+gather the experiences and knowledge of expert practitioners who employ
+visualizations in their daily collaborative activities, a collaborative
+visualizations framework was developed to help understand how visualizations can
+be leveraged to support collaborative activities and how they can facilitate the
+distribution of knowledge across team members. The framework consisted of the
+following seven dimensions:
+
+\begin{itemize}
+\item \emph{Visual impact}: The extent to which the visualization is attractive and if it facilitates attention and recall.
+\item \emph{Clarity}: Is the visualization self-explanatory, easy to understand and dose it reduce cognitive effort.
+\item \emph{Perceived finishedness (provisionality)}: Is the visualization perceived by the user as a final product.
+\item \emph{Directed focus}:Does the visualization direct the users attention to any particular area or areas.
+\item \emph{Inference support}: Do the constraints of the visualization help or  support the creation of new and novel insights. "Inference support is the core differentiator and added value of visualization over text: it allows to gain new understanding "for free" just by changing the visualization type, the focus, or the representational constrains."
+\item \emph{Modifiability}: Is there support for dynamic modification of the visualization?
+\item \emph{Discourse management}: Does the visualization support control over the discussion and workflow of the activity.
+\end{itemize}
+The paper applied the dimensions to real world visualizations to determine to what extent the different dimensions were supported by the visualizations. They identified six different but common forms of collaboration and suggested that some dimensions would be more appropriate for certain collaborative activities, The following lists each of the six collaborative activities along with the dimensions that provide the best support for those activities:
+\begin{itemize}
+\item idea generation (high visual impact, low clarity, low perceived finishedness, high modifiability)
+\item general knowledge sharing (high visual impact, low perceived finishedness)
+\item problem analysis (low perceived finishedness, high clarity, high inference support)
+\item option evaluation (high clarity, high directed focus, high inference support, moderate-low modifiability)
+\item deliberation or decision elaboration (high clarity, high directed focus, high inference support, moderate-low modifiability)
+\item planning (high modifiability)
+\end{itemize}
+
+As noted the above dimensions are not always independent and careful
+consideration must be made when deciding the level of support for each
+dimension. This concept of trade off between dimensions was first introduced by
+Green and Petre \cite{}. As an example of these trade-offs the paper refers to
+the fireworks visualization from Let's Focus collaborative software which was
+used as one of the three visualizations to which they applied the collaborative
+dimensions.  The application of the dimensions to the fireworks visualization
+revealed several relationships or trade-offs between the dimensions. Visual
+impact had effect on clarity and on directed focus. The high visual impact of
+the fireworks visualization was distracting and therefor reduced its clarity and
+it had reduced support for directed focus because of the appealing nature of the
+visualization in fact, "When the visual stimuli are very high, then the focus
+will diminish because the attention is caught more by the aesthetics than the
+content". There were also trade-offs between modifiability and perceived
+finishedness and  between modifiability and discourse management. The
+visualization had a high level of support for discourse management through the
+Let's Focus software package that provided the visualization. It also had high
+perceived finishedness "because the diagram resembles a final piece of work
+instead of a discussion tool." If a visualization is perceived as finished, then
+it will be less likely that collaborators will feel like they should contribute
+or modify it. If there is no tool support for discourse management then high
+modifiability usually results in in low discourse management because
+coordination of the group becomes more difficult.
+
+Another important consideration is the medium on which the visualization is
+delivered.  "The choice of alternative media such as a whiteboard, paper or
+computer-based interaction, strongly affects people's willingness to make
+contributions and collaborate." If people feel that modifications of the
+visualization are permanent then they are less likely to want to contribute,
+also the perceived finishedness can be affected by the medium, a peice of paper
+tends to be though of as more provisional where as a visualization on a computer
+monitor has more of a sense or permanence even though the computer based
+visualization may in fact have high support for modification.
+\subsubsection{Key Contributions}
+\subsection{Sumary: Distributed and Collaborative Visualization}
+\subsubsection{Key Contributions}
+\section{Discussion}
+\section{Conclusions}
+\bibliographystyle{abbrv}
+\bibliography{litReview}%sigproc.bib is the name of the Bibliography
+\end{document}

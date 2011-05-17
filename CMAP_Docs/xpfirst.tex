@@ -1,0 +1,336 @@
+% %%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  This
+% is the LaTeX source for the instructions to authors using the LaTeX document
+% class SVMultln with class option 'lnbip' for contributions to the Lecture
+% Notes in Business Information Processing series. www.springer.com/series/7911
+% Springer Heidelberg 2007/08/05  It may be used as a template for your own
+% input - copy it to a new file with a new name and use it as the basis for your
+% article. It contains a few tweaked sections to demonstrate features of the
+% package, though.  If you have not much experiences with Springer LaTeX
+% support, you should better use the special demonstration file "lnbip.tex"
+% included in the LaTeX package for LNBIP as template.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[lnbip,sechang,a4paper]{svmultln}
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}    
+\usepackage{graphicx}
+
+\usepackage{url}
+\urldef{\mailsa}\path|sgossage@scs.carleton.ca|
+\urldef{\mailRobert}\path|robert_biddle@carleton.ca|
+\usepackage[pdfpagelabels,hypertexnames=false,breaklinks=true,bookmarksopen=true,bookmarksopenlevel=2]{hyperref}
+\bibliographystyle{plain}
+
+
+\begin{document}
+
+\mainmatter  
+
+\title{CMAP: A Collaborative Multitouch Agile Planner based on Principles for Collaboration}
+
+
+\titlerunning{CMAP}
+
+\author{Stevenson Gossage and Robert Biddle}  
+\authorrunning{Gossage and Biddle}
+\institute{School of Computer Science, Carleton University, Ottawa, Canada\\
+\mailsa, \mailRobert}
+
+% \toctitle{TOC}
+% \tocauthor{Gossage and Biddle}
+
+\maketitle
+
+\begin{abstract}
+
+  Agile software development often involves two very simple but very
+  effective supporting tools: the storycard and the cardwall.  This
+  paper reports on our project to design a collaborative Agile planner
+  based on principles for collabortion around interactive displays.
+  The main goal of this project was to explore the use of multitouch
+  enabled surfaces and how this technology could be leveraged to
+  create a new level of usability in terms of group collaboration in
+  Agile development. 
+
+\end{abstract}
+
+% \tableofcontents
+
+\keywords{Agile Software Development, User Stories,  Cardwalls, Multitouch Displays}
+
+\section{Introduction}
+
+Agile software development often involves two very simple but very
+effective supporting tools: the storycard and the cardwall. These work
+so well that we need to be cautious about applying any technology to
+improve them. Recent advances in interactive display technology,
+however, suggest that effective collaboration might now be supported
+in a more lightweight way and in harmony with Agile
+practices. Moreover, excellent work has been done on identifying
+principles for collaborative behaviour around tables and displays.
+This paper reports on our project to design a collaborative Agile
+planner based on principles for collabortion around interactive
+displays.
+
+Both story cards and cardwalls work from the basis of stories
+themselves, and as Cohn says, ``The technique of expressing
+requirements as user stories is one of the most broadly applicable
+techniques introduced by the Agile processes'' \cite{StoriesRequ}.
+Moreover, cardwalls act as what Cockburn call an {\em Information
+  Radiator} \cite{InfoRad}, and help people maintain a situational
+awareness of the state of the project, and also serve as place for
+people to gather and discuss the project and state of the project and
+quickly determine areas that need attention.  The role of physical
+artefects, especially story cards and cardwalls, in Agile development
+has been considered by Sharp, Robinson and Petre \cite{cite}, and they
+show how there are both notational and social elements successfully at
+work. Their results connect well with work in our own group, both on
+social elements \cite{EWAgile} and on the nature of artefacts in
+planning meetings \cite{JBAgile}. 
+
+Large multitouch displays can be tables or walls. Their support for
+handling multiple touchs allows recognition of multi-finger gestures,
+such as pinching and twisting now commonplace on small-scale
+multitouch devices such as the Apple iPhone.  But large-scale surfaces
+also allow simultaneous use by more than one person, opening the door
+to a new kind of support for collaborative applications. Principles for
+the design of this kind of collaborative software have been identifies
+by Scott, Grant, and Mandryk \cite{ScottGuidelines}, based on studies
+of actual collaborative practices.
+
+This paper describes the design of a software system, CMAP: A
+Collaborative Multitouch Agile Planner. In this work, we began by
+studying the earlier projects by Weber, Ghanam, Wang, Morgan and
+Maurer at the University of Calgary \cite{Wang,Webber,DAP}. Their
+projects used demonstrated the feasibility and utility of using
+multitouch surfaces in support of Agile development. Our aim was to
+explore some design alternatives based on consideration of the needs
+for supporting flexible and lightweight collaboration. The Calgary
+work used the Smart Technologies Smart Board and Smart Table and their
+Microsoft Windows specific APIs. Our approach was to use open source
+frameworks, in particular Python PyMT \cite{PyMt}, a framework
+designed for the rapid development of multitouch UI prototypes and the
+Community Core Vision (CCV) optical touch infrastructure, and our
+software works on a range of hardware and operating systems.
+
+
+\section{Background}
+
+\subsection{Effectiveness of Agile Storycards and Storywalls}
+
+Our work concerns on user stories, story cards, and cardwalls, and how
+they are used by Agile teams. Of particular interest is their use by
+the two most common lightweight Agile processes, Extreme Programming
+\cite{XPvol} and Scrum \cite{Scrum}. Both of these methodologies take
+an iterative approach where less focus is put on upfront analysis and
+more on quick consistent deployment of quality working software.  We
+intend our work to apply to both XP and Scrum, are we used terminology
+from both.
+
+Customers or product owners use storycards to record user stories
+which describe features and requirements.  But the card is only a
+token that represents a practice.  Jeffries describes the procedure as
+the combination of the three C's, Card, Conversation and Confirmation
+\cite{Jeffries}. The storycard is deliberately small, preventing
+unnecessary verbose detail: Davies says ``The Card may be the most
+visible manifestation of a user story, but it is not the most
+important'' \cite{PowerStories}.  She continues to explain that cards
+``represent customer requirements rather than document them''. This
+emphasizes that the actual text on the card is simply a reminder or
+placeholder; as Cohn says, ``the details are worked out in the
+Conversation and recorded in the Confirmation''
+\cite{UserStoriesApplied}. In the process of creating stories the
+following should be considered, ``Words, especially when written, are
+a very thin medium through which to express requirements for something
+as complex as software. With their ability to be misinterpreted we
+need to replace written words with frequent conversations between
+developers, customers, and users. User stories provide us with a way
+of having just enough written down that we don't forget and that we
+can estimate and plan while also encouraging this time of
+communication'' \cite{UserStoriesApplied}.
+
+The practice starts with the assignment of a story to a developer; as
+Sharp et al. say: ``the physical possession of this card by a
+developer is a warrant that secures the conversation (and the
+confirmation process of them acceptance test) with a customer''
+\cite{Sharp}. The subsequent communication between developer and
+customer explores the details of the story and the confirmation,
+should be mutually agreed upon, such that the story's completion is
+well understood.  The cardwall is a tool where the storycards are
+organized and displayed.  Typically new stories are placed in the
+project backlog and remain their until they are scheduled for
+development at which point they are removed from the backlog and
+placed on the cardwall along with other stories also scheduled for
+development. The grouping and or placement of stories on the cardwall
+provides a visual cue as to the state of the stories. A natural
+question might be to wonder how does this seemingly simply, low
+technology solution helps software development teams to meet their
+goals and deadlines while producing quality code? Often, it is the
+human component that is the key to the success of the method. Any
+software trying to replace a physical task must consider this issue in
+depth and try and provide an environment, which supports and
+encourages those same interactions, which bring success to the
+physical task. 
+
+Sharp et. al \cite{Sharp} strongly suggest that anyone considering
+technology to support card and cardwall practices must take account of
+the complex relationships that exist within this social system if they
+wish to retain key properties of successful teams.  The following is a
+summary of some of their key points.
+
+While a general template for stories usually exists such that key
+information is usually present like the {\sc As A<Role>}, {\sc I want
+  <Description>}, and {\sc So that <Benefit>}, the process is
+extremely flexible and we commonly find distinct notation across Agile
+teams. At the same time, within any one team, people strictly adhere
+to their agreed understanding of the notation and use of
+cards. Everything on the card has meaning which is not necessarily
+clear to an observer unfamiliar with the team specific notation.  The
+location of, color, size of lettering and any annotations carry
+significant meaning and thus provide a high level of abstraction. One
+of the most compelling aspects of storycard is the flexibility it
+affords teams to personalized notation in a manner that works best for
+them. 
+
+The use of the wall is also an extremely flexible procedure but, has
+it's generalities in that, teams use walls for the duration of a
+project and leave them on constant display somewhere they are easily
+seen, usually, in a common space where stakeholders can quickly access
+key factors like the progress of the project. The wall is generally
+regarded as an ``Information Radiator'' \cite{InfoRad} and helps
+ensure the transparency of the project. Again, the wall is full of
+meaning not obvious to an observer who lacks familiarity with Agile
+methodologies or team-specific notation. Also again, the walls have
+inconsistent structure across distinct teams, but are used in
+extremely consistent manners within any one team.  Maybe more
+important still are the social interactions involved in the whole
+process; enabling teams to determine their best use of notation,
+annotation and layout. These interactions reveal the importance and
+meaning of the stories and thus drive their physical placement on the
+wall, which, in turn radiates information about each story's progress.
+
+\subsection{Multitouch Tool Support for Agile Development}
+
+There are a limited number of software design tools developed to
+harness the new possibilities in Human Computer Interaction afforded
+by the current technology in multitouch enabled devices. Everyday more
+devices are being produced at a reasonable cost with support for two
+or more simultaneous touches; a critical feature for the development
+of truly collaborative tools. The best example of similar software is
+the Agile Planner for Digital Tabletop (APDT), \cite{Wang}.  APDT was
+designed based on a prototype by Weber \cite{Webber} which was
+intended for co-located collaboration on a single touch surface. APDT
+chose to use this as a starting point but wanted to enhance it with
+support for multitouch, the ability to interface with other Agile
+planning tools and real world evaluation based on user studies;
+observing traditional Agile planning meetings as well as observing
+meetings conducted using DAP or Distributed AgilePlanner\cite{DAP} As
+the name suggests DAP was designed to support distributed Agile teams
+in the planning and maintenance of an Agile project through the use of
+a digital whiteboard and storycards. DAP had been developed with a
+traditional single user interface paradigm (one keyboard, one mouse)
+such that users could collaborate from a distance but not so much in a
+co-located environment. APDT also studied and drew from the literature
+available on the use of multitouch tabletops in a group
+collaboration. APDT was developed as a multitouch enabled tool,
+specifically for two tables designed by Smart Technologies Ltd
+(Smart), using Smart's proprietary SDK. The first table used DViT
+(Digital Vision Touch) \cite{DVT} technology and had support for two
+concurrent touches. The second table used FTIR (Frustrated Total
+Internal Reflection) \cite{FTIR} technology and had support for 40
+concurrent touches. The two touch capabilities of the DViT table
+limited the user's ability to work concurrently while the small form
+factor of the FTIR table meant that it was difficult to leverage its
+support for 40 simultaneous touches. APDT was a highly functional full
+featured tool, however, its dependence on the Smart SDK and therefore
+on Smart's hardware helped us make a key design decision; we wanted
+CMAP to be designed such that hardware and operating system
+independence was a goal, as well as support for multiple concurrent
+touches.
+
+\subsection{Collaboration in Digital Workspaces}
+
+Scott, Grant and Mandryk have considered studies of digital
+workspaces, and identified guidelines for co-located collaborative
+work on a large interactive displays \cite{ScottGuidelines}.  They
+suggest there are eight key elements that must be addressed via the
+physical hardware of the tabletop, via the software being used on the
+tabletop or by a combination of the two. The following is a summary of
+those key requirements and a brief description of each.
+
+
+\begin{description}
+\item[Support interpersonal interaction] The technology must support
+  the mediation of the collaborative interaction and must not
+  interfere with this interaction. Ideally it should be as natural to
+  collaborate around a digital tabletop as it is to collaborate around
+  a regular table.
+
+\item[Support for fluid Transitions between Activities] Switching
+  tasks during collaboration should be as seamless as possible. For
+  example, if the activity needs to combine data entry and the ability
+  to draw, then switching between these activities must be a natural
+  process. This allows the focus to remain on communication. The use
+  of multiple input mechanisms must be considered but, should be a
+  feature that enhances the overall activity and not a hindrance for
+  these transitions.
+
+\item[Support for Transitions between Personal and Group Work] If the
+  collaborative task involves a combination of both personal and group
+  work, the system should try and capture this by providing a similar
+  mechanism. The physical shape of the table might be a key factor for
+  this point because the individuals must feel comfortable and their
+  personal workspace must not feel cramped or invaded. One suggestion
+  may be to support external devices or displays that could be used in
+  conjunction with the digital tabletop. This approach may however,
+  interfere with the fluid collaboration Scott suggests that this area
+  needs more study.
+
+\item[Support Transitions between Tabletop Collaboration and External
+  Work] It should be easy to integrate previous work into the shared
+  environment where it can viewed and manipulated as needed.
+
+\item[Support the use of Physical Objects] The system should support
+  both work and non-work related physical artifacts. For example,
+  there should be no negative impact on the system if a non-work
+  related object were placed on the table while the same action using
+  a digital work related object might cause a communication link to be
+  established, giving access to this work-related object.
+
+\item[Provide Shared Access to Physical and Digital Objects] While
+  collaborating around a traditional table, pointing and other
+  gestures are usually easily interpreted by the group. On a digital
+  surface this may not always be the case. A digital tabletop may
+  provide several representations of the shared object (maybe one for
+  each person) using gestures to try and point something out in this
+  scenario could lead to confusion as users try to interpret how the
+  gesture related to the object they are viewing. If however only one
+  representation of the object is present, those same gestures may be
+  a contributing factor to the overall understanding and group
+  collaboration. The digital representation of shared objects is a key
+  to the successfulness of the collaborative session. The designers
+  must consider the potential physical locations of the participants
+  as well as the possibility of obstruction by other users, objects or
+  even gestures. Obvious examples of physical objects are digital
+  artefacts like an IPad. A non-digital artefact might be the pieces
+  or tokens of a board game implemented for the tabletop where users
+  interact with the pieces in game-play.
+
+\item[Considerations for the Appropriate Arrangements of Users] The
+  system must be designed to accommodate sufficient personnel space to
+  allow users to comfortably interact with each other without feeling
+  cramped. Also, the intended audience is important because the
+  physical difference between adults and children suggest that more
+  children could comfortably interact around a table. Children also
+  tend to want to be closer to their neighbours then most
+  adults\cite{Aiello}. The system should also not be affected by
+  participants repositioning themselves around the table. Virtual
+  objects should be rotatable thus allowing equitable user interaction
+  from any position.
+
+\item[Support Simultaneous User Actions] This is an area where true
+  hardware and software advancements have developed since the
+  publication of Scott's paper in 2003. Most current tabletop
+  implementations support both multiple input devices and concurrent
+  user input.
+\end{description}

@@ -1,0 +1,12 @@
+@book{Norman:1986:UserCenteredSystemDesign,
+	author={Donald A. Norman and Stephen W. Draper},
+	year={1986},
+	title={User centered system design : new perspectives on human-computer interaction},
+	publisher={L. Erlbaum Associates},
+	address={Hillsdale, N.J},
+	note={Includes index.},
+	keywords={Human-computer interaction.; System design.},
+	isbn={0898597811 (pbk.)},
+	language={eng}
+}
+

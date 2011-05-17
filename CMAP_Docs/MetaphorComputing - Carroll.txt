@@ -1,0 +1,16 @@
+@article{Carroll:1985:MetaphorComputingSystems,
+title = {Metaphor, computing systems, and active learning},
+journal = {International Journal of Man-Machine Studies},
+volume = {22},
+number = {1},
+pages = {39 - 57},
+year = {1985},
+note = {},
+issn = {0020-7373},
+doi = {DOI: 10.1016/S0020-7373(85)80076-6},
+url = {http://www.sciencedirect.com/science/article/B6WGS-4T6NC5P-5/2/ca97325ff6dd64e97613e82e2ce783a8},
+author = {John M. Carroll and Robert L. Mack},
+abstract = {
+Recent discussion has resolved the question of how prior knowledge organizes new learning into the technical definition and study of "metaphor". Some theorists have adopted an "operational" approach, focusing on the manifest effects of suggesting metaphoric comparisons to learners. Some have resolved the question formally into a "structural" definition of metaphor. However, structural and operation approaches typically ignore the goal-directed learner-initiated learning process through which metaphors become relevant and effective in learning. Taking this process seriously affords an analysis of metaphor that explains why metaphors are intrinsically open-ended and how their open-endedness stimulates the construction of mental models.}
+}
+

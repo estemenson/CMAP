@@ -1,0 +1,13 @@
+#TeXlipse project settings
+#Sat May 14 08:20:39 EDT 2011
+builderNum=2
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=CSCW 2012 Paper Brown et al.tex
+outputFile=CSCW 2012 Paper Brown et al.pdf
+langSpell=en
+markDer=true
+srcDir=
