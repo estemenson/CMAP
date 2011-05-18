@@ -19,9 +19,9 @@ from cmap.tools.myTools import scale_tuple
 from cmap.view.stories.storyViews import StoryView, MinStoryView
 from pymt.ui.window import MTWindow
 from pymt.base import runTouchApp
-from cmap.controller.basicControllers import ArtifactController
+from cmap.controller.basicControllers import ArtefactController
 
-class StoryController(ArtifactController):
+class StoryController(ArtefactController):
     def __init__(self,main, defn=None, **kwargs):
         kwargs['view_type_name'] = 'Story'
         super(StoryController,self).__init__(main, defn, **kwargs)

@@ -16,11 +16,11 @@ except Exception:
     Log = ConsoleLogger('CMAP')
 
 from pymt.ui.window import MTWindow
-from cmap.controller.basicControllers import ArtifactController
+from cmap.controller.basicControllers import ArtefactController
 from pymt.base import runTouchApp
 
 
-class SprintController(ArtifactController):
+class SprintController(ArtefactController):
     def __init__(self, main, defn=None, **kwargs):
         kwargs['view_type_name'] = 'Sprint'
         super(SprintController,self).__init__(main,defn,**kwargs)

@@ -16,10 +16,10 @@ except Exception: #IGNORE:W0703
     Log = ConsoleLogger('CMAP')
 
 from pymt.ui.window import MTWindow
-from cmap.controller.basicControllers import ArtifactController
+from cmap.controller.basicControllers import ArtefactController
 from pymt.base import runTouchApp
 
-class TaskController(ArtifactController):
+class TaskController(ArtefactController):
     def __init__(self, main, defn=None, **kwargs):
         kwargs['view_type_name'] = 'Task'
         super(TaskController,self).__init__(main,defn,**kwargs)

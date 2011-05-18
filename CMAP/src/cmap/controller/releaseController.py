@@ -15,11 +15,11 @@ except Exception:
     from petaapan.utilities.console_logger import ConsoleLogger
     Log = ConsoleLogger('CMAP')
 
-from cmap.controller.basicControllers import ArtifactController
+from cmap.controller.basicControllers import ArtefactController
 from pymt.ui.window import MTWindow
 from pymt.base import runTouchApp
 
-class ReleaseController(ArtifactController):
+class ReleaseController(ArtefactController):
     def __init__(self, main, defn=None, **kwargs):
         kwargs['view_type_name'] = 'Release'
         super(ReleaseController,self).__init__(main, defn, **kwargs)

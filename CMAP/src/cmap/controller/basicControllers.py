@@ -32,9 +32,9 @@ from pymt.ui.window import MTWindow
 from cmap.tools.mvc.mvc import Observer, Subject
 from pymt.base import runTouchApp
 
-class ArtifactController(Subject,Observer):
+class ArtefactController(Subject,Observer):
     def __init__(self, main, defn=None, **kwargs):
-        super(ArtifactController,self).__init__()
+        super(ArtefactController,self).__init__()
         self.root = main
         self._view = None
         self._view_image = None
@@ -199,5 +199,5 @@ class ArtifactController(Subject,Observer):
 
 if __name__ == '__main__':
     root = MTWindow()
-    project = ArtifactController(root)
+    project = ArtefactController(root)
     runTouchApp()

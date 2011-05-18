@@ -18,10 +18,10 @@ except Exception:
     from petaapan.utilities.console_logger import ConsoleLogger
     Log = ConsoleLogger('CMAP')
 
-from cmap.controller.basicControllers import ArtifactController
+from cmap.controller.basicControllers import ArtefactController
 from pymt.ui.window import MTWindow
 from pymt.base import runTouchApp
-class ProjectCtrl(ArtifactController):
+class ProjectCtrl(ArtefactController):
     def __init__(self,root, file=None, **kwargs):
         kwargs.setdefault('mini_view_type', MinView)#ProjectMinView)
         kwargs.setdefault('view_type', MinView)#ProjectMinView)
@@ -52,7 +52,7 @@ class ProjectCtrl(ArtifactController):
         self.model.Status = value
     status = property(_get_status, _set_status)
 
-class ProjectController(ArtifactController):
+class ProjectController(ArtefactController):
     def __init__(self, main, defn=None, **kwargs):
         kwargs['view_type_name'] = 'Project'
         super(ProjectController,self).__init__(main, defn, **kwargs)

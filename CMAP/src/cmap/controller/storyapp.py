@@ -74,21 +74,25 @@ GestureCSS = '''
 }
 '''
 css_add_sheet(GestureCSS)
-        kwargs['view_type'] = ProjectView
-        kwargs['mini_view_type'] = ProjectMinView
-        kwargs['get_artefact'] = 'newProject'
-        kwargs['model'] = ProjectModel
-        kwargs['folder'] = 'projects'
 
 BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 0,1,2,3,4,5
 artefact_types = {
                   {BACKLOG:'backlog'},
                   {PROJECTS:'projects','view_type':ProjectView, 
-                   'mini_view_type':ProjectMinView, 'get_artefact':'newProject'
-        kwargs['model'] = ProjectModel
-        kwargs['folder'] = 'projects'},
-        ,RELEASES:'releases',
-                  SPRINTS:'sprints',STORIES:'stories',TASKS:'tasks'}
+                   'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
+                   'model': ProjectModel,'folder':'projects'},
+                  {RELEASES:'releases','view_type':ReleaseView, 
+                   'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
+                   'model': ReleaseModel,'folder':'releases'},
+                  {SPRINTS:'sprints','view_type':SprintView, 
+                   'mini_view_type':SprintMinView, 'get_artefact':'newSprint',
+                   'model': SprintModel,'folder':'sprints'},
+                  {STORIES:'stories','view_type':StoryView, 
+                   'mini_view_type':MinStoryView, 'get_artefact':'newStory',
+                   'model': StoryModel,'folder':'stories'},
+                  {TASKS:'tasks','view_type':TaskView, 
+                   'mini_view_type':TaskMinView, 'get_artefact':'newTask',
+                   'model': TaskModel,'folder':'tasks'}}
 
 class StoryApp(object):
     def __init__(self, **kwargs):

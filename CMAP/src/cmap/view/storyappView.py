@@ -49,7 +49,7 @@ from pymt.ui.widgets.klist import MTList
 from cmap.controller.storyController import StoryController
 from cmap.controller.projectController import ProjectController
 from cmap.controller.releaseController import ReleaseController
-from cmap.controller.basicControllers import ArtifactController
+from cmap.controller.basicControllers import ArtefactController
 from pymt.ui.widgets.button import MTToggleButton, MTButton 
 from cmap.tools.my_buttons import MyImageButton
 from pymt.loader import Loader
@@ -287,7 +287,7 @@ class StoryAppView(MyInnerWindow):
     def flow_backlog_select(self,btn):
         #make the selected backlog item the active one
         try:
-            idu = btn.Id if isinstance(btn, ArtifactController)\
+            idu = btn.Id if isinstance(btn, ArtefactController)\
                          else btn._id #IGNORE:W0212
             self.current_backlog = self.backlog[idu] 
             self.viewCurrentBacklog(btn)     
@@ -300,7 +300,7 @@ class StoryAppView(MyInnerWindow):
     def flow_projects_select(self,btn):
         #make the selected project the active one
         try:
-            idu = btn.Id if isinstance(btn, ArtifactController)\
+            idu = btn.Id if isinstance(btn, ArtefactController)\
                          else btn._id #IGNORE:W0212
             self.current_project = self.artefacts[idu]
             self.viewCurrentProject(btn)     
@@ -329,7 +329,7 @@ class StoryAppView(MyInnerWindow):
     def flow_release_select(self,btn):
         #make the selected release the active one
         try:
-            idu = btn.Id if isinstance(btn, ArtifactController)\
+            idu = btn.Id if isinstance(btn, ArtefactController)\
                          else btn._id #IGNORE:W0212
             self.current_release = self.artefacts[idu]
             self.viewCurrentRelease(btn)
@@ -356,7 +356,7 @@ class StoryAppView(MyInnerWindow):
     def flow_sprint_select(self,btn):
         #make the selected sprint the active one
         try:
-            idu = btn.Id if isinstance(btn, ArtifactController)\
+            idu = btn.Id if isinstance(btn, ArtefactController)\
                          else btn._id #IGNORE:W0212
             self.current_sprint = self.artefacts[idu]
             self.viewCurrentSprint(btn)
@@ -381,7 +381,7 @@ class StoryAppView(MyInnerWindow):
                               (self.current_sprint[0].Name,story))
     def flow_story_select(self,btn):
         try:
-            idu = btn.Id if isinstance(btn, ArtifactController)\
+            idu = btn.Id if isinstance(btn, ArtefactController)\
                          else btn._id #IGNORE:W0212
             self.current_story = self.artefacts[idu]
             self.viewCurrentStory(btn)
@@ -406,7 +406,7 @@ class StoryAppView(MyInnerWindow):
                               (self.current_story[0].Name,task))
     def flow_task_select(self,btn):
         try:
-            idu = btn.Id if isinstance(btn, ArtifactController)\
+            idu = btn.Id if isinstance(btn, ArtefactController)\
                          else btn._id #IGNORE:W0212
             self.current_task = self.artefacts[idu]
             self.viewCurrentTask(btn)
@@ -789,7 +789,7 @@ class StoryAppView(MyInnerWindow):
             _c = Dummy()
             _c.Id = ''
 
-        idu =  lbl.Id if isinstance(lbl, ArtifactController)\
+        idu =  lbl.Id if isinstance(lbl, ArtefactController)\
                       else lbl._id #IGNORE:W0212          
         if _c.Id != idu:
             #set current artefact to the one selected
