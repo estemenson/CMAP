@@ -24,20 +24,26 @@ except Exception: #IGNORE:W0703
     
 import os.path
 from glob     import glob
-from Storyapp import artefact_types
+from cmap.controller.storyapp import artefact_types
 
 class StoryAppModel(object):
-    def __init__(self, **kwargs):
-        self.artefacts = {}
-        self.story_files = []
-        self.current_backlog = None
-        self.current_project = None
-        self.current_release = None
-        self.current_sprint = None
-        self.current_story = None
-        self.current_task = None
+    def __init__(self, controller,**kwargs):
+        self._artefacts = {}
+        self.controller = controller
         self.path = Config().datastore
         Log.debug('Path to repository: %s' % self.path)
+        self._current_backlog    = []
+        self._current_project    = []
+        self._current_release    = []
+        self._current_sprint     = []
+        self._current_story      = []
+        self._current_task       = []
+
+        self._currentProjectView = []
+        self._currentReleaseView = []
+        self._currentSprintView  = []
+        self._currentStoryView   = []
+        self._currentTaskView    = []
 
         self.get_local_artefacts()
         self.load_artefacts()
@@ -56,83 +62,17 @@ class StoryAppModel(object):
         
     def load_artefacts(self):
         for type in artefact_types.values():
-            for artefact in self.xmlFiles[type]:
+            for artefact in self.xmlFiles[type['type']]:
                 Log.debug('loading %s' % artefact)
-                ctrl = self.getArtefact(artefact ,model=ProjectModel,
-                    get_artefact='newProject',
-                    name=os.path.splitext(os.path.basename(f))[0])
-            self.artefacts[p.Id] = (p,{})
-            self.newProject(p)
-    def load_projects(self):
-        for f in self.xmlFiles[artefact_types[PROJECTS]]:
-            Log.debug('load only xmlFile: %s' % f)
-            
-            p = self.getProject(f,model=ProjectModel,
-                    get_artefact='newProject',
-                    name=os.path.splitext(os.path.basename(f))[0])
-            self.artefacts[p.Id] = (p,{})
-            self.newProject(p)
-    def load_releases(self):
-        if self.checked_for_releases: return
-        self.checked_for_releases = True
-        for f in self.xmlFiles[artefact_types[RELEASES]]:
-            Log.debug('only loading release %s' % f)
-            r = self.getRelease(f, model=ReleaseModel,
-                    get_artefact='newRelease',name=\
-                os.path.splitext(os.path.basename(f))[0])
-            self.artefacts[r.Id] = (r,{})
-            self.newRelease(r)
-    def load_sprints(self):
-        if self.checked_for_sprints: return
-        self.checked_for_sprints = True
-        for f in self.xmlFiles[artefact_types[SPRINTS]]:
-            Log.debug('only loading sprint %s' % f)
-            s = self.getSprint(f, model=SprintModel, name=\
-                os.path.splitext(os.path.basename(f))[0])
-            self.artefacts[s.Id] = (s, {})
-            self.newSprint(s)
-    def load_backlog(self):
-        Log.debug('BackLog loading:')
-        for f in self.xmlFiles[artefact_types[BACKLOG]]:
-            b = self.getBacklog(f)
-            self.backlog[b.Id] = (b,{})
-            self.newBacklog(b)
-        Log.debug('Backlog Done loading')
-    def load_stories(self):
-        if self.checked_for_stories: return
-        self.checked_for_stories = True
-        Log.debug('Stories loading: ')
-        for f in self.xmlFiles[artefact_types[STORIES]]:
-            Log.debug('only loading story %s' % f)
-            s = self.getStory(f)
-            self.artefacts[s.Id] = (s ,{})
-            self.newStory(s)
-        Log.debug('Stories Done loading')
-    def load_tasks(self):
-        if self.checked_for_tasks: return
-        self.checked_for_tasks = True
-        for f in self.xmlFiles[artefact_types[TASKS]]:
-            Log.debug('%s' % f)
-            t = self.getTask(f, name=\
-                os.path.splitext(os.path.basename(f))[0])
-            self.artefacts[t.Id] = (t, {})
-            self.newTask(t)
-
+                ctrl = self.getArtefact(artefact, type['controller'],
+                                        type['model'], type['get_artefact'], 
+                    name=os.path.splitext(os.path.basename(artefact))[0])
+            self.artefacts[ctrl.Id] = (ctrl,{})
+            self.add_new_artefact(ctrl,
+                                     type['container'],type['viewCurrent'],
+                                     self.artefacts[ctrl.Id][1])
     def trash(self,artefact,atype=None):
-        if atype is None:# or type is 'stories':
-            btn = self.buttons[artefact.Id]
-            lbl = self.labels[artefact.Id]
-            self.backlog_list_layout.remove_widget(btn)
-            self.story_flow.remove_widget(lbl)
-            self.remove_widget(artefact)
-            del self.artefacts[artefact.Id]
-        else:
-            if artefact.Id in self.Artifacts:
-                dic = self.Artifacts[artefact.Id][1]
-                for l in dic.keys():
-                    self.__getattribute__(l).remove_widget(dic[l])
-                del self.Artifacts[artefact.Id]
-                super(StoryApp,self).remove_widget(artefact.view)
+        Log.debug('Need to trash artefact: %s' % artefact)
         return
     def close(self,touch=None):
         #close all the artefacts
@@ -140,11 +80,67 @@ class StoryAppModel(object):
             a[0].close()
         for b in self.backlog.values():
             b[0].close()
-        self.add_to_git()
-        AsyncHandler().shutdown()
-        super(StoryApp, self).close(touch)
     
     @property        
-    def Artifacts(self):
+    def artefacts(self):
         return self.artefacts
-    
+    @property
+    def current_project(self):
+        return self._current_project 
+    @current_project.setter
+    def current_project(self, value):
+        self._current_project.append(value)
+    @property
+    def current_release(self):
+        return self._current_release
+    @current_release.setter
+    def current_release(self, value):
+        self._current_release.append(value)
+    @property
+    def current_sprint(self):
+        return self._current_sprint
+    @current_sprint.setter
+    def current_sprint(self, value):
+        self._current_sprint.append(value)
+    @property
+    def current_story(self):
+        return self._current_story
+    @current_story.setter
+    def current_story(self, value):
+        self._current_story.append(value)
+    @property
+    def current_task(self):
+        return self._current_task
+    @current_task.setter
+    def current_task(self, value):
+        self._current_task.append(value)
+    @property
+    def currentProjectView(self):
+        return self._currentProjectView
+    @currentProjectView.setter
+    def currentProjectView(self, value):
+        self._currentProjectView.append(value)
+    @property
+    def currentReleaseView(self):
+        return self._currentReleaseView
+    @currentReleaseView.setter
+    def currentReleaseView(self, value):
+        self._currentReleaseView.append(value)
+    @property
+    def currentSprintView(self):
+        return self._currentSprintView
+    @currentSprintView.setter
+    def currentSprintView(self, value):
+        self._currentSprintView.append(value)
+    @property
+    def currentStoryView(self):
+        return self._currentStoryView
+    @currentStoryView.setter
+    def currentStoryView(self, value):
+        self._currentStoryView.append(value)
+    @property
+    def currentTaskView(self):
+        return self._currentTaskView
+    @currentTaskView.setter
+    def currentTaskView(self, value):
+        self._currentTaskView.append(value)

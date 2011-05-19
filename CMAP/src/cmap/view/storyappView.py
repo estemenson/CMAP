@@ -79,34 +79,20 @@ GestureCSS = '''
 }
 '''
 css_add_sheet(GestureCSS)
-BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 0,1,2,3,4,5
-artefact_types = {BACKLOG:'backlog',PROJECTS:'projects',RELEASES:'releases',
-                  SPRINTS:'sprints',STORIES:'stories',TASKS:'tasks'}
+from cmap.controller.storyapp import BACKLOG,PROJECTS,RELEASES,SPRINTS,\
+                                     STORIES,TASKS,artefact_types
+
 LABEL_NEW_PROJECT  = 'New\nProject...'
 LABEL_NEW_RELEASE  = 'New\nRelease...'
 LABEL_NEW_SPRINT   = 'New\nSprint...'
 LABEL_NEW_STORY    = 'New\nStory...'
 LABEL_NEW_TASK     = 'New\nTask...'
-CONTAINERS_BACKLOG = ['backlog_list_layout', 'backlog_flow']
-CONTAINERS_PROJECT = ['projects_flow']
-CONTAINERS_RELEASE = ['release_flow']
-CONTAINERS_SPRINT  = ['sprint_flow']
-CONTAINERS_STORY   = ['story_flow']
-CONTAINERS_TASK    = ['task_flow']
 
 class StoryAppView(MyInnerWindow):
-    def __init__(self, **kwargs):
-        global _storyapp_singleton #IGNORE:W0603
-        # Make ourself globally known
-        _storyapp_singleton = self
-        super(StoryApp, self).__init__(**kwargs)
+    def __init__(self,controller, **kwargs):
+        self.controller = controller
+        super(StoryAppView, self).__init__(**kwargs)
         set_caption("Collaborative Multitouch Agile Planner")
-        AsyncHandler().set_handler(ON_GITHUBNOTIFICATION,
-                                   self.on_github_notification)
-        self.no_local_repo = Config().localRepoNotAvailable
-        if not self.no_local_repo:
-            AsyncHandler().save([],
-                                'Cleanup any outstanding uncommitted edits')
         self.root_window = kwargs['root_window']
         self.canvas = None
         self.backlog_list_layout = MTGridLayout(rows=1)
@@ -126,32 +112,17 @@ class StoryAppView(MyInnerWindow):
                                         pos=(0,self.root_window.height-100)) 
         self.buttons = {}
         self.labels = {}
-        self.backlog = {}
-        self.artefacts = {}
-        self.story_files = []
-        self.tasks = {}
-        self.backlog_flow_open = True
-        self.projects_flow_open = True
-        self.releases_flow_open = True
-        self.story_flow_open = True
-        self.sprint_flow_open = True
-        self.task_flow_open = True
-        self.current_backlog = None
-        self.current_project = None
-        self.current_release = None
-        self.current_sprint = None
-        self.current_story = None
-        self.current_task = None
+#        self.backlog_flow_open = True
+#        self.projects_flow_open = True
+#        self.releases_flow_open = True
+#        self.story_flow_open = True
+#        self.sprint_flow_open = True
+#        self.task_flow_open = True
         self.currentProjectView = None
         self.currentReleaseView = None
         self.currentSprintView = None
         self.currentStoryView = None
         self.currentTaskView = None
-        
-        self.checked_for_releases = False
-        self.checked_for_sprints = False
-        self.checked_for_stories = False
-        self.checked_for_tasks = False
         
         # Load the default image for buttons and cover flows
         path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
@@ -272,29 +243,15 @@ class StoryAppView(MyInnerWindow):
         self.current_project = None
         self.current_story = None
         
-    def on_github_notification(self, ret):
-        msg = ret[1]
-        print("GOOGLE APP HOOK CCALLED ***************************************************************************")
-        for c in msg['commits']:
-            for a in c['added']:
-                Log.debug('%s added by %s' % (a, c['author']['name']))
-            for m in c['modified']:
-                Log.debug('%s modified by %s' % (m, c['author']['name']))
-            for r in c['removed']:
-                Log.debug('%s removed by %s' % (r, c['author']['name']))
-
+    def toggle_view_current_Artefact(self, artefact):
+        if artefact in self.container.children:
+            super(StoryAppView,self).remove_widget(artefact)
+        else:
+            super(StoryAppView,self).add_widget(artefact)
         
     def flow_backlog_select(self,btn):
         #make the selected backlog item the active one
-        try:
-            idu = btn.Id if isinstance(btn, ArtefactController)\
-                         else btn._id #IGNORE:W0212
-            self.current_backlog = self.backlog[idu] 
-            self.viewCurrentBacklog(btn)     
-        except KeyError:
-            #create new backlog story
-            lbl = self.new_backlog_pressed()
-            self.current_backlog = self.backlog[lbl.Id]
+        self.controller.add_current_artefact('backlog',btn)
         self.current_story = self.current_backlog
         set_caption(self.current_backlog[0].Name)
     def flow_projects_select(self,btn):
@@ -674,7 +631,7 @@ class StoryAppView(MyInnerWindow):
     def new_artefact_pressed(self,ctrl,view, **kwargs): # *largs
         _r = ctrl(self,None,**kwargs)
         self.__setattr__(view, _r.newDialog(minv=True))
-        super(StoryApp,self).add_widget(self.__getattribute__(view))
+        super(StoryAppView,self).add_widget(self.__getattribute__(view))
         return _r 
     def getBacklog(self,defn,**kwargs):
         kwargs['view_type'] = StoryView

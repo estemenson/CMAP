@@ -16,6 +16,8 @@ from __future__                         import unicode_literals
 # repository and the collaboration server
 from agileConfig                        import Config, AsyncHandler
 from async                              import ON_GITHUBNOTIFICATION
+from cmap.model.storyappModel import StoryAppModel
+from cmap.view.storyappView import StoryAppView
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -63,44 +65,50 @@ from cmap.controller.storyController    import StoryController
 from cmap.controller.taskController     import TaskController
 
 size = get_min_screen_size()
-
-
-GestureCSS = '''
-.gesturecss {
-    bg-color: rgba(185,211,238, 255);
-    border-color: rgb(100, 100, 220);
-    border-width: 20;
-    draw-border: 1;    
-}
-'''
-css_add_sheet(GestureCSS)
-
-BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 0,1,2,3,4,5
+BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 'backlog','projects','releases','sprints','stories','tasks'
 artefact_types = {
-                  {BACKLOG:'backlog'},
-                  {PROJECTS:'projects','view_type':ProjectView, 
-                   'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
-                   'model': ProjectModel,'folder':'projects'},
-                  {RELEASES:'releases','view_type':ReleaseView, 
-                   'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
-                   'model': ReleaseModel,'folder':'releases'},
-                  {SPRINTS:'sprints','view_type':SprintView, 
-                   'mini_view_type':SprintMinView, 'get_artefact':'newSprint',
-                   'model': SprintModel,'folder':'sprints'},
-                  {STORIES:'stories','view_type':StoryView, 
-                   'mini_view_type':MinStoryView, 'get_artefact':'newStory',
-                   'model': StoryModel,'folder':'stories'},
-                  {TASKS:'tasks','view_type':TaskView, 
-                   'mini_view_type':TaskMinView, 'get_artefact':'newTask',
-                   'model': TaskModel,'folder':'tasks'}}
+    BACKLOG:
+        {'type':BACKLOG,'view_type':StoryView, 'mini_view_type':MinStoryView, 
+         'get_artefact':'newBacklog', 'model': StoryModel,
+         'container':['backlog_list_layout', 'backlog_flow'], 
+         'viewCurrent':'viewCurrentBacklog', 'controller':StoryController, 
+         'current':'current_backlog'},
+    PROJECTS:
+        {'type':PROJECTS,'view_type':ProjectView, 
+         'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
+         'model': ProjectModel,'container':['projects_flow'], 
+         'viewCurrent':'viewCurrentProject','callback':'flow_projects_select', 
+         'controller':ProjectController, 'current':'current_project'},
+    RELEASES:
+        {'type':RELEASES,'view_type':ReleaseView, 
+         'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
+         'model': ReleaseModel,'container':['release_flow'], 
+         'viewCurrent':'viewCurrentRelease','callback':'flow_release_select', 
+         'controller':ReleaseController, 'current':'current_release'},
+    SPRINTS:
+        {'type':SPRINTS,'view_type':SprintView, 'mini_view_type':SprintMinView,
+         'get_artefact':'newSprint', 'model': SprintModel,
+         'container':['sprint_flow'],'viewCurrent':'viewCurrentSprint',
+         'callback':'flow_sprint_select','controller':SprintController, 
+         'current':'current_sprint'},
+    STORIES:
+        {'type':STORIES,'view_type':StoryView, 'mini_view_type':MinStoryView, 
+         'get_artefact':'newStory', 'model': StoryModel,
+         'container':['story_flow'], 'callback':'flow_task_select', 
+        'viewCurrent':'viewCurrentStory', 'controller':StoryController, 
+        'current':'current_story'},
+    TASKS:
+        {'type':TASKS,'view_type':TaskView, 'mini_view_type':TaskMinView, 
+         'get_artefact':'newTask', 'model': TaskModel,'container':['task_flow'], 
+         'viewCurrent':'viewCurrentTask','callback':'flow_task_select',
+         'controller':TaskController, 'current':'current_task'}
+    }
 
 class StoryApp(object):
     def __init__(self, **kwargs):
         global _storyapp_singleton #IGNORE:W0603
         # Make ourself globally known
         _storyapp_singleton = self
-        
-        set_caption("Collaborative Multitouch Agile Planner")
         
         #call back for repository notifications
         AsyncHandler().set_handler(ON_GITHUBNOTIFICATION,
@@ -117,39 +125,34 @@ class StoryApp(object):
         self._y_range = range(self.root_window.y, self.root_window.y + \
                               self.root_window.height - minimal_size[1])
 
-        #self.backlog = {}
-        self.artefacts = {}
-        self.story_files = []
-        #self.tasks = {}
-
-        self.current_backlog = None
-        self.current_project = None
-        self.current_release = None
-        self.current_sprint = None
-        self.current_story = None
-        self.current_task = None
-
-        self.currentProjectView = None
-        self.currentReleaseView = None
-        self.currentSprintView = None
-        self.currentStoryView = None
-        self.currentTaskView = None
-        
-        self.checked_for_releases = False
-        self.checked_for_sprints = False
-        self.checked_for_stories = False
-        self.checked_for_tasks = False
-        
         self.datastore = Config().datastore
         Log.debug('Path to repository: %s' % self.datastore)
 
-        #enable gesture detection
-        self.enable_gestures()
-        self.xmlFiles = self.get_local_artefacts()
-        
         #create the storyapp model and view
+        self.model = StoryAppModel(self)
+        self.view = StoryAppView(self)
+
+    def add_current_aretfact(self, type, artefact):
+        type = artefact_types[type]
+        id  = None
+        try:
+            id = artefact.Id if isinstance(artefact, ArtefactController)\
+                         else artefact._id #IGNORE:W0212
+            self.view.view_current_Artifact(artefact, type['current'],
+                                            type['callback'], type['type'] )     
+        except KeyError:
+            #create new backlog story
+            id = self.new_artefact().Id
         
-        
+        self.__setattr__(type['current'], self.artefacts[id])
+
+    def new_artefact(self,type,**kwargs): # *largs
+        _r = type['controller'](self,None,**kwargs)
+        view = type['viewCurrent']
+        self.__setattr__(view, _r.newDialog(minv=True))
+        self.view.add_artefact(view)
+        return _r 
+                
     def on_github_notification(self, ret):
         msg = ret[1]
         print("GOOGLE APP HOOK CCALLED ***************************************************************************")
@@ -487,44 +490,33 @@ class StoryApp(object):
     def remove_project_view(self,w):
         super(StoryApp,self).remove_widget(w)
     def newBacklog(self,ctrl):
-        return self.add_new_artefact(ctrl, CONTAINERS_BACKLOG, 
-                              'viewCurrentBacklog', self.backlog[ctrl.Id][1])
+        return self.add_new_artefact(ctrl, artefact_types[BACKLOG]['container'], 
+            artefact_types[BACKLOG]['viewCurrent'], self.backlog[ctrl.Id][1])
     def newProject(self,ctrl):
         return self.add_new_artefact(ctrl,
-                                     CONTAINERS_PROJECT,
-                                     'viewCurrentProject',
+                                     artefact_types[PROJECTS]['container'],
+                                     artefact_types[PROJECTS]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def newRelease(self,ctrl):
         return self.add_new_artefact(ctrl,
-                                     CONTAINERS_RELEASE,
-                                     'viewCurrentRelease',
+                                     artefact_types[RELEASES]['container'],
+                                     artefact_types[RELEASES]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def newSprint(self,ctrl):
         return self.add_new_artefact(ctrl,
-                                     CONTAINERS_SPRINT,
-                                     'viewCurrentSprint',
+                                     artefact_types[SPRINTS]['container'],
+                                     artefact_types[SPRINTS]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def newStory(self,ctrl):
         return self.add_new_artefact(ctrl,
-                                     CONTAINERS_STORY, 
-                                     'viewCurrentStory',
+                                     artefact_types[STORIES]['container'], 
+                                     artefact_types[STORIES]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def newTask(self,ctrl):
-        return self.add_new_artefact(ctrl,
-                                     CONTAINERS_TASK,
-                                     'viewCurrentTask',
+        return self.view.add_new_artefact(ctrl,
+                                     artefact_types[TASKS]['container'],
+                                     artefact_types[TASKS]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
-    def add_new_artefact(self, ctrl, container, callback, ret):
-        for c in container:
-            _lbl = MyImageButton(id=ctrl.Id, size=self._default_button_size,
-                                 image=self._default_image)
-            self.check_btn_width(_lbl)
-            _lbl.push_handlers(on_press=curry(self.__getattribute__(callback), 
-                                                                        _lbl))
-            self.__getattribute__(c).add_widget(_lbl)
-            ret[c] = _lbl
-        return ret
-            
     def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
         self.view_current_Artefact(lbl, 'current_backlog',\
                                     'flow_backlog_select', 'backlog')
@@ -557,53 +549,10 @@ class StoryApp(object):
             self.__getattribute__(flow_select)\
                             (self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
             return #to avoid add then removing the same widget
-        _view = _c.view
-        if _view in self.container.children:
-            super(StoryApp,self).remove_widget(_view)
-        else:
-            super(StoryApp,self).add_widget(_view)
-    def createNewBacklogFlowButton(self):
-        return self.create_button('Browse\nBacklog...',
-                                  curry(self._flow_pressed,\
-                        'backlog_flow_open',self.dragable_backlog_flow))
-    def createNewProjectFlowButton(self):
-        return self.create_button('Browse\nProjects...',\
-                                  curry(self._flow_pressed,\
-                        'projects_flow_open',self.dragable_project_flow))
-    def createNewReleasesFlowButton(self):
-        return self.create_button('Browse\nReleases...',
-                                  curry(self._flow_pressed,\
-                        'releases_flow_open',self.dragable_release_flow))
-    def createNewSprintFlowButton(self):
-        return self.create_button('Browse\nSprints...',
-                                  curry(self._flow_pressed,\
-                        'sprint_flow_open',self.dragable_sprint_flow))
-    def createNewStoryFlowButton(self):
-        return self.create_button('Browse\nStories...', 
-            curry(self._flow_pressed,\
-                        'story_flow_open',self.dragable_story_flow))
-    def createNewTaskFlowButton(self):
-        return self.create_button('Browse\nTasks...',
-                                  curry(self._flow_pressed,\
-                        'task_flow_open',self.dragable_task_flow))
-    def create_button(self,label,callback):#,flag=None,widget=None):
-        _btn = MTButton(multiline=True, label=label, anchor_x='left',
-                        halign='left', padding_x=8)
-        _btn.connect('on_press', callback)
-        _max = 1
-        for _s in label.splitlines():
-            _l = len(_s)
-            if _l > _max:
-                _max = _l
-        _btn.width = min(int(_max * pixels),100)
-        return _btn
+        self.view.toggle_view_current_Artefact(_c.view)
+        
     def update_story_btn_name(self,story):
-        idu = story.Id
-        btn = self.buttons[idu]
-        if btn.id == idu:
-            btn.label = story.Name
-            self.check_btn_width(btn)
-        return
+        return self.view.update_story_btn_name(story)
     def trash(self,artefact,atype=None):
         if atype is None:# or type is 'stories':
             btn = self.buttons[artefact.Id]
@@ -627,24 +576,9 @@ class StoryApp(object):
             super(StoryApp,self).add_widget(view)
         else: ctrl.app_btn_pressed()
     def fullscreen(self, *largs, **kwargs):
-        super(StoryApp,self).fullscreen()
-        root_win = self.parent.children
-        for rw in root_win:
-            try:
-                if rw.label == 'Back':
-                    self.parent.remove_widget(rw)
-                    rw.label = 'Exit'
-                    rw.pos = (self.width - 100, 0)
-                    rw.size=self._default_button_size
-                    self.main_ctlrs_container.add_widget(rw)
-                    Log.debug('Renamed back label to exit')
-                    return
-            except Exception: #IGNORE:W0703
-                pass
+        pass
     def unfullscreen(self, *largs, **kwargs):
-        self.root_window.remove_widget(self)
-        stopTouchApp()
-        Log.info('Closing CMAP application')
+        pass
     def close(self,touch=None):
         #close all the artefacts
         for a in self.artefacts.values():
@@ -665,25 +599,86 @@ class StoryApp(object):
             x = len(f.children) -1
     
     @property        
-    def Artefacts(self):
-        return self.artefacts
+    def artefacts(self):
+        return self.model.artefacts
+    @property
+    def current_project(self):
+        return self.model.current_project 
+    @current_project.setter
+    def current_project(self, value):
+        self.model.current_project.append(value)
+    @property
+    def current_release(self):
+        return self.model.current_release
+    @current_release.setter
+    def current_release(self, value):
+        self.model.current_release.append(value)
+    @property
+    def current_sprint(self):
+        return self.model.current_sprint
+    @current_sprint.setter
+    def current_sprint(self, value):
+        self.model.current_sprint.append(value)
+    @property
+    def current_story(self):
+        return self.model.current_story
+    @current_story.setter
+    def current_story(self, value):
+        self.model.current_story.append(value)
+    @property
+    def current_task(self):
+        return self.model.current_task
+    @current_task.setter
+    def current_task(self, value):
+        self.model.current_task.append(value)
+    @property
+    def currentProjectView(self):
+        return self.model.currentProjectView
+    @currentProjectView.setter
+    def currentProjectView(self, value):
+        self.model.currentProjectView.append(value)
+    @property
+    def currentReleaseView(self):
+        return self.model.currentReleaseView
+    @currentReleaseView.setter
+    def currentReleaseView(self, value):
+        self.model.currentReleaseView.append(value)
+    @property
+    def currentSprintView(self):
+        return self.model.currentSprintView
+    @currentSprintView.setter
+    def currentSprintView(self, value):
+        self.model.currentSprintView.append(value)
+    @property
+    def currentStoryView(self):
+        return self.model.currentStoryView
+    @currentStoryView.setter
+    def currentStoryView(self, value):
+        self.model.currentStoryView.append(value)
+    @property
+    def currentTaskView(self):
+        return self.model.currentTaskView
+    @currentTaskView.setter
+    def currentTaskView(self, value):
+        self.model.currentTaskView.append(value)
     
         
 if __name__ == '__main__':
     from pymt.ui.window import MTWindow
     from pymt.base import runTouchApp, stopTouchApp
+    from cmap.tools.myTools import scale_tuple
     mw = MTWindow()
     mw.size = scale_tuple(size,0.045)
     scale = .13
     size = scale_tuple(mw.size, scale)
     base_image = os.path.abspath(os.path.join(os.path.dirname(__file__),
                             '..',  '..', 'examples', 'framework','images'))
-    coverflow = MTCoverFlow(size=(500,500))
-    for fn in glob(os.path.join(base_image, '*.png')):
-        button = MTToggleButton(label=os.path.basename(fn)) #MTImageButton(image=Loader.image(filename))
-        coverflow.add_widget(button)
-    
-    dc = MyDragableContainer(coverflow, True)
-    mw.add_widget(dc)
+#    coverflow = MTCoverFlow(size=(500,500))
+#    for fn in glob(os.path.join(base_image, '*.png')):
+#        button = MTToggleButton(label=os.path.basename(fn)) #MTImageButton(image=Loader.image(filename))
+#        coverflow.add_widget(button)
+#    
+#    dc = MyDragableContainer(coverflow, True)
+#    mw.add_widget(dc)
     runTouchApp()
     
