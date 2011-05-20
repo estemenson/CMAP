@@ -27,8 +27,8 @@ class StoryController(ArtefactController):
         super(StoryController,self).__init__(main, defn, **kwargs)
         if kwargs.setdefault('project',None):
             self.project = kwargs['project'] 
-        if kwargs.setdefault('p_artifact',None):
-            self.sprint = kwargs['p_artifact'] 
+        if kwargs.setdefault('p_artefact',None):
+            self.sprint = kwargs['p_artefact'] 
         
     def createView(self):
         pos = None

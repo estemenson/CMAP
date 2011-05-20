@@ -13,7 +13,7 @@ except Exception: #IGNORE:W0703
 from cmap.tools.mvc.mvc import Observer, Subject
 from xml.dom import minidom
 from cmap.tools.uniqueID import uuid
-from cmap.controller.storyapp import Storyapp
+#from cmap.controller.storyapp import Storyapp
 from os.path import abspath, join, dirname, basename, exists, splitext
 import os
 os.environ.setdefault("GIT_PYTHON_TRACE", "full")
@@ -39,7 +39,7 @@ class BaseModel(Observer, Subject):
         self._ActualFinish = None
         self._ActualHours = None
         self._schema = kwargs['model_str']
-        self.datapath = abspath(join(Config().datastore,kwargs['folder']))
+        self.datapath = abspath(join(Config().datastore,kwargs['type']))
         if not os.path.exists(self.datapath):
             os.mkdir(self.datapath)
         Log.debug('Creating skeleton %s' % self._schema)
@@ -227,10 +227,10 @@ class BaseModel(Observer, Subject):
         node.firstChild.data = v
     def _set_parent(self, value):
         '''
-        Setter for the parent of an artifact
-        The attribute is the actual artifact object that is the parent of this
-        artifact.
-        The value argument is the artifact object of the parent
+        Setter for the parent of an artefact
+        The attribute is the actual artefact object that is the parent of this
+        artefact.
+        The value argument is the artefact object of the parent
         The XML element for Parent has two attributes
         a) The type of the parent - this is the name of the XML Document
            element for the parent
@@ -371,7 +371,7 @@ class BaseModel(Observer, Subject):
         self._dom = value
     dom = property(_get_dom, _set_dom)
     @property
-    def ArtifactType(self):
+    def ArtefactType(self):
         return self._dom.documentElement.nodeName
         
     Id = property(_get_id, _set_id)    
@@ -425,9 +425,10 @@ class BaseModel(Observer, Subject):
                 pass
     def listData(self, target, atype):
         ret = []
+        from cmap.controller.storyapp import Storyapp
         for c in target:
-            aro = Storyapp().Artifacts[c]
-            if aro.ArtifactType == atype:
+            aro = Storyapp().artefacts[c]
+            if aro.ArtefactType == atype:
                 ret.append(c)
         return ret
     def trash(self):
@@ -475,7 +476,8 @@ class BaseModel(Observer, Subject):
             fnp.append(fn)
             self.dirty = False
             # Save our dirty parents
-            p = Storyapp().Artifacts
+            from cmap.controller.storyapp import Storyapp
+            p = Storyapp().artefacts
             if self.Parent:
                 try:
                     p[self.Parent][0].internalSave(fnp)

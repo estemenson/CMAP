@@ -24,8 +24,8 @@ class TaskController(ArtefactController):
         kwargs['view_type_name'] = 'Task'
         super(TaskController,self).__init__(main,defn,**kwargs)
         self._project = None
-        if kwargs.setdefault('p_artifact', None):
-            self.story = kwargs['p_artifact']
+        if kwargs.setdefault('p_artefact', None):
+            self.story = kwargs['p_artefact']
     def _get_sprint(self): return self._model.Sprint
     def _set_sprint(self,  value): 
         self._model.Sprint = value

@@ -83,7 +83,7 @@ def main():
         else:
             Log.debug('Fullscreen mode...')
             b = StoryApp(root_window=w,size=w.size, pos=(0,0), 
-                                  control_scale=0.7)
+                                  control_scale=0.7).view
         w.add_widget(b)
         b.fullscreen()
         # Run the application

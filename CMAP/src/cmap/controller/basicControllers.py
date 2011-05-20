@@ -23,7 +23,7 @@ except Exception: #IGNORE:W0703
 # Determine maximum physical screen size
 from cmap.view.baseViews import minimal_size
 from cmap.tools.myTools import get_min_screen_size, scale_tuple
-from cmap.controller.storyapp import Storyapp
+#from cmap.controller.storyapp import Storyapp
 
 min_size = get_min_screen_size()
 
@@ -43,9 +43,9 @@ class ArtefactController(Subject,Observer):
         self.isMinimal = True
         self._mini_view_type = kwargs['mini_view_type']
         self._view_type = kwargs['view_type']
-        self._save_callback = kwargs['get_artifact']
+        self._save_callback = kwargs['get_artefact']
         self._view_type_name = kwargs['view_type_name']
-        self._p_artifact = kwargs.setdefault('p_artifact',None)
+        self._p_artefact = kwargs.setdefault('p_artefact',None)
         self._x_range = range(int(self.root.x + int(minimal_size[0]/2)), 
                               int(self.root.width - minimal_size[0]))
         self._y_range = range(int(self.root.y + 100), 
@@ -75,7 +75,8 @@ class ArtefactController(Subject,Observer):
     def trash(self):
         if self.Id:
             self._model.trash()
-            self.root.trash(self, Storyapp().Artifacts)
+            from cmap.controller.storyapp import Storyapp
+            self.root.trash(self, Storyapp().artefacts)
 #        for o in self.observers:
 #            try:
 #                o.trash(self.view)
@@ -83,7 +84,7 @@ class ArtefactController(Subject,Observer):
 #            except:
 #                pass        
     def createModel(self,defn, **kwargs):
-        kwargs['p_artifact'] = self._p_artifact
+        kwargs['p_artefact'] = self._p_artefact
         self.Model = kwargs['model'](self, **kwargs)
         self._model.load_from_disk(defn)
     def scribble_text_change(self, text):
@@ -190,7 +191,7 @@ class ArtefactController(Subject,Observer):
         self._model.Children = value
     Children = property(_get_children, _set_children)
     @property
-    def ArtifactType(self): return self._model.ArtifactType
+    def ArtefactType(self): return self._model.ArtefactType
     @property
     def dom(self): return self._model.dom
     

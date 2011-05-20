@@ -25,7 +25,7 @@ class ProjectCtrl(ArtefactController):
     def __init__(self,root, file=None, **kwargs):
         kwargs.setdefault('mini_view_type', MinView)#ProjectMinView)
         kwargs.setdefault('view_type', MinView)#ProjectMinView)
-        kwargs.setdefault('get_artifact',None)
+        kwargs.setdefault('get_artefact',None)
         kwargs.setdefault('ctrl_container', None)
         kwargs.setdefault('model', ProjectModel)
         kwargs['view_type_name'] = 'Project'

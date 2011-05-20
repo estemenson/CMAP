@@ -16,6 +16,21 @@ from __future__ import unicode_literals
 # repository and the collaboration server
 from agileConfig import Config, AsyncHandler
 from async import ON_GITHUBNOTIFICATION
+from cmap.view.stories.storyViews import MinStoryView, StoryView
+from cmap.model.storyModel import StoryModel
+from cmap.controller.storyController import StoryController
+from cmap.view.projects.projectViews import ProjectView, ProjectMinView
+from cmap.model.projectModel import ProjectModel
+from cmap.controller.projectController import ProjectController
+from cmap.view.releases.releaseViews import ReleaseView, ReleaseMinView
+from cmap.model.releaseModel import ReleaseModel
+from cmap.controller.releaseController import ReleaseController
+from cmap.view.sprints.sprintViews import SprintMinView, SprintView
+from cmap.model.sprintModel import SprintModel
+from cmap.controller.sprintController import SprintController
+from cmap.view.tasks.taskViews import TaskMinView, TaskView
+from cmap.model.taskModel import TaskModel
+from cmap.controller.taskController import TaskController
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -24,14 +39,52 @@ except Exception: #IGNORE:W0703
     
 import os.path
 from glob     import glob
-from cmap.controller.storyapp import artefact_types
+BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 'backlog','projects',\
+                                        'releases','sprints','stories','tasks'
+artefact_types = {
+    BACKLOG:
+        {'type':BACKLOG,'view_type':StoryView, 'mini_view_type':MinStoryView, 
+         'get_artefact':'newBacklog', 'model': StoryModel,
+         'container':['backlog_list_layout', 'backlog_flow'], 
+         'viewCurrent':'viewCurrentBacklog', 'controller':StoryController, 
+         'current':'current_backlog'},
+    PROJECTS:
+        {'type':PROJECTS,'view_type':ProjectView, 
+         'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
+         'model': ProjectModel,'container':['projects_flow'], 
+         'viewCurrent':'viewCurrentProject','callback':'flow_projects_select', 
+         'controller':ProjectController, 'current':'current_project'},
+    RELEASES:
+        {'type':RELEASES,'view_type':ReleaseView, 
+         'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
+         'model': ReleaseModel,'container':['release_flow'], 
+         'viewCurrent':'viewCurrentRelease','callback':'flow_release_select', 
+         'controller':ReleaseController, 'current':'current_release'},
+    SPRINTS:
+        {'type':SPRINTS,'view_type':SprintView, 'mini_view_type':SprintMinView,
+         'get_artefact':'newSprint', 'model': SprintModel,
+         'container':['sprint_flow'],'viewCurrent':'viewCurrentSprint',
+         'callback':'flow_sprint_select','controller':SprintController, 
+         'current':'current_sprint'},
+    STORIES:
+        {'type':STORIES,'view_type':StoryView, 'mini_view_type':MinStoryView, 
+         'get_artefact':'newStory', 'model': StoryModel,
+         'container':['story_flow'], 'callback':'flow_task_select', 
+        'viewCurrent':'viewCurrentStory', 'controller':StoryController, 
+        'current':'current_story'},
+    TASKS:
+        {'type':TASKS,'view_type':TaskView, 'mini_view_type':TaskMinView, 
+         'get_artefact':'newTask', 'model': TaskModel,'container':['task_flow'], 
+         'viewCurrent':'viewCurrentTask','callback':'flow_task_select',
+         'controller':TaskController, 'current':'current_task'}
+    }
 
 class StoryAppModel(object):
     def __init__(self, controller,**kwargs):
         self._artefacts = {}
         self.controller = controller
-        self.path = Config().datastore
-        Log.debug('Path to repository: %s' % self.path)
+        self.datastore = Config().datastore
+        Log.debug('Path to repository: %s' % self.datastore)
         self._current_backlog    = []
         self._current_project    = []
         self._current_release    = []
@@ -53,37 +106,42 @@ class StoryAppModel(object):
         Loads the file names of all local artefacts into a dictionary
         keyed on artefact type
         '''
-        Log.debug('path: %s' % self.path)
+        Log.debug('path: %s' % self.datastore)
         self.xmlFiles = {}
-        for atype in artefact_types.values():
+        for atype in artefact_types.keys():
             self.xmlFiles[atype] = []
-            self.xmlFiles[atype].append(f for f in glob(
+            self.xmlFiles[atype].extend(glob(
                                 os.path.join(self.datastore, atype, '*.xml')))
         
     def load_artefacts(self):
-        for type in artefact_types.values():
-            for artefact in self.xmlFiles[type['type']]:
+        for type in artefact_types:
+            for artefact in self.xmlFiles[type]:
                 Log.debug('loading %s' % artefact)
-                ctrl = self.getArtefact(artefact, type['controller'],
-                                        type['model'], type['get_artefact'], 
-                    name=os.path.splitext(os.path.basename(artefact))[0])
+#                ctrl = self.controller.getArtefact(artefact, type['controller'],
+#                                        type['model'], type['get_artefact'], 
+#                    name=os.path.splitext(os.path.basename(artefact))[0])
+                ctrl = self.controller.getArtefact(type=artefact,controller=artefact_types[type]['controller'],
+                                        model=artefact_types[type]['model'], 
+                                        get_artefact=artefact_types[type]['get_artefact'],
+                                        name=os.path.splitext(os.path.basename(artefact))[0]) 
             self.artefacts[ctrl.Id] = (ctrl,{})
-            self.add_new_artefact(ctrl,
-                                     type['container'],type['viewCurrent'],
+            self.controller.add_new_artefact(ctrl,
+                                     artefact_types[type]['container'],artefact_types[type]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def trash(self,artefact,atype=None):
         Log.debug('Need to trash artefact: %s' % artefact)
         return
     def close(self,touch=None):
-        #close all the artefacts
-        for a in self.artefacts.values():
-            a[0].close()
-        for b in self.backlog.values():
-            b[0].close()
+        pass
+#        #close all the artefacts
+#        for a in self.artefacts.values():
+#            a[0].close()
+#        for b in self.backlog.values():
+#            b[0].close()
     
     @property        
     def artefacts(self):
-        return self.artefacts
+        return self._artefacts
     @property
     def current_project(self):
         return self._current_project 

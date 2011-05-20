@@ -28,7 +28,7 @@ from pymt.core.image import Image
 from OpenGL.GL import glReadBuffer, glReadPixels, GL_RGB, \
             GL_UNSIGNED_BYTE, GL_FRONT
 from pymt.texture import Texture
-from cmap.controller.storyapp import Storyapp
+#from cmap.controller.storyapp import Storyapp
 
 minimal_size = (600,400)
 pixels = 9
@@ -163,19 +163,20 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         texture = Texture.create(size[0], size[1], format=GL_RGB)
         texture.blit_buffer(data, size)
         self._button_image = Image(texture)
-        # Update all the buttons referencing this artifact
+        # Update all the buttons referencing this artefact
+        from cmap.controller.storyapp import Storyapp
         try:
-            blist = Storyapp().artifacts[self.Id][1]
+            blist = Storyapp().artefacts[self.Id][1]
             for im in blist:
                 blist[im].image = self._button_image
         except KeyError:
             pass
-        try:
-            blist = Storyapp().backlog[self.Id][1]
-            for im in blist:
-                blist[im].image = self._button_image
-        except KeyError:
-            pass
+#        try:
+#            blist = Storyapp().backlog[self.Id][1]
+#            for im in blist:
+#                blist[im].image = self._button_image
+#        except KeyError:
+#            pass
 
     def save(self, touch=None):
         self.ctrl.save()
@@ -279,11 +280,11 @@ if __name__ == '__main__':
                'cls':'type1css'}
     c = TaskController(mw,  #IGNORE:W0142
                        None,
-                       p_artifact=None,
+                       p_artefact=None,
                        model=TaskModel,
                        view_type=MinView,
                        mini_view_type=MinView,
-                       get_artifact=None, **mkwargs)
+                       get_artefact=None, **mkwargs)
     mw.add_widget(c.view)
     mw.size = scale_tuple(get_min_screen_size(),.045)
     runTouchApp()
