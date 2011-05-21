@@ -608,12 +608,16 @@ class StoryApp(object):
     def close(self,touch=None):
         #close all the artefacts
         for a in self.artefacts.values():
-            a[0].close()
+            ctrl = a[0]
+            try:
+                ctrl.close()
+            except TypeError:
+                Log.debug('Unable to close %s' % ctrl)
 #        for b in self.backlog.values():
 #            b[0].close()
         self.add_to_git()
         AsyncHandler().shutdown()
-        super(StoryApp, self).close(touch)
+        super(StoryAppView, self.view).close(touch)
     def add_to_git(self):
         AsyncHandler().save(None, 'Commit session edits')    
     def container_reset_children(self,container):
