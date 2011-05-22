@@ -18,6 +18,8 @@ from agileConfig                        import Config, AsyncHandler
 from async                              import ON_GITHUBNOTIFICATION
 from cmap.model.storyappModel import StoryAppModel
 from cmap.view.storyappView import StoryAppView
+from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
+
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -64,46 +66,6 @@ from cmap.controller.sprintController   import SprintController
 from cmap.controller.storyController    import StoryController
 from cmap.controller.taskController     import TaskController
 
-#size = get_min_screen_size()
-BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 'backlog','projects',\
-                                        'releases','sprints','stories','tasks'
-artefact_types = {
-    BACKLOG:
-        {'type':BACKLOG,'view_type':StoryView, 'mini_view_type':MinStoryView, 
-         'get_artefact':'newBacklog', 'model': StoryModel,
-         'container':['backlog_list_layout', 'backlog_flow'], 
-         'viewCurrent':'viewCurrentBacklog', 'controller':StoryController, 
-         'current':'current_backlog'},
-    PROJECTS:
-        {'type':PROJECTS,'view_type':ProjectView, 
-         'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
-         'model': ProjectModel,'container':['projects_flow'], 
-         'viewCurrent':'viewCurrentProject','callback':'flow_projects_select', 
-         'controller':ProjectController, 'current':'current_project'},
-    RELEASES:
-        {'type':RELEASES,'view_type':ReleaseView, 
-         'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
-         'model': ReleaseModel,'container':['release_flow'], 
-         'viewCurrent':'viewCurrentRelease','callback':'flow_release_select', 
-         'controller':ReleaseController, 'current':'current_release'},
-    SPRINTS:
-        {'type':SPRINTS,'view_type':SprintView, 'mini_view_type':SprintMinView,
-         'get_artefact':'newSprint', 'model': SprintModel,
-         'container':['sprint_flow'],'viewCurrent':'viewCurrentSprint',
-         'callback':'flow_sprint_select','controller':SprintController, 
-         'current':'current_sprint'},
-    STORIES:
-        {'type':STORIES,'view_type':StoryView, 'mini_view_type':MinStoryView, 
-         'get_artefact':'newStory', 'model': StoryModel,
-         'container':['story_flow'], 'callback':'flow_task_select', 
-        'viewCurrent':'viewCurrentStory', 'controller':StoryController, 
-        'current':'current_story'},
-    TASKS:
-        {'type':TASKS,'view_type':TaskView, 'mini_view_type':TaskMinView, 
-         'get_artefact':'newTask', 'model': TaskModel,'container':['task_flow'], 
-         'viewCurrent':'viewCurrentTask','callback':'flow_task_select',
-         'controller':TaskController, 'current':'current_task'}
-    }
 
 class StoryApp(object):
     def __init__(self, **kwargs):
@@ -544,40 +506,40 @@ class StoryApp(object):
                                      self.artefacts[ctrl.Id][1])
     def add_new_artefact(self, ctrl, container, callback, ret):
         return self.view.add_new_artefact(ctrl, container, callback, ret)
-    def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
-        self.view_current_Artefact(lbl, 'current_backlog',\
-                                    'flow_backlog_select', 'backlog')
-    def viewCurrentProject(self,lbl, *largs): #IGNORE:W0613
-        self.view_current_Artefact(lbl, 'current_project',\
-                                    'flow_projects_select', 'projects')
-    def viewCurrentRelease(self,lbl, *largs): #IGNORE:W0613
-        self.view_current_Artefact(lbl, 'current_release',\
-                                    'flow_release_select', 'releases')
-    def viewCurrentSprint(self,lbl, *largs): #IGNORE:W0613
-        self.view_current_Artefact(lbl, 'current_sprint',\
-                                    'flow_sprint_select', 'sprints')
-    def viewCurrentStory(self,lbl, *largs): #IGNORE:W0613
-        self.view_current_Artefact(lbl, 'current_story',\
-                                    'flow_story_select', 'stories')
-    def viewCurrentTask(self,lbl, *largs): #IGNORE:W0613
-        self.view_current_Artefact(lbl, 'current_task',\
-                                    'flow_task_select', 'tasks')
-    def view_current_Artefact(self,lbl,curr,flow_select, container):
-        try:
-            _c = self.__getattribute__(curr)[0]
-        except Exception: #IGNORE:W0703
-            _c = Dummy()
-            _c.Id = ''
-
-        idu =  lbl.Id if isinstance(lbl, ArtefactController)\
-                      else lbl._id #IGNORE:W0212          
-        if _c.Id != idu:
-            #set current artefact to the one selected
-            self.__getattribute__(flow_select)\
-                            (self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
-            return #to avoid add then removing the same widget
-        self.view.toggle_view_current_Artefact(_c.view)
-        
+#    def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_backlog',\
+#                                    'flow_backlog_select', 'backlog')
+#    def viewCurrentProject(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_project',\
+#                                    'flow_projects_select', 'projects')
+#    def viewCurrentRelease(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_release',\
+#                                    'flow_release_select', 'releases')
+#    def viewCurrentSprint(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_sprint',\
+#                                    'flow_sprint_select', 'sprints')
+#    def viewCurrentStory(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_story',\
+#                                    'flow_story_select', 'stories')
+#    def viewCurrentTask(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_task',\
+#                                    'flow_task_select', 'tasks')
+#    def view_current_Artefact(self,lbl,curr,flow_select, container):
+#        try:
+#            _c = self.__getattribute__(curr)[0]
+#        except Exception: #IGNORE:W0703
+#            _c = Dummy()
+#            _c.Id = ''
+#
+#        idu =  lbl.Id if isinstance(lbl, ArtefactController)\
+#                      else lbl._id #IGNORE:W0212          
+#        if _c.Id != idu:
+#            #set current artefact to the one selected
+#            self.__getattribute__(flow_select)\
+#                            (self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
+#            return #to avoid add then removing the same widget
+#        self.view.toggle_view_current_Artefact(_c.view)
+#        
     def update_story_btn_name(self,story):
         return self.view.update_story_btn_name(story)
     def trash(self,artefact,atype=None):

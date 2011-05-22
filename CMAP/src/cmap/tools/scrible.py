@@ -16,7 +16,6 @@ from pymt.ui.widgets.button import MTImageButton
 from pymt.loader import Loader
 from pymt.ui.widgets.layout.gridlayout import MTGridLayout
 from pymt.parser import parse_color
-from cmap import AGILE_ICONS
 from agileConfig import Config
 try:
     Log = Config().log.logger
@@ -82,6 +81,7 @@ DEFAULT_COLOR=WHITE=parse_color('rgb(255,255,255)')
 BLACK=parse_color('rgb(0,0,0)')
 DELETED_LINE=parse_color('rgb(30,30,0)')
 from os import path
+AGILE_ICONS = path.join(Config().datastore, '..','icons')
 OPEN_SIDE_ICON = path.join(AGILE_ICONS,'arrow-left-double-2.png')
 CLOSE_SIDE_ICON = path.join(AGILE_ICONS,'arrow-right-double-2.png')
 COLOR_ICON = path.join(AGILE_ICONS,'color_line 48.png')

@@ -36,48 +36,9 @@ try:
 except Exception: #IGNORE:W0703
     from petaapan.utilities.console_logger import ConsoleLogger
     Log = ConsoleLogger('AgiMan')
-    
+from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
 import os.path
 from glob     import glob
-BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 'backlog','projects',\
-                                        'releases','sprints','stories','tasks'
-artefact_types = {
-    BACKLOG:
-        {'type':BACKLOG,'view_type':StoryView, 'mini_view_type':MinStoryView, 
-         'get_artefact':'newBacklog', 'model': StoryModel,
-         'container':['backlog_list_layout', 'backlog_flow'], 
-         'viewCurrent':'viewCurrentBacklog', 'controller':StoryController, 
-         'current':'current_backlog'},
-    PROJECTS:
-        {'type':PROJECTS,'view_type':ProjectView, 
-         'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
-         'model': ProjectModel,'container':['projects_flow'], 
-         'viewCurrent':'viewCurrentProject','callback':'flow_projects_select', 
-         'controller':ProjectController, 'current':'current_project'},
-    RELEASES:
-        {'type':RELEASES,'view_type':ReleaseView, 
-         'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
-         'model': ReleaseModel,'container':['release_flow'], 
-         'viewCurrent':'viewCurrentRelease','callback':'flow_release_select', 
-         'controller':ReleaseController, 'current':'current_release'},
-    SPRINTS:
-        {'type':SPRINTS,'view_type':SprintView, 'mini_view_type':SprintMinView,
-         'get_artefact':'newSprint', 'model': SprintModel,
-         'container':['sprint_flow'],'viewCurrent':'viewCurrentSprint',
-         'callback':'flow_sprint_select','controller':SprintController, 
-         'current':'current_sprint'},
-    STORIES:
-        {'type':STORIES,'view_type':StoryView, 'mini_view_type':MinStoryView, 
-         'get_artefact':'newStory', 'model': StoryModel,
-         'container':['story_flow'], 'callback':'flow_task_select', 
-        'viewCurrent':'viewCurrentStory', 'controller':StoryController, 
-        'current':'current_story'},
-    TASKS:
-        {'type':TASKS,'view_type':TaskView, 'mini_view_type':TaskMinView, 
-         'get_artefact':'newTask', 'model': TaskModel,'container':['task_flow'], 
-         'viewCurrent':'viewCurrentTask','callback':'flow_task_select',
-         'controller':TaskController, 'current':'current_task'}
-    }
 
 class StoryAppModel(object):
     def __init__(self, **kwargs):

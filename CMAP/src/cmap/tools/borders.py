@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 
 from agileConfig import Config
 from cmap.tools.decorators import MyDragableContainer
-from cmap import AGILE_ICONS
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -51,7 +50,7 @@ InnerWindowCSS = '''
 '''
 
 css_add_sheet(InnerWindowCSS)
-_iconPath = AGILE_ICONS #os.path.dirname(__file__)
+_iconPath = os.path.join(Config().datastore, '..','icons')#os.path.dirname(__file__)
 _minimize_icon_path = os.path.join(_iconPath, 'min.png')
 _trash_icon_path = os.path.join(_iconPath,'User-trash.png')
 _save_icon_path = os.path.join(_iconPath,'save.png')

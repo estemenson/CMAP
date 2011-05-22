@@ -69,7 +69,7 @@ from cmap.tools.borders import MyInnerWindow
 from pymt.ui.window import MTWindow
 from pymt.base import runTouchApp, stopTouchApp
 from pygame.display import set_caption
-
+from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
 GestureCSS = '''
 .gesturecss {
     bg-color: rgba(185,211,238, 255);
@@ -79,45 +79,6 @@ GestureCSS = '''
 }
 '''
 css_add_sheet(GestureCSS)
-BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS = 'backlog','projects',\
-                                        'releases','sprints','stories','tasks'
-artefact_types = {
-    BACKLOG:
-        {'type':BACKLOG,'view_type':StoryView, 'mini_view_type':MinStoryView, 
-         'get_artefact':'newBacklog', 'model': StoryModel,
-         'container':['backlog_list_layout', 'backlog_flow'], 
-         'viewCurrent':'viewCurrentBacklog', 'controller':StoryController, 
-         'current':'current_backlog'},
-    PROJECTS:
-        {'type':PROJECTS,'view_type':ProjectView, 
-         'mini_view_type':ProjectMinView, 'get_artefact':'newProject',
-         'model': ProjectModel,'container':['projects_flow'], 
-         'viewCurrent':'viewCurrentProject','callback':'flow_projects_select', 
-         'controller':ProjectController, 'current':'current_project'},
-    RELEASES:
-        {'type':RELEASES,'view_type':ReleaseView, 
-         'mini_view_type':ReleaseMinView, 'get_artefact':'newRelease',
-         'model': ReleaseModel,'container':['release_flow'], 
-         'viewCurrent':'viewCurrentRelease','callback':'flow_release_select', 
-         'controller':ReleaseController, 'current':'current_release'},
-    SPRINTS:
-        {'type':SPRINTS,'view_type':SprintView, 'mini_view_type':SprintMinView,
-         'get_artefact':'newSprint', 'model': SprintModel,
-         'container':['sprint_flow'],'viewCurrent':'viewCurrentSprint',
-         'callback':'flow_sprint_select','controller':SprintController, 
-         'current':'current_sprint'},
-    STORIES:
-        {'type':STORIES,'view_type':StoryView, 'mini_view_type':MinStoryView, 
-         'get_artefact':'newStory', 'model': StoryModel,
-         'container':['story_flow'], 'callback':'flow_task_select', 
-        'viewCurrent':'viewCurrentStory', 'controller':StoryController, 
-        'current':'current_story'},
-    TASKS:
-        {'type':TASKS,'view_type':TaskView, 'mini_view_type':TaskMinView, 
-         'get_artefact':'newTask', 'model': TaskModel,'container':['task_flow'], 
-         'viewCurrent':'viewCurrentTask','callback':'flow_task_select',
-         'controller':TaskController, 'current':'current_task'}
-    }
 
 LABEL_NEW_PROJECT  = 'New\nProject...'
 LABEL_NEW_RELEASE  = 'New\nRelease...'
@@ -132,6 +93,12 @@ class StoryAppView(MyInnerWindow):
         set_caption("Collaborative Multitouch Agile Planner")
         self.root_window = kwargs['root_window']
         self.canvas = None
+        self.backlog_flow_open  = False
+        self.projects_flow_open = False
+        self.releases_flow_open = False
+        self.sprint_flow_open   = False
+        self.story_flow_open    = False
+        self.task_flow_open     = False
         self.buttons = {}
         self.labels = {}
         self.backlog_list_layout = MTGridLayout(rows=1)
@@ -295,7 +262,7 @@ class StoryAppView(MyInnerWindow):
             widget.pos = self.get_new_random_position()
             super(StoryAppView,self).add_widget(widget)
     def get_new_random_position(self):
-        return (choice(self._x_range),choice(self._y_range))
+        return self.controller.get_new_random_position()
     def enable_gestures(self):
         print("enabling gestures")
         gdb = myGestures()
@@ -334,9 +301,6 @@ class StoryAppView(MyInnerWindow):
         self.controller.load_children(id, type)
     def createNewBacklogButton(self):
         return self.create_button(LABEL_NEW_BACKLOG,curry(self.new_story_pressed))
-    def createNewProjectButton(self):
-        return self.create_button(LABEL_NEW_PROJECT,curry(\
-                                                    self.new_project_pressed))
     def createNewReleaseButton(self):
         return self.create_button(LABEL_NEW_RELEASE,curry(\
                                                     self.new_release_pressed))
@@ -492,42 +456,42 @@ class StoryAppView(MyInnerWindow):
         self.__setattr__(view, _r.newDialog(minv=True))
         super(StoryAppView,self).add_widget(self.__getattribute__(view))
         return _r 
-    def getBacklog(self,defn,**kwargs):
-        kwargs['view_type'] = StoryView
-        kwargs['mini_view_type'] = MinStoryView
-        kwargs['get_artefact'] = 'newBacklog'
-        kwargs['model'] = StoryModel
-        return self.getArtefact(defn, StoryController, **kwargs)
-    def getProject(self,defn,**kwargs):
-        kwargs['view_type'] = ProjectView
-        kwargs['mini_view_type'] = ProjectMinView
-        kwargs['get_artefact'] = 'newProject'
-        kwargs['model'] = ProjectModel
-        return self.getArtefact(defn, ProjectController, **kwargs)
-    def getRelease(self,defn,**kwargs):
-        kwargs['view_type'] = ReleaseView
-        kwargs['mini_view_type'] = ReleaseMinView
-        kwargs['get_artefact'] = 'newRelease'
-        kwargs['model'] = ReleaseModel
-        return self.getArtefact(defn, ReleaseController, **kwargs)
-    def getSprint(self,defn,**kwargs):
-        kwargs['view_type'] = SprintView
-        kwargs['mini_view_type'] = SprintMinView
-        kwargs['get_artefact'] = 'newSprint'
-        kwargs['model'] = SprintModel
-        return self.getArtefact(defn, SprintController, **kwargs)
-    def getStory(self,defn,**kwargs):
-        kwargs['view_type'] = StoryView
-        kwargs['mini_view_type'] = MinStoryView
-        kwargs['get_artefact'] = 'newStory'
-        kwargs['model'] = StoryModel
-        return self.getArtefact(defn, StoryController, **kwargs)
-    def getTask(self,defn,**kwargs):
-        kwargs['view_type'] = TaskView
-        kwargs['mini_view_type'] = TaskMinView
-        kwargs['get_artefact'] = 'newTask'
-        kwargs['model'] = TaskModel
-        return self.getArtefact(defn, TaskController,**kwargs)
+#    def getBacklog(self,defn,**kwargs):
+#        kwargs['view_type'] = StoryView
+#        kwargs['mini_view_type'] = MinStoryView
+#        kwargs['get_artefact'] = 'newBacklog'
+#        kwargs['model'] = StoryModel
+#        return self.getArtefact(defn, StoryController, **kwargs)
+#    def getProject(self,defn,**kwargs):
+#        kwargs['view_type'] = ProjectView
+#        kwargs['mini_view_type'] = ProjectMinView
+#        kwargs['get_artefact'] = 'newProject'
+#        kwargs['model'] = ProjectModel
+#        return self.getArtefact(defn, ProjectController, **kwargs)
+#    def getRelease(self,defn,**kwargs):
+#        kwargs['view_type'] = ReleaseView
+#        kwargs['mini_view_type'] = ReleaseMinView
+#        kwargs['get_artefact'] = 'newRelease'
+#        kwargs['model'] = ReleaseModel
+#        return self.getArtefact(defn, ReleaseController, **kwargs)
+#    def getSprint(self,defn,**kwargs):
+#        kwargs['view_type'] = SprintView
+#        kwargs['mini_view_type'] = SprintMinView
+#        kwargs['get_artefact'] = 'newSprint'
+#        kwargs['model'] = SprintModel
+#        return self.getArtefact(defn, SprintController, **kwargs)
+#    def getStory(self,defn,**kwargs):
+#        kwargs['view_type'] = StoryView
+#        kwargs['mini_view_type'] = MinStoryView
+#        kwargs['get_artefact'] = 'newStory'
+#        kwargs['model'] = StoryModel
+#        return self.getArtefact(defn, StoryController, **kwargs)
+#    def getTask(self,defn,**kwargs):
+#        kwargs['view_type'] = TaskView
+#        kwargs['mini_view_type'] = TaskMinView
+#        kwargs['get_artefact'] = 'newTask'
+#        kwargs['model'] = TaskModel
+#        return self.getArtefact(defn, TaskController,**kwargs)
     def getArtefact(self,defn,ctrl,**kwargs):
         _p = kwargs.setdefault('controller', None)
         if _p is None:
@@ -628,6 +592,9 @@ class StoryAppView(MyInnerWindow):
         return self.create_button('Browse\nBacklog...',
                                   curry(self._flow_pressed,\
                         'backlog_flow_open',self.dragable_backlog_flow))
+    def createNewProjectButton(self):
+        return self.create_button(LABEL_NEW_PROJECT,curry(\
+                                                    self.new_project_pressed))
     def createNewProjectFlowButton(self):
         return self.create_button('Browse\nProjects...',\
                                   curry(self._flow_pressed,\

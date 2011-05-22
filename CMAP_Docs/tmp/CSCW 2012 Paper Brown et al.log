@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.1415926-1.40.11 (MiKTeX 2.9) (preloaded format=pdflatex 2011.1.3)  14 MAY 2011 08:31
+This is pdfTeX, Version 3.1415926-1.40.11 (MiKTeX 2.9) (preloaded format=pdflatex 2011.1.3)  22 MAY 2011 17:22
 entering extended mode
 **CSCW*2012*Paper*Brown*et*al.tex
-("T:\workspace\CMAP_Docs\CSCW 2012 Paper Brown et al.tex"
+("C:\Users\stevenson\OpenSource\CMAP\CMAP_Docs\CSCW 2012 Paper Brown et al.tex"
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
@@ -13,7 +13,8 @@ an, ngerman-x-2009-06-19, nynorsk, oriya, panjabi, pinyin, polish, portuguese,
 romanian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swis
 sgerman, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, u
 senglishmax, welsh, loaded.
-(T:\workspace\CMAP_Docs\chi2009.cls (D:\MiKTeX\tex\latex\graphics\epsfig.sty
+(C:\Users\stevenson\OpenSource\CMAP\CMAP_Docs\chi2009.cls
+(D:\MiKTeX\tex\latex\graphics\epsfig.sty
 Package: epsfig 1999/02/16 v1.7a (e)psfig emulation (SPQR)
 
 (D:\MiKTeX\tex\latex\graphics\graphicx.sty
@@ -323,7 +324,7 @@ Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 19.
 Package hyperref Info: Option `colorlinks' set `true' on input line 19.
 Package hyperref Info: Option `breaklinks' set `true' on input line 19.
 
-("T:\workspace\CMAP_Docs\CSCW 2012 Paper Brown et al.aux"
+("C:\Users\stevenson\OpenSource\CMAP\CMAP_Docs\CSCW 2012 Paper Brown et al.aux"
 
 LaTeX Warning: Label `table_1' multiply defined.
 
@@ -381,21 +382,21 @@ LaTeX Info: Redefining \ref on input line 26.
 LaTeX Info: Redefining \pageref on input line 26.
 LaTeX Info: Redefining \nameref on input line 26.
 
-("T:\workspace\CMAP_Docs\CSCW 2012 Paper Brown et al.out")
-("T:\workspace\CMAP_Docs\CSCW 2012 Paper Brown et al.out")
+("C:\Users\stevenson\OpenSource\CMAP\CMAP_Docs\CSCW 2012 Paper Brown et al.out"
+) ("C:\Users\stevenson\OpenSource\CMAP\CMAP_Docs\CSCW 2012 Paper Brown et al.ou
+t")
 \@outlinefile=\write3
 LaTeX Font Info:    Try loading font information for U+msa on input line 57.
-
-(D:\MiKTeX\tex\latex\amsfonts\umsa.fd
+ (D:\MiKTeX\tex\latex\amsfonts\umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
 LaTeX Font Info:    Try loading font information for U+msb on input line 57.
- (D:\MiKTeX\tex\latex\amsfonts\umsb.fd
+
+(D:\MiKTeX\tex\latex\amsfonts\umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
 LaTeX Font Info:    Try loading font information for U+lasy on input line 57.
-
-(D:\MiKTeX\tex\latex\base\ulasy.fd
+ (D:\MiKTeX\tex\latex\base\ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
 Overfull \hbox (4.93855pt too wide) in paragraph at lines 57--57
@@ -669,7 +670,9 @@ Package atveryend Info: Empty hook `BeforeClearDocument' on input line 302.
 
 ]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 302.
- ("T:\workspace\CMAP_Docs\CSCW 2012 Paper Brown et al.aux")
+
+("C:\Users\stevenson\OpenSource\CMAP\CMAP_Docs\CSCW 2012 Paper Brown et al.aux"
+)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 302.
 Package rerunfilecheck Info: File `CSCW*2012*Paper*Brown*et*al.out' has not cha
 nged.
@@ -681,8 +684,8 @@ LaTeX Warning: There were multiply-defined labels.
  ) 
 Here is how much of TeX's memory you used:
  5857 strings out of 494019
- 81816 string characters out of 3154335
- 187420 words of memory out of 3000000
+ 82102 string characters out of 3154335
+ 188212 words of memory out of 3000000
  8992 multiletter control sequences out of 15000+200000
  26657 words of font info for 55 fonts, out of 3000000 for 9000
  714 hyphenation exceptions out of 8191

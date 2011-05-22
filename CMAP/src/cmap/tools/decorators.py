@@ -14,8 +14,7 @@ from pymt.graphx.css import drawCSSRectangle
 from pymt.ui.widgets.dragable import MTDragable
 from pymt.utils import interpolate
 from cmap.tools.myTools import scale_tuple, get_min_screen_size
-from cmap import AGILE_ICONS
-
+from agileConfig import Config
 try:
     from cmap.view.baseViews import MinView
 except:
@@ -24,7 +23,7 @@ from pymt.ui.widgets.button import MTImageButton
 from pymt import pymt_icons_dir
 import os
 from pymt.vector import Vector
-_iconPath = AGILE_ICONS#os.path.dirname(__file__)
+_iconPath = os.path.join(Config().datastore, '..','icons')#os.path.dirname(__file__)
 _minimize_icon_path = os.path.join(_iconPath, 'min.png')
 _trash_icon_path = os.path.join(_iconPath,'User-trash.png')
 _save_icon_path = os.path.join(_iconPath,'save.png')
