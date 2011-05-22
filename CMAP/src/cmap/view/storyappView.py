@@ -132,6 +132,8 @@ class StoryAppView(MyInnerWindow):
         set_caption("Collaborative Multitouch Agile Planner")
         self.root_window = kwargs['root_window']
         self.canvas = None
+        self.buttons = {}
+        self.labels = {}
         self.backlog_list_layout = MTGridLayout(rows=1)
         self.main_ctlrs_container = MTSidePanel(\
                                         corner=MTToggleButton(padding=5,
@@ -147,22 +149,17 @@ class StoryAppView(MyInnerWindow):
                                         align='middle',
                                         side='bottom',
                                         pos=(0,self.root_window.height-100)) 
-        self.buttons = {}
-        self.labels = {}
-#        self.backlog_flow_open = True
-#        self.projects_flow_open = True
-#        self.releases_flow_open = True
-#        self.story_flow_open = True
-#        self.sprint_flow_open = True
-#        self.task_flow_open = True
         
         # Load the default image for buttons and cover flows
         #path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
         self.path = Config().datastore
+        Log.debug('Path to repository: %s' % self.path)
         path = os.path.join(self.path,'..', 'data', 'ModelScribble.jpg')
         Log.debug('Data Schemas in: %s' % path)
         self._default_button_size = (100, 100)
         self._default_image = Loader.image(path)
+
+        #create the cover flow containers for each artefact type
         self.createFlows([
         (BACKLOG, 1,self.flow_backlog_select, self.createNewStoryButton),
         (PROJECTS,0,self.flow_projects_select,self.createNewProjectButton),
@@ -171,8 +168,7 @@ class StoryAppView(MyInnerWindow):
         (STORIES, 0,self.flow_story_select,   self.createNewStoryButton),
         (TASKS,   0,self.flow_task_select,    self.createNewTaskButton)])
 
-        #dragable containers for the flow objects so we can move them around 
-        #the screen
+        #make the coverflow containers dragable
         self.dragable_backlog_flow = MyDragableContainer(self.backlog_flow,
                                     True, size_scaler=(-.1,-.1), cls='dragcss',
                                     use_widget_size=False)
@@ -189,7 +185,6 @@ class StoryAppView(MyInnerWindow):
         self.backlog_list = MTList(size=(self.root_window.width,100),pos=(0,0))
         self.backlog_list.add_widget(self.backlog_list_layout)
         self.backlog_container.add_widget(self.backlog_list)
-        Log.debug('Path to repository: %s' % self.path)
 
         #enable gesture detection
         self.enable_gestures()
