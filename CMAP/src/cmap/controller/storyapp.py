@@ -130,8 +130,9 @@ class StoryApp(object):
         Log.debug('Path to repository: %s' % self.datastore)
 
         #create the storyapp model and view
-        self.view = StoryAppView(self, **kwargs)
-        self.model = StoryAppModel(self)
+        kwargs['controller'] = self
+        self.view = StoryAppView(**kwargs)
+        self.model = StoryAppModel(**kwargs)
 
     def add_current_aretfact(self, type, artefact):
         type = artefact_types[type]
@@ -617,7 +618,7 @@ class StoryApp(object):
 #            b[0].close()
         self.add_to_git()
         AsyncHandler().shutdown()
-        super(StoryAppView, self.view).close(touch)
+        #super(StoryAppView, self.view).close(touch)
     def add_to_git(self):
         AsyncHandler().save(None, 'Commit session edits')    
     def container_reset_children(self,container):

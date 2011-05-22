@@ -80,9 +80,9 @@ artefact_types = {
     }
 
 class StoryAppModel(object):
-    def __init__(self, controller,**kwargs):
+    def __init__(self, **kwargs):
         self._artefacts = {}
-        self.controller = controller
+        self.controller = kwargs['controller']
         self.datastore = Config().datastore
         Log.debug('Path to repository: %s' % self.datastore)
         self._current_backlog    = []

@@ -126,8 +126,8 @@ LABEL_NEW_STORY    = 'New\nStory...'
 LABEL_NEW_TASK     = 'New\nTask...'
 
 class StoryAppView(MyInnerWindow):
-    def __init__(self,controller, **kwargs):
-        self.controller = controller
+    def __init__(self,**kwargs):
+        self.controller = kwargs['controller']
         super(StoryAppView, self).__init__(**kwargs)
         set_caption("Collaborative Multitouch Agile Planner")
         self.root_window = kwargs['root_window']
@@ -155,99 +155,22 @@ class StoryAppView(MyInnerWindow):
 #        self.story_flow_open = True
 #        self.sprint_flow_open = True
 #        self.task_flow_open = True
-        self.currentProjectView = None
-        self.currentReleaseView = None
-        self.currentSprintView = None
-        self.currentStoryView = None
-        self.currentTaskView = None
         
         # Load the default image for buttons and cover flows
-        path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
+        #path = os.path.join(os.getcwd(), 'data', 'ModelScribble.jpg')
+        self.path = Config().datastore
+        path = os.path.join(self.path,'..', 'data', 'ModelScribble.jpg')
+        Log.debug('Data Schemas in: %s' % path)
         self._default_button_size = (100, 100)
         self._default_image = Loader.image(path)
-        _sf_pos = (200,200)
-        try:
-            self.backlog_flow = MTCoverFlow(
-                                      layout=MTGridLayout(spacing=10,rows=1),
-                                      pos=_sf_pos,
-                                      size=self._default_button_size,
-                                      cover_spacing=20,
-                                      cover_distance=115,
-                                      thumbnail_size=self._default_button_size)
-            self.backlog_flow.push_handlers(on_select=self.flow_backlog_select)
-            self.backlog_flow.add_widget(self.createNewStoryButton())
-        except Exception: #IGNORE:W0703
-            Log.exception("Unable to create backlog cover flow")
-            self.backlog_flow = MTGridLayout(rows=1, pos=_sf_pos)
-            self.backlog_flow.add_widget(self.createNewStoryButton())
-        try:
-            self.projects_flow = MTCoverFlow(\
-                                      layout=MTGridLayout(spacing=10,rows=1),
-                                      pos=_sf_pos,
-                                      size=self._default_button_size,
-                                      cover_spacing=20,
-                                      cover_distance=115,
-                                      thumbnail_size=self._default_button_size)
-            self.projects_flow.push_handlers(\
-                                           on_select=self.flow_projects_select)
-            self.projects_flow.add_widget(self.createNewProjectButton())
-        except Exception: #IGNORE:W0703
-            Log.exception("Unable to create project cover flow")
-            self.projects_flow = MTGridLayout(rows=1, pos=_sf_pos)
-        try:
-            self.release_flow = MTCoverFlow(\
-                                      layout=MTGridLayout(spacing=10,rows=1),
-                                      pos=_sf_pos,
-                                      size=self._default_button_size,
-                                      cover_spacing=20,
-                                      cover_distance=115,
-                                      thumbnail_size=self._default_button_size)
-            self.release_flow.push_handlers(\
-                                            on_select=self.flow_release_select)
-            self.release_flow.add_widget(self.createNewReleaseButton())
-        except Exception: #IGNORE:W0703
-            Log.exception("Unable to create release cover flow")
-            self.release_flow = MTGridLayout(rows=1, pos=_sf_pos)
-        try:
-            self.sprint_flow = MTCoverFlow(\
-                                      layout=MTGridLayout(spacing=10,rows=1),
-                                      pos=_sf_pos,
-                                      size=self._default_button_size,
-                                      cover_spacing=20,
-                                      cover_distance=115,
-                                      thumbnail_size=self._default_button_size)
-            self.sprint_flow.push_handlers(\
-                                            on_select=self.flow_sprint_select)
-            self.sprint_flow.add_widget(self.createNewSprintButton())
-        except Exception: #IGNORE:W0703
-            Log.exception("Unable to create sprint cover flow")
-            self.sprint_flow = MTGridLayout(rows=1, pos=_sf_pos)
-        try:
-            self.story_flow = MTCoverFlow(\
-                                      layout=MTGridLayout(spacing=10,rows=1),
-                                      pos=_sf_pos,
-                                      size=self._default_button_size,
-                                      cover_spacing=20,
-                                      cover_distance=115,
-                                      thumbnail_size=self._default_button_size)
-            self.story_flow.push_handlers(on_select=self.flow_story_select)
-            self.story_flow.add_widget(self.createNewStoryButton())
-        except Exception: #IGNORE:W0703
-            Log.exception("Unable to create story cover flow")
-            self.story_flow = MTGridLayout(rows=1, pos=_sf_pos)
-        try:
-            self.task_flow = MTCoverFlow(\
-                                      layout=MTGridLayout(spacing=10,rows=1),
-                                      pos=_sf_pos,
-                                      size=self._default_button_size,
-                                      cover_spacing=20,
-                                      cover_distance=115,
-                                      thumbnail_size=self._default_button_size)
-            self.task_flow.push_handlers(on_select=self.flow_task_select)
-            self.task_flow.add_widget(self.createNewTaskButton())
-        except Exception: #IGNORE:W0703
-            Log.exception("Unable to create task coverflow")
-            self.task_flow = MTGridLayout(rows=1, pos=_sf_pos)
+        self.createFlows([
+        (BACKLOG, 1,self.flow_backlog_select, self.createNewStoryButton),
+        (PROJECTS,0,self.flow_projects_select,self.createNewProjectButton),
+        (RELEASES,0,self.flow_release_select, self.createNewReleaseButton),
+        (SPRINTS, 0,self.flow_sprint_select,  self.createNewSprintButton),
+        (STORIES, 0,self.flow_story_select,   self.createNewStoryButton),
+        (TASKS,   0,self.flow_task_select,    self.createNewTaskButton)])
+
         #dragable containers for the flow objects so we can move them around 
         #the screen
         self.dragable_backlog_flow = MyDragableContainer(self.backlog_flow,
@@ -266,13 +189,30 @@ class StoryAppView(MyInnerWindow):
         self.backlog_list = MTList(size=(self.root_window.width,100),pos=(0,0))
         self.backlog_list.add_widget(self.backlog_list_layout)
         self.backlog_container.add_widget(self.backlog_list)
-        self.path = Config().datastore
         Log.debug('Path to repository: %s' % self.path)
 
         #enable gesture detection
         self.enable_gestures()
         self.canvas.add_widget(self.backlog_container)
         self.addMainControls()
+    def createFlows(self, flows): 
+        _sf_pos = (200,200)
+        for type, container, callback, btn in flows:
+            flow = artefact_types[type]['container'][container]
+            try:
+                self.__setattr__(flow,
+                                 MTCoverFlow(
+                                   layout=MTGridLayout(spacing=10,rows=1),
+                                   pos=_sf_pos,
+                                   size=self._default_button_size,
+                                   cover_spacing=20,
+                                   cover_distance=115,
+                                   thumbnail_size=self._default_button_size))
+            except Exception: #IGNORE:W0703
+                Log.exception("Unable to create %s cover flow" % type)
+                self.__setattr__(flow,MTGridLayout(rows=1, pos=_sf_pos))
+            self.__getattribute__(flow).push_handlers(on_select=callback)
+            self.__getattribute__(flow).add_widget(btn())
         
     def toggle_view_current_Artefact(self, artefact):
         if artefact in self.container.children:
@@ -397,8 +337,8 @@ class StoryAppView(MyInnerWindow):
         
     def load_children(self, id, type):
         self.controller.load_children(id, type)
-
-
+    def createNewBacklogButton(self):
+        return self.create_button(LABEL_NEW_BACKLOG,curry(self.new_story_pressed))
     def createNewProjectButton(self):
         return self.create_button(LABEL_NEW_PROJECT,curry(\
                                                     self.new_project_pressed))
@@ -802,7 +742,21 @@ class StoryAppView(MyInnerWindow):
     @property        
     def artefacts(self):
         return self.controller.artefacts
-    
+    @property
+    def currentProjectView(self):
+        return self.controller.currentProjectView
+    @property
+    def currentReleaseView(self):
+        return self.controller.currentReleaseView
+    @property
+    def currentProjectView(self):
+        return self.controller.currentSprintView
+    @property
+    def currentProjectView(self):
+        return self.controller.currentStoryView
+    @property
+    def currentProjectView(self):
+        return self.controller.currentTaskView
         
 if __name__ == '__main__':
     mw = MTWindow()
