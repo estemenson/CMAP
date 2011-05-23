@@ -93,12 +93,12 @@ class StoryAppView(MyInnerWindow):
         set_caption("Collaborative Multitouch Agile Planner")
         self.root_window = kwargs['root_window']
         self.canvas = None
-        self.backlog_flow_open  = False
-        self.projects_flow_open = False
-        self.releases_flow_open = False
-        self.sprint_flow_open   = False
-        self.story_flow_open    = False
-        self.task_flow_open     = False
+        self.backlog_flow_open  = True
+        self.projects_flow_open = True
+        self.releases_flow_open = True
+        self.sprint_flow_open   = True
+        self.story_flow_open    = True
+        self.task_flow_open     = True
         self.buttons = {}
         self.labels = {}
         self.backlog_list_layout = MTGridLayout(rows=1)
@@ -188,7 +188,7 @@ class StoryAppView(MyInnerWindow):
     def flow_projects_select(self,btn):
         #we need to populate the releases flow with any release 
         #in the current project
-        self.load_children(self.controller.add_current_artefact('project',btn),
+        self.load_children(self.controller.add_current_artefact('projects',btn),
                            'releases')
 #        self.container_reset_children('release_flow')
 #        self.container_reset_children('sprint_flow')
@@ -299,18 +299,6 @@ class StoryAppView(MyInnerWindow):
         
     def load_children(self, id, type):
         self.controller.load_children(id, type)
-    def createNewBacklogButton(self):
-        return self.create_button(LABEL_NEW_BACKLOG,curry(self.new_story_pressed))
-    def createNewReleaseButton(self):
-        return self.create_button(LABEL_NEW_RELEASE,curry(\
-                                                    self.new_release_pressed))
-    def createNewSprintButton(self):
-        return self.create_button(LABEL_NEW_SPRINT, curry(\
-                                                    self.new_sprint_pressed))
-    def createNewStoryButton(self):
-        return self.create_button(LABEL_NEW_STORY,curry(self.new_story_pressed))
-    def createNewTaskButton(self):
-        return self.create_button(LABEL_NEW_TASK,curry(self.new_task_pressed))
     def new_backlog_pressed(self): # *largs
         _b = self.new_artefact_pressed(StoryController,
                                        'currentBacklogView',
@@ -558,17 +546,19 @@ class StoryAppView(MyInnerWindow):
                                     'flow_task_select', 'tasks')
     def view_current_Artefact(self,lbl,curr,flow_select, container):
         try:
-            _c = self.__getattribute__(curr)[0]
+            #get the controller for this artefact
+            _c = self.controller.__getattribute__(curr)[0]
         except Exception: #IGNORE:W0703
             _c = Dummy()
             _c.Id = ''
-
+        idu = None
         idu =  lbl.Id if isinstance(lbl, ArtefactController)\
                       else lbl._id #IGNORE:W0212          
         if _c.Id != idu:
             #set current artefact to the one selected
             self.__getattribute__(flow_select)\
-                            (self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
+            (self.artefacts[lbl._id][0])
+                            #(self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
             return #to avoid add then removing the same widget
         _view = _c.view
         if _view in self.container.children:
@@ -588,6 +578,8 @@ class StoryAppView(MyInnerWindow):
         self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
         self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
         self.canvas.add_widget(self.main_ctlrs_container)
+    def createNewBacklogButton(self):
+        return self.create_button(LABEL_NEW_BACKLOG,curry(self.new_story_pressed))
     def createNewBacklogFlowButton(self):
         return self.create_button('Browse\nBacklog...',
                                   curry(self._flow_pressed,\
@@ -599,18 +591,28 @@ class StoryAppView(MyInnerWindow):
         return self.create_button('Browse\nProjects...',\
                                   curry(self._flow_pressed,\
                         'projects_flow_open',self.dragable_project_flow))
+    def createNewReleaseButton(self):
+        return self.create_button(LABEL_NEW_RELEASE,curry(\
+                                                    self.new_release_pressed))
     def createNewReleasesFlowButton(self):
         return self.create_button('Browse\nReleases...',
                                   curry(self._flow_pressed,\
                         'releases_flow_open',self.dragable_release_flow))
+    def createNewSprintButton(self):
+        return self.create_button(LABEL_NEW_SPRINT, curry(\
+                                                    self.new_sprint_pressed))
     def createNewSprintFlowButton(self):
         return self.create_button('Browse\nSprints...',
                                   curry(self._flow_pressed,\
                         'sprint_flow_open',self.dragable_sprint_flow))
+    def createNewStoryButton(self):
+        return self.create_button(LABEL_NEW_STORY,curry(self.new_story_pressed))
     def createNewStoryFlowButton(self):
         return self.create_button('Browse\nStories...', 
             curry(self._flow_pressed,\
                         'story_flow_open',self.dragable_story_flow))
+    def createNewTaskButton(self):
+        return self.create_button(LABEL_NEW_TASK,curry(self.new_task_pressed))
     def createNewTaskFlowButton(self):
         return self.create_button('Browse\nTasks...',
                                   curry(self._flow_pressed,\

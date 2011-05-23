@@ -96,29 +96,35 @@ class StoryApp(object):
         self.view = StoryAppView(**kwargs)
         self.model = StoryAppModel(**kwargs)
 
-    def add_current_aretfact(self, type, artefact):
+    def add_current_artefact(self, type, artefact):
         type = artefact_types[type]
-        idu  = None
+        idu,id  = None,None
         try:
             #object exists get a reference
             idu = artefact.Id if isinstance(artefact, ArtefactController)\
                          else artefact._id #IGNORE:W0212
+            if idu:
+                #add artefact to the view
+                id = idu
+                self.view.toggle_view_current_Artefact(self.artefacts[id][0].view)
+#                self.view.view_current_Artefact(artefact, type['current'],
+#                                               type['callback'], type['type'] )     
         except KeyError:
-            #create a new artefact
-            id = self.new_artefact().Id
+            pass
         if not idu:
-            #add artefact to the view
-            id = idu
-            self.view.view_current_Artefact(artefact, type['current'],
-                                            type['callback'], type['type'] )     
+            #create a new artefact
+            id = self.new_artefact(**type).Id
         #set the current artefact (appends to the list)
         self.__setattr__(type['current'], self.artefacts[id])
         return id
-    def new_artefact(self,type,**kwargs): # *largs
-        _r = type['controller'](self,None,**kwargs)
-        view = type['viewCurrent']
+    def new_artefact(self,**kwargs): # *largs
+        #create the controller for the new artefact
+        _r = kwargs['controller'](self,None,**kwargs)
+        self.artefacts[_r.Id] = (_r,{})
+        view = kwargs['viewCurrent']
+        #cretae the view for the new artefact
         self.__setattr__(view, _r.newDialog(minv=True))
-        self.view.add_artefact(view)
+        self.view.toggle_view_current_Artefact(self.__getattribute__(view))
         return _r 
 
 #    def load_projects(self):
@@ -166,21 +172,22 @@ class StoryApp(object):
 #            self.artefacts[t.Id] = (t, {})
 #            self.newTask(t)
     def load_children(self,id, type):
-        for f in self.xmlFiles[artefact_types[type]]:
+        #TODO: STEVE refactor to get children from model of the artefact
+        for f in self.model.xmlFiles[type]:#artefact_types[type]['type']]:
             Log.debug('only loading %s %s' % (type,f))
             kwargs = {
                 'view_type':artefact_types[type]['view_type'],
                 'mini_view_type':artefact_types[type]['mini_view_type'],
                 'get_artefact':artefact_types[type]['get_artefact'],
                 'model':artefact_types[type]['model'],
-                'type':artefact_types[type][type],
+                'type':artefact_types[type]['type'],
                 'name':os.path.splitext(os.path.basename(f))[0],
                 'file':f,
                 'controller':artefact_types[type]['controller']
             }
             r = self.getArtefact(**kwargs)
             self.artefacts[r.Id] = (r,{})
-            artefact_types[type]['get_artefact'](self, r)
+            #artefact_types[type]['get_artefact'](self, r)
                 
     def on_github_notification(self, ret):
         msg = ret[1]
@@ -471,7 +478,7 @@ class StoryApp(object):
         return _r 
     def getArtefact(self,**kwargs):
         _p = kwargs.setdefault('controller', None)
-        if type(_p) is None:
+        if not isinstance(_p, ArtefactController):
             _p = _p(self,kwargs.setdefault('file', None),**kwargs)
         return _p
     def remove_project_view(self,w):
@@ -628,7 +635,8 @@ class StoryApp(object):
         return self.model.current_project 
     @current_project.setter
     def current_project(self, value):
-        self.model.current_project.append(value)
+        if not value in self.model.current_project: 
+            self.model.current_project.append(value)
     @property
     def current_release(self):
         return self.model.current_release

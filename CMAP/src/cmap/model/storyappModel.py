@@ -81,10 +81,16 @@ class StoryAppModel(object):
 #                ctrl = self.controller.getArtefact(artefact, type['controller'],
 #                                        type['model'], type['get_artefact'], 
 #                    name=os.path.splitext(os.path.basename(artefact))[0])
-                ctrl = self.controller.getArtefact(type=artefact,controller=artefact_types[type]['controller'],
-                                        model=artefact_types[type]['model'], 
-                                        get_artefact=artefact_types[type]['get_artefact'],
-                                        name=os.path.splitext(os.path.basename(artefact))[0]) 
+                ctrl = self.controller.\
+                getArtefact(
+                        type=type,
+                        mini_view_type=artefact_types[type]['mini_view_type'],
+                        view_type=artefact_types[type]['view_type'],
+                        file=artefact,
+                        controller=artefact_types[type]['controller'],
+                        model=artefact_types[type]['model'], 
+                        get_artefact=artefact_types[type]['get_artefact'],
+                        name=os.path.splitext(os.path.basename(artefact))[0]) 
             self.artefacts[ctrl.Id] = (ctrl,{})
             self.controller.add_new_artefact(ctrl,
                                      artefact_types[type]['container'],artefact_types[type]['viewCurrent'],
