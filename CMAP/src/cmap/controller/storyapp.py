@@ -106,9 +106,8 @@ class StoryApp(object):
             if idu:
                 #add artefact to the view
                 id = idu
-                self.view.toggle_view_current_Artefact(self.artefacts[id][0].view)
-#                self.view.view_current_Artefact(artefact, type['current'],
-#                                               type['callback'], type['type'] )     
+                self.view.toggle_view_current_Artefact(
+                                                    self.artefacts[id][0].view)
         except KeyError:
             pass
         if not idu:
@@ -122,55 +121,11 @@ class StoryApp(object):
         _r = kwargs['controller'](self,None,**kwargs)
         self.artefacts[_r.Id] = (_r,{})
         view = kwargs['viewCurrent']
-        #cretae the view for the new artefact
+        #create the view for the new artefact
         self.__setattr__(view, _r.newDialog(minv=True))
         self.view.toggle_view_current_Artefact(self.__getattribute__(view))
         return _r 
 
-#    def load_projects(self):
-#        for f in self.xmlFiles[artefact_types[PROJECTS]]:
-#            Log.debug('load only xmlFile: %s' % f)
-#            
-#            p = self.getProject(f,model=ProjectModel,
-#                    get_artefact='newProject',
-#                    name=os.path.splitext(os.path.basename(f))[0])
-#            self.artefacts[p.Id] = (p,{})
-#            self.newProject(p)
-#    def load_sprints(self):
-#        if self.checked_for_sprints: return
-#        self.checked_for_sprints = True
-#        for f in self.xmlFiles[artefact_types[SPRINTS]]:
-#            Log.debug('only loading sprint %s' % f)
-#            s = self.getSprint(f, model=SprintModel, name=\
-#                os.path.splitext(os.path.basename(f))[0])
-#            self.artefacts[s.Id] = (s, {})
-#            self.newSprint(s)
-#    def load_backlog(self):
-#        Log.debug('BackLog loading:')
-#        for f in self.xmlFiles[artefact_types[BACKLOG]]:
-#            b = self.getBacklog(f)
-#            self.artefacts[b.Id] = (b,{})
-#            self.newBacklog(b)
-#        Log.debug('Backlog Done loading')
-#    def load_stories(self):
-#        if self.checked_for_stories: return
-#        self.checked_for_stories = True
-#        Log.debug('Stories loading: ')
-#        for f in self.xmlFiles[artefact_types[STORIES]]:
-#            Log.debug('only loading story %s' % f)
-#            s = self.getStory(f)
-#            self.artefacts[s.Id] = (s ,{})
-#            self.newStory(s)
-#        Log.debug('Stories Done loading')
-#    def load_tasks(self):
-#        if self.checked_for_tasks: return
-#        self.checked_for_tasks = True
-#        for f in self.xmlFiles[artefact_types[TASKS]]:
-#            Log.debug('%s' % f)
-#            t = self.getTask(f, name=\
-#                os.path.splitext(os.path.basename(f))[0])
-#            self.artefacts[t.Id] = (t, {})
-#            self.newTask(t)
     def load_children(self,id, type):
         #TODO: STEVE refactor to get children from model of the artefact
         for f in self.model.xmlFiles[type]:#artefact_types[type]['type']]:
@@ -187,11 +142,11 @@ class StoryApp(object):
             }
             r = self.getArtefact(**kwargs)
             self.artefacts[r.Id] = (r,{})
-            #artefact_types[type]['get_artefact'](self, r)
                 
     def on_github_notification(self, ret):
         msg = ret[1]
-        print("GOOGLE APP HOOK CCALLED ***************************************************************************")
+        print("GOOGLE APP HOOK CCALLED ***************************************")
+        print("***********************************")
         for c in msg['commits']:
             for a in c['added']:
                 Log.debug('%s added by %s' % (a, c['author']['name']))
@@ -200,146 +155,6 @@ class StoryApp(object):
             for r in c['removed']:
                 Log.debug('%s removed by %s' % (r, c['author']['name']))
 
-        
-#    def flow_backlog_select(self,btn):
-#        #make the selected backlog item the active one
-#        try:
-#            idu = btn.Id if isinstance(btn, ArtefactController)\
-#                         else btn._id #IGNORE:W0212
-#            self.current_backlog = self.artefacts[idu] 
-#            self.viewCurrentBacklog(btn)     
-#        except KeyError:
-#            #create new backlog story
-#            lbl = self.new_backlog_pressed()
-#            self.current_backlog = self.artefacts[lbl.Id]
-#        self.current_story = self.current_backlog
-#        set_caption(self.current_backlog[0].Name)
-#    def flow_projects_select(self,btn):
-#        #make the selected project the active one
-#        try:
-#            idu = btn.Id if isinstance(btn, ArtefactController)\
-#                         else btn._id #IGNORE:W0212
-#            self.current_project = self.artefacts[idu]
-#            self.viewCurrentProject(btn)     
-#        except KeyError:
-#            #create new project
-#            lbl = self.new_project_pressed()
-#            if lbl is None: return
-#            self.current_project = self.artefacts[lbl.Id]
-#        set_caption(self.current_project[0].Name)
-#        #we need to populate the releases flow with any release 
-#        #in the current project
-#        self.load_releases()
-#        self.container_reset_children('release_flow')
-#        self.container_reset_children('sprint_flow')
-#        self.container_reset_children('story_flow')
-#        self.container_reset_children('task_flow')
-#        if self.current_project and self.current_project[0].Children:
-#            for release in self.current_project[0].Children:
-#                if release in self.artefacts:
-#                    r = self.artefacts[release][0]
-#                    if r.ArtefactType != 'Release': continue
-#                    self.newRelease(r)
-#                else:
-#                    Log.debug('Project: %s found a release: %s not in releases' % \
-#                              (self.current_project[0].Name,release))
-#    def flow_release_select(self,btn):
-#        #make the selected release the active one
-#        try:
-#            idu = btn.Id if isinstance(btn, ArtefactController)\
-#                         else btn._id #IGNORE:W0212
-#            self.current_release = self.artefacts[idu]
-#            self.viewCurrentRelease(btn)
-#        except KeyError:
-#            #create new release
-#            lbl = self.new_release_pressed()
-#            if lbl is None: return
-#            self.current_release = self.artefacts[lbl.Id]
-#        #we need to populate the sprint flow with any sprints already
-#        #in the current release
-#        self.load_sprints()
-#        self.container_reset_children('sprint_flow')
-#        self.container_reset_children('story_flow')
-#        self.container_reset_children('task_flow')
-#        if self.current_release and self.current_release[0].Children:
-#            for sprint in self.current_release[0].Children:
-#                if sprint in self.artefacts.keys():
-#                    s = self.artefacts[sprint][0]
-#                    if s.ArtefactType != 'Sprint': continue
-#                    self.newSprint(s)
-#                else:
-#                    Log.debug('Release: %s found a sprint: %s not in sprints' % \
-#                              (self.current_release[0].Name,sprint))
-#    def flow_sprint_select(self,btn):
-#        #make the selected sprint the active one
-#        try:
-#            idu = btn.Id if isinstance(btn, ArtefactController)\
-#                         else btn._id #IGNORE:W0212
-#            self.current_sprint = self.artefacts[idu]
-#            self.viewCurrentSprint(btn)
-#        except KeyError:
-#            #create new sprint
-#            lbl = self.new_sprint_pressed()
-#            if lbl is None: return
-#            self.current_sprint = self.artefacts[lbl.Id]
-#        #we need to populate the story flow with any stories already
-#        #in the current sprint
-#        self.load_stories()
-#        self.container_reset_children('story_flow')
-#        self.container_reset_children('task_flow')
-#        if self.current_sprint and self.current_sprint[0].Children:
-#            for story in self.current_sprint[0].Children:
-#                if story in self.artefacts.keys():
-#                    s = self.artefacts[story][0]
-#                    if s.ArtefactType != 'Story': continue
-#                    self.newStory(s)
-#                else:
-#                    Log.debug('Sprint: %s found a story: %s not in stories' % \
-#                              (self.current_sprint[0].Name,story))
-#    def flow_story_select(self,btn):
-#        try:
-#            idu = btn.Id if isinstance(btn, ArtefactController)\
-#                         else btn._id #IGNORE:W0212
-#            self.current_story = self.artefacts[idu]
-#            self.viewCurrentStory(btn)
-#        except KeyError:
-#            #create new story
-#            lbl = self.new_story_pressed()
-#            if lbl is None: return
-#            if lbl.Parent:
-#                self.current_story = self.artefacts[lbl.Id]
-#        #we need to populate the task flow with any tasks already
-#        #in the current story
-#        self.load_tasks()
-#        self.container_reset_children('task_flow')
-#        if self.current_story and self.current_story[0].Children:
-#            for task in self.current_story[0].Children:
-#                if task in self.artefacts.keys():
-#                    t = self.artefacts[task][0]
-#                    if t.ArtefactType != 'Task': continue
-#                    self.newTask(t)
-#                else:
-#                    Log.debug('Story: %s found a task: %s not in tasks' % \
-#                              (self.current_story[0].Name,task))
-#    def flow_task_select(self,btn):
-#        try:
-#            idu = btn.Id if isinstance(btn, ArtefactController)\
-#                         else btn._id #IGNORE:W0212
-#            self.current_task = self.artefacts[idu]
-#            self.viewCurrentTask(btn)
-#        except KeyError:
-#            #create new task
-#            lbl = self.new_task_pressed()
-#            if lbl is None: return
-#            self.current_task = self.artefacts[lbl.Id]
-#    def _flow_pressed(self, flag, widget, *largs): #IGNORE:W0613
-#        _flag =  not self.__getattribute__(flag)
-#        self.__setattr__(flag, _flag)
-#        if _flag:
-#            super(StoryApp,self).remove_widget(widget)
-#        else:
-#            widget.pos = self.get_new_random_position()
-#            super(StoryApp,self).add_widget(widget)
     def get_new_random_position(self):
         return (choice(self._x_range),choice(self._y_range))
     def new_backlog_pressed(self): # *largs
@@ -484,7 +299,8 @@ class StoryApp(object):
     def remove_project_view(self,w):
         super(StoryApp,self).remove_widget(w)
     def newBacklog(self,ctrl):
-        return self.view.add_new_artefact(ctrl, artefact_types[BACKLOG]['container'], 
+        return self.view.add_new_artefact(ctrl,\
+                                          artefact_types[BACKLOG]['container'], 
             artefact_types[BACKLOG]['viewCurrent'], self.artefacts[ctrl.Id][1])
     def newProject(self,ctrl):
         return self.view.add_new_artefact(ctrl,
@@ -543,7 +359,7 @@ class StoryApp(object):
 #        if _c.Id != idu:
 #            #set current artefact to the one selected
 #            self.__getattribute__(flow_select)\
-#                            (self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
+#                            (self.__getattribute__(container)[lbl._id][0])
 #            return #to avoid add then removing the same widget
 #        self.view.toggle_view_current_Artefact(_c.view)
 #        
@@ -706,7 +522,8 @@ if __name__ == '__main__':
                             '..',  '..', 'examples', 'framework','images'))
 #    coverflow = MTCoverFlow(size=(500,500))
 #    for fn in glob(os.path.join(base_image, '*.png')):
-#        button = MTToggleButton(label=os.path.basename(fn)) #MTImageButton(image=Loader.image(filename))
+#        button = MTToggleButton(label=os.path.basename(fn)) 
+#MTImageButton(image=Loader.image(filename))
 #        coverflow.add_widget(button)
 #    
 #    dc = MyDragableContainer(coverflow, True)
