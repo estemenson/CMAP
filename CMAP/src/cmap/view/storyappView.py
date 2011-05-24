@@ -515,7 +515,21 @@ class StoryAppView(MyInnerWindow):
 #                                     CONTAINERS_TASK,
 #                                     'viewCurrentTask',
 #                                     self.artefacts[ctrl.Id][1])
+
     def add_new_artefact(self, ctrl, container, callback, ret):
+        '''add a button to access the artifact in the appropriate container(s)
+    :Parameters:
+        `ctrl` : ArtefactController, A derived controller from the 
+            ArtefactController base class
+        `container` : List containing all the string names of the containers 
+            where access to this artefact is needed, usually a CoverFlow or 
+            Kinectic List or both
+        'callback' : method to be called when when a press event is fired
+        'ret' : returns this dictionary keyed on the string names of each 
+            container where a button was added, this dictionary is used as a 
+            short cut to all buttons that access this artefact
+    :Returns: the dictionary 'ret'
+    '''        
         for c in container:
             _lbl = MyImageButton(id=ctrl.Id, size=self._default_button_size,
                                  image=self._default_image)

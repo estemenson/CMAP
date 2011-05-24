@@ -43,7 +43,6 @@ class ArtefactController(Subject,Observer):
         self.isMinimal = True
         self._mini_view_type = kwargs['mini_view_type']
         self._view_type = kwargs['view_type']
-        self._save_callback = kwargs['get_artefact']
         self._view_type_name = kwargs['view_type_name']
         self._p_artefact = kwargs.setdefault('p_artefact',None)
         self._x_range = range(int(self.root.x + int(minimal_size[0]/2)), 
@@ -63,7 +62,7 @@ class ArtefactController(Subject,Observer):
             pass
         finally:
             if self.isNew:
-                self.root.__getattribute__(self._save_callback)(self)
+                self.view.add_new_artefact(self, )
                 self.isNew = False
             
     def internalSave(self, fn):
