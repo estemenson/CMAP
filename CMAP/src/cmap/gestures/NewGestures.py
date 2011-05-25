@@ -325,7 +325,7 @@ class GestureUI(MTWidget):
 def get_and_or_store_gesture(gdb, name, label=None, file=None):
     file = file if file else path.abspath(path.join(Config().gestures,\
                                     'xmlGestures','gestures.xml'))
-    Log.debug('path: %s' % file)
+    #Log.debug('path: %s' % file)
     gestures = Gestures(file)
     g = gdb.pull_gesture_from_shelf(name)
     if not g:

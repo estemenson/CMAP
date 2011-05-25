@@ -24,7 +24,7 @@ class myGestures(GestureDatabase):
     def pull_gesture_from_shelf(self, name):
         try:
             _gdb = 'gesturesDB'
-            Log.debug('current directory: %s' % path.abspath(path.curdir))
+            #Log.debug('current directory: %s' % path.abspath(path.curdir))
             _file = path.join(Config().gestures, _gdb)
 #            if not path.exists(_file):
 #                _file = path.join(path.join(path.join(\

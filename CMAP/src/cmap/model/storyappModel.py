@@ -73,7 +73,6 @@ class StoryAppModel(object):
             self.xmlFiles[atype] = []
             self.xmlFiles[atype].extend(glob(
                                 os.path.join(self.datastore, atype, '*.xml')))
-        
     def load_artefacts(self):
         for type in artefact_types:
             kwargs = artefact_types[type].copy()
@@ -86,10 +85,10 @@ class StoryAppModel(object):
                             name=os.path.splitext(os.path.basename(artefact))[0]
                 kwargs['file'] = artefact
                 ctrl = self.controller.getArtefact(**kwargs) 
-            self.artefacts[ctrl.Id] = (ctrl,{})
-            self.controller.add_new_artefact(ctrl,
-                                     artefact_types[type]['container'],
-                                     artefact_types[type]['viewCurrent'],
+                self.artefacts[ctrl.Id] = (ctrl,{})
+                self.controller.add_new_artefact(ctrl,
+                                     kwargs['container'],
+                                     kwargs['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def trash(self,artefact,atype=None):
         Log.debug('Need to trash artefact: %s' % artefact)

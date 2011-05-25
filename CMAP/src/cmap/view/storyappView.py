@@ -411,11 +411,6 @@ class StoryAppView(MyInnerWindow):
                     return
             except Exception: #IGNORE:W0703
                 pass
-    def getArtefact(self,defn,ctrl,**kwargs):
-        _p = kwargs.setdefault('controller', None)
-        if _p is None:
-            _p = ctrl(self,defn,**kwargs)
-        return _p
     def get_new_random_position(self):
         return self.controller.get_new_random_position()
     def list_button_pressed(self, btn):
@@ -470,6 +465,47 @@ class StoryAppView(MyInnerWindow):
             btn.label = story.Name
             self.check_btn_width(btn)
         return
+#
+#    def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_backlog',\
+#                                    'flow_backlog_select', 'backlog')
+#    def viewCurrentProject(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_project',\
+#                                    'flow_projects_select', 'projects')
+#    def viewCurrentRelease(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_release',\
+#                                    'flow_release_select', 'releases')
+#    def viewCurrentSprint(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_sprint',\
+#                                    'flow_sprint_select', 'sprints')
+#    def viewCurrentStory(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_story',\
+#                                    'flow_story_select', 'stories')
+#    def viewCurrentTask(self,lbl, *largs): #IGNORE:W0613
+#        self.view_current_Artefact(lbl, 'current_task',\
+#                                    'flow_task_select', 'tasks')
+#    def view_current_Artefact(self,lbl,curr,flow_select, container):
+#        try:
+#            #get the controller for this artefact
+#            _c = self.controller.__getattribute__(curr)[0]
+#        except Exception: #IGNORE:W0703
+#            _c = Dummy()
+#            _c.Id = ''
+#        idu = None
+#        idu =  lbl.Id if isinstance(lbl, ArtefactController)\
+#                      else lbl._id #IGNORE:W0212          
+#        if _c.Id != idu:
+#            #set current artefact to the one selected
+#            self.__getattribute__(flow_select)\
+#            (self.artefacts[lbl._id][0])
+#                            #(self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
+#            return #to avoid add then removing the same widget
+#        _view = _c.view
+#        if _view in self.container.children:
+#            super(StoryAppView,self).remove_widget(_view)
+#        else:
+#            super(StoryAppView,self).add_widget(_view)
+#    
     def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
         self.view_current_Artefact(lbl, 'current_backlog',\
                                     'flow_backlog_select', 'backlog')
@@ -509,7 +545,6 @@ class StoryAppView(MyInnerWindow):
             super(StoryAppView,self).remove_widget(_view)
         else:
             super(StoryAppView,self).add_widget(_view)
-    
     @property        
     def artefacts(self):
         return self.controller.artefacts
@@ -520,13 +555,13 @@ class StoryAppView(MyInnerWindow):
     def currentReleaseView(self):
         return self.controller.currentReleaseView
     @property
-    def currentProjectView(self):
+    def currentSprintView(self):
         return self.controller.currentSprintView
     @property
-    def currentProjectView(self):
+    def currentStoryView(self):
         return self.controller.currentStoryView
     @property
-    def currentProjectView(self):
+    def currentTaskView(self):
         return self.controller.currentTaskView
         
 if __name__ == '__main__':
