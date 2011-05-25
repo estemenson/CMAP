@@ -35,24 +35,24 @@ class MyCaptureWidget(CaptureGesture):
                       (best[0],best[1].label))
             self.lastbest = best
             if best[1].label in ['Backlog','Backlog1', 'Backlog2']:
-                self.StoryApp._flow_pressed('backlog_flow_open',
+                self.StoryApp.flow_pressed('backlog_flow_open',
                                         self.StoryApp.dragable_backlog_flow)
             elif best[1].label in ['Projects','Projects1', 'Projects2']:
-                self.StoryApp._flow_pressed('projects_flow_open',
+                self.StoryApp.flow_pressed('projects_flow_open',
                                         self.StoryApp.dragable_project_flow)
             elif best[1].label in ['Sprints','Sprints1', 'Sprints2']:
-                self.StoryApp._flow_pressed('sprint_flow_open',
+                self.StoryApp.flow_pressed('sprint_flow_open',
                                         self.StoryApp.dragable_sprint_flow)
             elif best[1].label in ['New Story']:
                 self.StoryApp.new_story_pressed(None)
             elif best[1].label in ['Releases','Releases1', 'Releases2']:
-                self.StoryApp._flow_pressed('releases_flow_open',
+                self.StoryApp.flow_pressed('releases_flow_open',
                                         self.StoryApp.dragable_release_flow)
             elif best[1].label in ['Tasks','Tasks1', 'Tasks2']:
-                self.StoryApp._flow_pressed('task_flow_open',
+                self.StoryApp.flow_pressed('task_flow_open',
                                             self.StoryApp.dragable_task_flow)
             elif best[1].label in ['Square', 'square']:
-                self.StoryApp._flow_pressed('story_flow_open',
+                self.StoryApp.flow_pressed('story_flow_open',
                                             self.StoryApp.dragable_story_flow)
             elif best[1].label in ['X', 'x']:
                 self.StoryApp.unfullscreen()

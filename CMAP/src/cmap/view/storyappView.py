@@ -80,11 +80,17 @@ GestureCSS = '''
 '''
 css_add_sheet(GestureCSS)
 
-LABEL_NEW_PROJECT  = 'New\nProject...'
-LABEL_NEW_RELEASE  = 'New\nRelease...'
-LABEL_NEW_SPRINT   = 'New\nSprint...'
-LABEL_NEW_STORY    = 'New\nStory...'
-LABEL_NEW_TASK     = 'New\nTask...'
+LABEL_NEW_PROJECT   = 'New\nProject...'
+LABEL_NEW_RELEASE   = 'New\nRelease...'
+LABEL_NEW_SPRINT    = 'New\nSprint...'
+LABEL_NEW_STORY     = 'New\nStory...'
+LABEL_NEW_TASK      = 'New\nTask...'
+LABEL_BROWSE_BACKLOG='Browse\nBacklog...'
+LABEL_BROWSE_PROJECT='Browse\nProjects...'
+LABEL_BROWSE_RELEASE='Browse\nReleases...'
+LABEL_BROWSE_SPRINT ='Browse\nSprints...'
+LABEL_BROWSE_STORY  ='Browse\nStories...'
+LABEL_BROWSE_TASK   ='Browse\nTasks...'
 
 class StoryAppView(MyInnerWindow):
     def __init__(self,**kwargs):
@@ -157,6 +163,59 @@ class StoryAppView(MyInnerWindow):
         self.enable_gestures()
         self.canvas.add_widget(self.backlog_container)
         self.addMainControls()
+    def addMainControls(self):
+        self.main_ctlrs_container.add_widget(self.createNewProjectButton())
+        self.main_ctlrs_container.add_widget(self.createNewReleaseButton())
+        self.main_ctlrs_container.add_widget(self.createNewSprintButton())
+        self.main_ctlrs_container.add_widget(self.createNewStoryButton())
+        self.main_ctlrs_container.add_widget(self.createNewTaskButton())
+        self.main_ctlrs_container.add_widget(self.createNewBacklogFlowButton())
+        self.main_ctlrs_container.add_widget(self.createNewProjectFlowButton())
+        self.main_ctlrs_container.add_widget(self.createNewReleasesFlowButton())
+        self.main_ctlrs_container.add_widget(self.createNewSprintFlowButton())
+        self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
+        self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
+        self.canvas.add_widget(self.main_ctlrs_container)
+    def add_new_artefact(self, ctrl, container, callback, ret):
+        '''add a button to access the artifact in the appropriate container(s)
+    :Parameters:
+        `ctrl` : ArtefactController, A derived controller from the 
+            ArtefactController base class
+        `container` : List containing all the string names of the containers 
+            where access to this artefact is needed, usually a CoverFlow or 
+            Kinectic List or both
+        'callback' : method to be called when when a press event is fired
+        'ret' : returns this dictionary keyed on the string names of each 
+            container where a button was added, this dictionary is used as a 
+            short cut to all buttons that access this artefact
+    :Returns: the dictionary 'ret'
+    '''        
+        for c in container:
+            _lbl = MyImageButton(id=ctrl.Id, size=self._default_button_size,
+                                 image=self._default_image)
+            self.check_btn_width(_lbl)
+            _lbl.push_handlers(on_press=curry(self.__getattribute__(callback), 
+                                                                        _lbl))
+            self.__getattribute__(c).add_widget(_lbl)
+            ret[c] = _lbl
+        return ret
+    def check_btn_width(self,btn):
+        _label = btn.label
+        _w = int(len(_label) *pixels)
+        if _w > btn.width:
+            if not btn.multiline:
+                btn.multiline = True
+            btn.label = '\n'.join(_label.split('-'))
+    def close(self,touch=None):
+        self.controller.close(touch)
+        #close all the artefacts
+#        for a in self.artefacts.values():
+#            a[0].close()
+#        for b in self.backlog.values():
+#            b[0].close()
+#        self.add_to_git()
+#        AsyncHandler().shutdown()
+        super(StoryAppView, self).close(touch)
     def createFlows(self, flows): 
         _sf_pos = (200,200)
         for type, container, callback, btn in flows:
@@ -175,94 +234,56 @@ class StoryAppView(MyInnerWindow):
                 self.__setattr__(flow,MTGridLayout(rows=1, pos=_sf_pos))
             self.__getattribute__(flow).push_handlers(on_select=callback)
             self.__getattribute__(flow).add_widget(btn())
-        
-    def toggle_view_current_Artefact(self, artefact):
-        if artefact in self.container.children:
-            super(StoryAppView,self).remove_widget(artefact)
-        else:
-            super(StoryAppView,self).add_widget(artefact)
-        
-    def flow_backlog_select(self,btn):
-        #make the selected backlog item the active one
-        self.controller.add_current_artefact('backlog',btn)
-    def flow_projects_select(self,btn):
-        #we need to populate the releases flow with any release 
-        #in the current project
-        self.load_children(self.controller.add_current_artefact('projects',btn),
-                           'releases')
-#        self.container_reset_children('release_flow')
-#        self.container_reset_children('sprint_flow')
-#        self.container_reset_children('story_flow')
-#        self.container_reset_children('task_flow')
-#        if self.current_project and self.current_project[0].Children:
-#            for release in self.current_project[0].Children:
-#                if release in self.artefacts:
-#                    r = self.artefacts[release][0]
-#                    if r.ArtefactType != 'Release': continue
-#                    self.newRelease(r)
-#                else:
-#                    Log.debug('Project: %s found a release: %s not in releases' % \
-#                              (self.current_project[0].Name,release))
-    def flow_release_select(self,btn):
-        #we need to populate the sprint flow with any sprints already
-        #in the current release
-        self.load_children(self.controller.add_current_artefact('releases',btn),
-                           'sprints')
-#        self.container_reset_children('sprint_flow')
-#        self.container_reset_children('story_flow')
-#        self.container_reset_children('task_flow')
-#        if self.current_release and self.current_release[0].Children:
-#            for sprint in self.current_release[0].Children:
-#                if sprint in self.artefacts.keys():
-#                    s = self.artefacts[sprint][0]
-#                    if s.ArtefactType != 'Sprint': continue
-#                    self.newSprint(s)
-#                else:
-#                    Log.debug('Release: %s found a sprint: %s not in sprints' % \
-#                              (self.current_release[0].Name,sprint))
-    def flow_sprint_select(self,btn):
-        #we need to populate the story flow with any stories already
-        #in the current sprint
-        self.load_children(self.controller.add_current_artefact('sprints',btn),
-                           'stories')
-#        self.container_reset_children('story_flow')
-#        self.container_reset_children('task_flow')
-#        if self.current_sprint and self.current_sprint[0].Children:
-#            for story in self.current_sprint[0].Children:
-#                if story in self.artefacts.keys():
-#                    s = self.artefacts[story][0]
-#                    if s.ArtefactType != 'Story': continue
-#                    self.newStory(s)
-#                else:
-#                    Log.debug('Sprint: %s found a story: %s not in stories' % \
-#                              (self.current_sprint[0].Name,story))
-    def flow_story_select(self,btn):
-        #we need to populate the task flow with any tasks already
-        #in the current story
-        self.load_children(self.controller.add_current_artefact('stories',btn),
-                           'tasks')
-#        self.container_reset_children('task_flow')
-#        if self.current_story and self.current_story[0].Children:
-#            for task in self.current_story[0].Children:
-#                if task in self.artefacts.keys():
-#                    t = self.artefacts[task][0]
-#                    if t.ArtefactType != 'Task': continue
-#                    self.newTask(t)
-#                else:
-#                    Log.debug('Story: %s found a task: %s not in tasks' % \
-#                              (self.current_story[0].Name,task))
-    def flow_task_select(self,btn):
-        self.controller.add_current_artefact('tasks',btn)
-    def _flow_pressed(self, flag, widget, *largs): #IGNORE:W0613
-        _flag =  not self.__getattribute__(flag)
-        self.__setattr__(flag, _flag)
-        if _flag:
-            super(StoryAppView,self).remove_widget(widget)
-        else:
-            widget.pos = self.get_new_random_position()
-            super(StoryAppView,self).add_widget(widget)
-    def get_new_random_position(self):
-        return self.controller.get_new_random_position()
+    def createNewBacklogButton(self):
+        return self.create_button(LABEL_NEW_STORY,curry(self.new_story_pressed))
+    def createNewBacklogFlowButton(self):
+        return self.create_button(LABEL_BROWSE_BACKLOG,
+                                  curry(self.flow_pressed,\
+                        'backlog_flow_open',self.dragable_backlog_flow))
+    def createNewProjectButton(self):
+        return self.create_button(LABEL_NEW_PROJECT,curry(\
+                                                    self.new_project_pressed))
+    def createNewProjectFlowButton(self):
+        return self.create_button(LABEL_BROWSE_PROJECT,\
+                                  curry(self.flow_pressed,\
+                        'projects_flow_open',self.dragable_project_flow))
+    def createNewReleaseButton(self):
+        return self.create_button(LABEL_NEW_RELEASE,curry(\
+                                                    self.new_release_pressed))
+    def createNewReleasesFlowButton(self):
+        return self.create_button(LABEL_BROWSE_RELEASE,
+                                  curry(self.flow_pressed,\
+                        'releases_flow_open',self.dragable_release_flow))
+    def createNewSprintButton(self):
+        return self.create_button(LABEL_NEW_SPRINT, curry(\
+                                                    self.new_sprint_pressed))
+    def createNewSprintFlowButton(self):
+        return self.create_button(LABEL_BROWSE_SPRINT,
+                                  curry(self.flow_pressed,\
+                        'sprint_flow_open',self.dragable_sprint_flow))
+    def createNewStoryButton(self):
+        return self.create_button(LABEL_NEW_STORY,curry(self.new_story_pressed))
+    def createNewStoryFlowButton(self):
+        return self.create_button(LABEL_BROWSE_STORY, 
+            curry(self.flow_pressed,\
+                        'story_flow_open',self.dragable_story_flow))
+    def createNewTaskButton(self):
+        return self.create_button(LABEL_NEW_TASK,curry(self.new_task_pressed))
+    def createNewTaskFlowButton(self):
+        return self.create_button(LABEL_BROWSE_TASK,
+                                  curry(self.flow_pressed,\
+                        'task_flow_open',self.dragable_task_flow))
+    def create_button(self,label,callback):
+        _btn = MTButton(multiline=True, label=label, anchor_x='left',
+                        halign='left', padding_x=8)
+        _btn.connect('on_press', callback)
+        _max = 1
+        for _s in label.splitlines():
+            _l = len(_s)
+            if _l > _max:
+                _max = _l
+        _btn.width = min(int(_max * pixels),100)
+        return _btn
     def enable_gestures(self):
         print("enabling gestures")
         gdb = myGestures()
@@ -296,250 +317,159 @@ class StoryAppView(MyInnerWindow):
         if not capture:
             print("No capture device in gestures")
         self.canvas.add_widget(capture)
-        
-    def load_children(self, id, type):
-        self.controller.load_children(id, type)
-    def new_backlog_pressed(self): # *largs
-        _b = self.new_artefact_pressed(StoryController,
-                                       'currentBacklogView',
-                                       model=StoryModel,
-                                       mini_view_type=MinStoryView,
-                                       view_type=StoryView,
-                                       get_artefact='newBacklog',
-                                       type='backlog')
-        self.artefacts[_b.Id] = (_b,{})
-        self.current_backlog = self.artefacts[_b.Id] 
-        return _b
-    def new_project_pressed(self, *largs): #IGNORE:W0613
-        _p = self.new_artefact_pressed(ProjectController,
-                                       'currentProjectView',
-                                       model=ProjectModel,
-                                       mini_view_type=ProjectMinView,
-                                       view_type=ProjectView,
-                                       get_artefact='newProject')
-        pobj = (_p, {})
-        self.artefacts[_p.Id] = pobj
-        self.current_project = pobj
-        return _p
-    def new_release_pressed(self, *largs): #IGNORE:W0613
-        project = None if self.current_project is None \
-                                        else self.current_project[0].Id
-        if not project:
-            return # Do not support releases in backlog now
-        _r = self.new_artefact_pressed(ReleaseController,
-                                       'currentReleaseView',
-                                       project=project if project else None,
-                                       model=ReleaseModel,
-                                       view_type=ReleaseView,
-                                       mini_view_type=ReleaseMinView,
-                                       get_artefact='newRelease' if project\
-                                                     else 'newBacklog',
-                                       folder='releases' if project\
-                                               else 'backlog')
-        robj = (_r, {})
-        self.artefacts[_r.Id] = robj
-        if project:
-            self.current_project[0].Children = _r.Id
-            _r.Parent = project
-            self.current_release = robj
-        return _r
-    def new_sprint_pressed(self, *largs): #IGNORE:W0613
-        project = None if self.current_project is None \
-                                        else self.current_project[0]
-        release = None if self.current_release is None \
-                        else self.current_release[0].Id
-        if not release:
-            return # No appropriate parent
-        _s = self.new_artefact_pressed(SprintController,
-                                       'currentSprintView',
-                                       p_artefact=release,
-                                       model=SprintModel,
-                                       view_type=SprintView,
-                                       mini_view_type=SprintMinView,
-                                       get_artefact='newSprint'\
-                                                    if release or project\
-                                                    else 'newBacklog',
-                                       folder='sprints' if release or project\
-                                              else 'backlog',
-                                       release=release)
-        sobj = (_s, {})
-        self.artefacts[_s.Id] = sobj
-        if release:
-            self.current_release[0].Children = _s.Id
-            _s.Parent = release
-            self.current_sprint = sobj
-        return _s
-    def new_story_pressed(self, *largs): #IGNORE:W0613
-        project = None
-        sprint = None
-        p = self.controller.current_project
-        if p and len(p):
-            project = p[0]
-#        project = None if self.controller.current_project is None \
-#                                        else self.controller.current_project[0]
-        s = self.controller.current_sprint
-        if s and len(s):
-            sprint = s[0]
-#        sprint = None if self.controller.current_sprint is None \
-#                        else self.controller.current_sprint[0]
-        parent = sprint if sprint else project
-        if not parent:
-            return self.new_backlog_pressed()
-        _s = self.new_artefact_pressed(StoryController,
-                                       'currentStoryView',
-                                        p_artefact=parent,
-                                        project=project.Id if project else None,
-                                        model=StoryModel,
-                                        view_type=StoryView,
-                                        mini_view_type=MinStoryView,
-                                        get_artefact='newStory' if parent\
-                                                      else 'newBacklog',
-                                        folder='stories' if parent\
-                                                else 'backlog')
-        sobj = (_s, {})
-        if sprint:
-            self.current_sprint[0].Children = _s.Id
-            _s.Parent = sprint.Id
-            self.artefacts[_s.Id] = sobj
-            self.current_story = sobj
-        elif not parent:
-            self.artefacts[_s.Id] = sobj
-        _s.register_observer(self)
-        return _s
-    def new_task_pressed(self, *largs): #IGNORE:W0613
-        story = None if self.current_story is None \
-                        else self.current_story[0]
-        sprint = None if self.current_sprint is None \
-                         else self.current_sprint[0]
-        parent = None
-        if story:
-            parent = story
-        elif sprint:
-            parent = sprint
-        if not parent:
-            return # No appropriate parent
-        _t = self.new_artefact_pressed(TaskController,
-                                       'currentTaskView',
-                                       p_artefact=parent,
-                                       model=TaskModel,
-                                       view_type=TaskView,
-                                       mini_view_type=TaskMinView,
-                                       get_artefact='newTask',
-                                       folder='tasks')
-        tobj = (_t, {})
-        self.artefacts[_t.Id] = tobj
-        if story:
-            story.Children = _t.Id
-            _t.Parent = story.Id
-        elif sprint:
-            sprint.Children = _t.Id
-            _t.Parent = sprint.Id
-        else:    
-            self.artefacts[_t.Id] = tobj
-        if story or sprint:
-            self.current_task = tobj
-        return _t
-    def new_artefact_pressed(self,ctrl,view, **kwargs): # *largs
-        _r = self.controller.new_artefact_pressed(ctrl,view,**kwargs)
-        self.__setattr__(view, _r.newDialog(minv=True))
-        super(StoryAppView,self).add_widget(self.__getattribute__(view))
-        return _r 
-#    def getBacklog(self,defn,**kwargs):
-#        kwargs['view_type'] = StoryView
-#        kwargs['mini_view_type'] = MinStoryView
-#        kwargs['get_artefact'] = 'newBacklog'
-#        kwargs['model'] = StoryModel
-#        return self.getArtefact(defn, StoryController, **kwargs)
-#    def getProject(self,defn,**kwargs):
-#        kwargs['view_type'] = ProjectView
-#        kwargs['mini_view_type'] = ProjectMinView
-#        kwargs['get_artefact'] = 'newProject'
-#        kwargs['model'] = ProjectModel
-#        return self.getArtefact(defn, ProjectController, **kwargs)
-#    def getRelease(self,defn,**kwargs):
-#        kwargs['view_type'] = ReleaseView
-#        kwargs['mini_view_type'] = ReleaseMinView
-#        kwargs['get_artefact'] = 'newRelease'
-#        kwargs['model'] = ReleaseModel
-#        return self.getArtefact(defn, ReleaseController, **kwargs)
-#    def getSprint(self,defn,**kwargs):
-#        kwargs['view_type'] = SprintView
-#        kwargs['mini_view_type'] = SprintMinView
-#        kwargs['get_artefact'] = 'newSprint'
-#        kwargs['model'] = SprintModel
-#        return self.getArtefact(defn, SprintController, **kwargs)
-#    def getStory(self,defn,**kwargs):
-#        kwargs['view_type'] = StoryView
-#        kwargs['mini_view_type'] = MinStoryView
-#        kwargs['get_artefact'] = 'newStory'
-#        kwargs['model'] = StoryModel
-#        return self.getArtefact(defn, StoryController, **kwargs)
-#    def getTask(self,defn,**kwargs):
-#        kwargs['view_type'] = TaskView
-#        kwargs['mini_view_type'] = TaskMinView
-#        kwargs['get_artefact'] = 'newTask'
-#        kwargs['model'] = TaskModel
-#        return self.getArtefact(defn, TaskController,**kwargs)
+    def flow_backlog_select(self,btn,*largs):
+        #make the selected backlog item the active one
+        self.controller.add_current_artefact('backlog',btn)
+    def flow_projects_select(self,btn,*largs):
+        #we need to populate the releases flow with any release 
+        #in the current project
+        self.load_children(self.controller.add_current_artefact('projects',btn),
+                           'releases')
+#        self.container_reset_children('release_flow')
+#        self.container_reset_children('sprint_flow')
+#        self.container_reset_children('story_flow')
+#        self.container_reset_children('task_flow')
+#        if self.current_project and self.current_project[0].Children:
+#            for release in self.current_project[0].Children:
+#                if release in self.artefacts:
+#                    r = self.artefacts[release][0]
+#                    if r.ArtefactType != 'Release': continue
+#                    self.newRelease(r)
+#                else:
+#                    Log.debug('Project: %s found a release: %s not in releases' % \
+#                              (self.current_project[0].Name,release))
+    def flow_release_select(self,btn,*largs):
+        #we need to populate the sprint flow with any sprints already
+        #in the current release
+        self.load_children(self.controller.add_current_artefact('releases',btn),
+                           'sprints')
+#        self.container_reset_children('sprint_flow')
+#        self.container_reset_children('story_flow')
+#        self.container_reset_children('task_flow')
+#        if self.current_release and self.current_release[0].Children:
+#            for sprint in self.current_release[0].Children:
+#                if sprint in self.artefacts.keys():
+#                    s = self.artefacts[sprint][0]
+#                    if s.ArtefactType != 'Sprint': continue
+#                    self.newSprint(s)
+#                else:
+#                    Log.debug('Release: %s found a sprint: %s not in sprints' % \
+#                              (self.current_release[0].Name,sprint))
+    def flow_sprint_select(self,btn,*largs):
+        #we need to populate the story flow with any stories already
+        #in the current sprint
+        self.load_children(self.controller.add_current_artefact('sprints',btn),
+                           'stories')
+#        self.container_reset_children('story_flow')
+#        self.container_reset_children('task_flow')
+#        if self.current_sprint and self.current_sprint[0].Children:
+#            for story in self.current_sprint[0].Children:
+#                if story in self.artefacts.keys():
+#                    s = self.artefacts[story][0]
+#                    if s.ArtefactType != 'Story': continue
+#                    self.newStory(s)
+#                else:
+#                    Log.debug('Sprint: %s found a story: %s not in stories' % \
+#                              (self.current_sprint[0].Name,story))
+    def flow_story_select(self,btn,*largs):
+        #we need to populate the task flow with any tasks already
+        #in the current story
+        self.load_children(self.controller.add_current_artefact('stories',btn),
+                           'tasks')
+#        self.container_reset_children('task_flow')
+#        if self.current_story and self.current_story[0].Children:
+#            for task in self.current_story[0].Children:
+#                if task in self.artefacts.keys():
+#                    t = self.artefacts[task][0]
+#                    if t.ArtefactType != 'Task': continue
+#                    self.newTask(t)
+#                else:
+#                    Log.debug('Story: %s found a task: %s not in tasks' % \
+#                              (self.current_story[0].Name,task))
+    def flow_task_select(self,btn,*largs):
+        self.controller.add_current_artefact('tasks',btn)
+    def flow_pressed(self, flag, widget, *largs):
+        _flag =  not self.__getattribute__(flag)
+        self.__setattr__(flag, _flag)
+        if _flag:
+            super(StoryAppView,self).remove_widget(widget)
+        else:
+            widget.pos = self.get_new_random_position()
+            super(StoryAppView,self).add_widget(widget)
+    def fullscreen(self, *largs, **kwargs):
+        super(StoryAppView,self).fullscreen()
+        root_win = self.parent.children
+        for rw in root_win:
+            try:
+                if rw.label == 'Back':
+                    self.parent.remove_widget(rw)
+                    rw.label = 'Exit'
+                    rw.pos = (self.width - 100, 0)
+                    rw.size=self._default_button_size
+                    self.main_ctlrs_container.add_widget(rw)
+                    Log.debug('Renamed back label to exit')
+                    return
+            except Exception: #IGNORE:W0703
+                pass
     def getArtefact(self,defn,ctrl,**kwargs):
         _p = kwargs.setdefault('controller', None)
         if _p is None:
             _p = ctrl(self,defn,**kwargs)
         return _p
-    def remove_project_view(self,w):
-        super(StoryAppView,self).remove_widget(w)
-#    def newBacklog(self,ctrl):
-#        return self.add_new_artefact(ctrl, CONTAINERS_BACKLOG, 
-#                              'viewCurrentBacklog', self.artefacts[ctrl.Id][1])
-#    def newProject(self,ctrl):
-#        return self.add_new_artefact(ctrl,
-#                                     CONTAINERS_PROJECT,
-#                                     'viewCurrentProject',
-#                                     self.artefacts[ctrl.Id][1])
-#    def newRelease(self,ctrl):
-#        return self.add_new_artefact(ctrl,
-#                                     CONTAINERS_RELEASE,
-#                                     'viewCurrentRelease',
-#                                     self.artefacts[ctrl.Id][1])
-#    def newSprint(self,ctrl):
-#        return self.add_new_artefact(ctrl,
-#                                     CONTAINERS_SPRINT,
-#                                     'viewCurrentSprint',
-#                                     self.artefacts[ctrl.Id][1])
-#    def newStory(self,ctrl):
-#        return self.add_new_artefact(ctrl,
-#                                     CONTAINERS_STORY, 
-#                                     'viewCurrentStory',
-#                                     self.artefacts[ctrl.Id][1])
-#    def newTask(self,ctrl):
-#        return self.add_new_artefact(ctrl,
-#                                     CONTAINERS_TASK,
-#                                     'viewCurrentTask',
-#                                     self.artefacts[ctrl.Id][1])
-
-    def add_new_artefact(self, ctrl, container, callback, ret):
-        '''add a button to access the artifact in the appropriate container(s)
-    :Parameters:
-        `ctrl` : ArtefactController, A derived controller from the 
-            ArtefactController base class
-        `container` : List containing all the string names of the containers 
-            where access to this artefact is needed, usually a CoverFlow or 
-            Kinectic List or both
-        'callback' : method to be called when when a press event is fired
-        'ret' : returns this dictionary keyed on the string names of each 
-            container where a button was added, this dictionary is used as a 
-            short cut to all buttons that access this artefact
-    :Returns: the dictionary 'ret'
-    '''        
-        for c in container:
-            _lbl = MyImageButton(id=ctrl.Id, size=self._default_button_size,
-                                 image=self._default_image)
-            self.check_btn_width(_lbl)
-            _lbl.push_handlers(on_press=curry(self.__getattribute__(callback), 
-                                                                        _lbl))
-            self.__getattribute__(c).add_widget(_lbl)
-            ret[c] = _lbl
-        return ret
-            
+    def get_new_random_position(self):
+        return self.controller.get_new_random_position()
+    def list_button_pressed(self, btn):
+        ctrl = self.artefacts[btn.id][0]
+        view = ctrl.view
+        if view not in self.container.children:
+            super(StoryAppView,self).add_widget(view)
+        else: ctrl.app_btn_pressed()
+    def load_children(self, id, type):
+        self.controller.load_children(id, type)
+    def new_backlog_pressed(self,*largs):
+        self.controller.new_backlog_artefact(**artefact_types[BACKLOG])
+    def new_project_pressed(self, *largs): 
+        self.controller.new_project(**artefact_types[PROJECTS])
+    def new_release_pressed(self, *largs): 
+        self.controller.new_release(**artefact_types[RELEASES])
+    def new_sprint_pressed(self, *largs): 
+        self.controller.new_sprint(**artefact_types[SPRINTS])
+    def new_story_pressed(self, *largs): 
+        self.controller.new_story(**artefact_types[STORIES])
+    def new_task_pressed(self, *largs): 
+        self.controller.new_task(**artefact_types[TASKS])
+    def toggle_view_current_Artefact(self, artefact):
+        if artefact in self.container.children:
+            super(StoryAppView,self).remove_widget(artefact)
+        else:
+            super(StoryAppView,self).add_widget(artefact)
+    def trash(self,artefact,atype=None):
+        if atype is None:# or type is 'stories':
+            btn = self.buttons[artefact.Id]
+            lbl = self.labels[artefact.Id]
+            self.backlog_list_layout.remove_widget(btn)
+            self.story_flow.remove_widget(lbl)
+            self.remove_widget(artefact)
+            del self.artefacts[artefact.Id]
+        else:
+            if artefact.Id in self.artefacts:
+                dic = self.artefact[artefact.Id][1]
+                for l in dic.keys():
+                    self.__getattribute__(l).remove_widget(dic[l])
+                del self.artefact[artefact.Id]
+                super(StoryAppView,self).remove_widget(artefact.view)
+        return
+    def unfullscreen(self, *largs, **kwargs):
+        self.root_window.remove_widget(self)
+        stopTouchApp()
+        Log.info('Closing CMAP application')
+    def update_story_btn_name(self,story):
+        idu = story.Id
+        btn = self.buttons[idu]
+        if btn.id == idu:
+            btn.label = story.Name
+            self.check_btn_width(btn)
+        return
     def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
         self.view_current_Artefact(lbl, 'current_backlog',\
                                     'flow_backlog_select', 'backlog')
@@ -579,143 +509,6 @@ class StoryAppView(MyInnerWindow):
             super(StoryAppView,self).remove_widget(_view)
         else:
             super(StoryAppView,self).add_widget(_view)
-    def addMainControls(self):
-        self.main_ctlrs_container.add_widget(self.createNewProjectButton())
-        self.main_ctlrs_container.add_widget(self.createNewReleaseButton())
-        self.main_ctlrs_container.add_widget(self.createNewSprintButton())
-        self.main_ctlrs_container.add_widget(self.createNewStoryButton())
-        self.main_ctlrs_container.add_widget(self.createNewTaskButton())
-        self.main_ctlrs_container.add_widget(self.createNewBacklogFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewProjectFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewReleasesFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewSprintFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
-        self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
-        self.canvas.add_widget(self.main_ctlrs_container)
-    def createNewBacklogButton(self):
-        return self.create_button(LABEL_NEW_BACKLOG,curry(self.new_story_pressed))
-    def createNewBacklogFlowButton(self):
-        return self.create_button('Browse\nBacklog...',
-                                  curry(self._flow_pressed,\
-                        'backlog_flow_open',self.dragable_backlog_flow))
-    def createNewProjectButton(self):
-        return self.create_button(LABEL_NEW_PROJECT,curry(\
-                                                    self.new_project_pressed))
-    def createNewProjectFlowButton(self):
-        return self.create_button('Browse\nProjects...',\
-                                  curry(self._flow_pressed,\
-                        'projects_flow_open',self.dragable_project_flow))
-    def createNewReleaseButton(self):
-        return self.create_button(LABEL_NEW_RELEASE,curry(\
-                                                    self.new_release_pressed))
-    def createNewReleasesFlowButton(self):
-        return self.create_button('Browse\nReleases...',
-                                  curry(self._flow_pressed,\
-                        'releases_flow_open',self.dragable_release_flow))
-    def createNewSprintButton(self):
-        return self.create_button(LABEL_NEW_SPRINT, curry(\
-                                                    self.new_sprint_pressed))
-    def createNewSprintFlowButton(self):
-        return self.create_button('Browse\nSprints...',
-                                  curry(self._flow_pressed,\
-                        'sprint_flow_open',self.dragable_sprint_flow))
-    def createNewStoryButton(self):
-        return self.create_button(LABEL_NEW_STORY,curry(self.new_story_pressed))
-    def createNewStoryFlowButton(self):
-        return self.create_button('Browse\nStories...', 
-            curry(self._flow_pressed,\
-                        'story_flow_open',self.dragable_story_flow))
-    def createNewTaskButton(self):
-        return self.create_button(LABEL_NEW_TASK,curry(self.new_task_pressed))
-    def createNewTaskFlowButton(self):
-        return self.create_button('Browse\nTasks...',
-                                  curry(self._flow_pressed,\
-                        'task_flow_open',self.dragable_task_flow))
-    def create_button(self,label,callback):#,flag=None,widget=None):
-        _btn = MTButton(multiline=True, label=label, anchor_x='left',
-                        halign='left', padding_x=8)
-        _btn.connect('on_press', callback)
-        _max = 1
-        for _s in label.splitlines():
-            _l = len(_s)
-            if _l > _max:
-                _max = _l
-        _btn.width = min(int(_max * pixels),100)
-        return _btn
-    def update_story_btn_name(self,story):
-        idu = story.Id
-        btn = self.buttons[idu]
-        if btn.id == idu:
-            btn.label = story.Name
-            self.check_btn_width(btn)
-        return
-    def trash(self,artefact,atype=None):
-        if atype is None:# or type is 'stories':
-            btn = self.buttons[artefact.Id]
-            lbl = self.labels[artefact.Id]
-            self.backlog_list_layout.remove_widget(btn)
-            self.story_flow.remove_widget(lbl)
-            self.remove_widget(artefact)
-            del self.artefacts[artefact.Id]
-        else:
-            if artefact.Id in self.artefacts:
-                dic = self.artefact[artefact.Id][1]
-                for l in dic.keys():
-                    self.__getattribute__(l).remove_widget(dic[l])
-                del self.artefact[artefact.Id]
-                super(StoryAppView,self).remove_widget(artefact.view)
-        return
-    def check_btn_width(self,btn):
-        _label = btn.label
-        _w = int(len(_label) *pixels)
-        if _w > btn.width:
-            if not btn.multiline:
-                btn.multiline = True
-            btn.label = '\n'.join(_label.split('-'))
-    def list_button_pressed(self, btn):
-        ctrl = self.artefacts[btn.id][0]
-        view = ctrl.view
-        if view not in self.container.children:
-            super(StoryAppView,self).add_widget(view)
-        else: ctrl.app_btn_pressed()
-    def fullscreen(self, *largs, **kwargs):
-        super(StoryAppView,self).fullscreen()
-        root_win = self.parent.children
-        for rw in root_win:
-            try:
-                if rw.label == 'Back':
-                    self.parent.remove_widget(rw)
-                    rw.label = 'Exit'
-                    rw.pos = (self.width - 100, 0)
-                    rw.size=self._default_button_size
-                    self.main_ctlrs_container.add_widget(rw)
-                    Log.debug('Renamed back label to exit')
-                    return
-            except Exception: #IGNORE:W0703
-                pass
-    def unfullscreen(self, *largs, **kwargs):
-        self.root_window.remove_widget(self)
-        stopTouchApp()
-        Log.info('Closing CMAP application')
-    def close(self,touch=None):
-        self.controller.close(touch)
-        #close all the artefacts
-#        for a in self.artefacts.values():
-#            a[0].close()
-#        for b in self.backlog.values():
-#            b[0].close()
-#        self.add_to_git()
-#        AsyncHandler().shutdown()
-        super(StoryAppView, self).close(touch)
-    def add_to_git(self):
-        AsyncHandler().save(None, 'Commit session edits')    
-    def container_reset_children(self,container):
-        f = self.__getattribute__(container)
-        x = len(f.children) -1
-        while x > 0:
-            w = f.children[x]
-            f.remove_widget(w) 
-            x = len(f.children) -1
     
     @property        
     def artefacts(self):

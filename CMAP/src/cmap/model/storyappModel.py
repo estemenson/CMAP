@@ -76,24 +76,20 @@ class StoryAppModel(object):
         
     def load_artefacts(self):
         for type in artefact_types:
+            kwargs = artefact_types[type].copy()
             for artefact in self.xmlFiles[type]:
                 Log.debug('loading %s' % artefact)
 #                ctrl = self.controller.getArtefact(artefact, type['controller'],
 #                                        type['model'], type['get_artefact'], 
 #                    name=os.path.splitext(os.path.basename(artefact))[0])
-                ctrl = self.controller.\
-                getArtefact(
-                        type=type,
-                        mini_view_type=artefact_types[type]['mini_view_type'],
-                        view_type=artefact_types[type]['view_type'],
-                        file=artefact,
-                        controller=artefact_types[type]['controller'],
-                        model=artefact_types[type]['model'], 
-                        get_artefact=artefact_types[type]['get_artefact'],
-                        name=os.path.splitext(os.path.basename(artefact))[0]) 
+                kwargs['name'] =\
+                            name=os.path.splitext(os.path.basename(artefact))[0]
+                kwargs['file'] = artefact
+                ctrl = self.controller.getArtefact(**kwargs) 
             self.artefacts[ctrl.Id] = (ctrl,{})
             self.controller.add_new_artefact(ctrl,
-                                     artefact_types[type]['container'],artefact_types[type]['viewCurrent'],
+                                     artefact_types[type]['container'],
+                                     artefact_types[type]['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
     def trash(self,artefact,atype=None):
         Log.debug('Need to trash artefact: %s' % artefact)

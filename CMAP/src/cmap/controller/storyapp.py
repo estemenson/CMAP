@@ -95,7 +95,6 @@ class StoryApp(object):
         kwargs['controller'] = self
         self.view = StoryAppView(**kwargs)
         self.model = StoryAppModel(**kwargs)
-
     def add_current_artefact(self, type, artefact):
         type = artefact_types[type]
         idu,id  = None,None
@@ -116,6 +115,57 @@ class StoryApp(object):
         #set the current artefact (appends to the list)
         self.__setattr__(type['current'], self.artefacts[id])
         return id
+    def add_new_artefact(self, ctrl, container, callback, ret):
+        _r = self.view.add_new_artefact(ctrl, container, callback, ret={})
+    def add_to_git(self):
+        AsyncHandler().save(None, 'Commit session edits')    
+    def close(self,touch=None):
+        #close all the artefacts
+        for a in self.artefacts.values():
+            ctrl = a[0]
+            try:
+                ctrl.close()
+            except TypeError:
+                Log.debug('Unable to close %s' % ctrl)
+#        for b in self.backlog.values():
+#            b[0].close()
+        self.add_to_git()
+        AsyncHandler().shutdown()
+        #super(StoryAppView, self.view).close(touch)
+    def container_reset_children(self,container):
+        f = self.__getattribute__(container)
+        x = len(f.children) -1
+        while x > 0:
+            w = f.children[x]
+            f.remove_widget(w) 
+            x = len(f.children) -1
+    def fullscreen(self, *largs, **kwargs):
+        pass
+    def getArtefact(self,**kwargs):
+        _p = kwargs.setdefault('controller', None)
+        if not isinstance(_p, ArtefactController):
+            _p = _p(self,kwargs.setdefault('file', None),**kwargs)
+        else:
+            Log.debug("file:%s, method:%s ha contrller ID: %s"\
+                      % (__file__,'getArtefact' ,_p.Id))
+        return _p
+    def get_new_random_position(self):
+        return (choice(self._x_range),choice(self._y_range))
+    def list_button_pressed(self, btn):
+        ctrl = self.artefacts[btn.id][0]
+        view = ctrl.view
+        if view not in self.container.children:
+            super(StoryApp,self).add_widget(view)
+        else: ctrl.app_btn_pressed()
+    def load_children(self,id, type):
+        #TODO: STEVE refactor to get children from model of the artefact
+        for f in self.model.xmlFiles[type]:#artefact_types[type]['type']]:
+            Log.debug('only loading %s %s' % (type,f))
+            kwargs = artefact_types[type].copy()
+            kwargs['name'] = os.path.splitext(os.path.basename(f))[0]
+            kwargs['file'] = f
+            r = self.getArtefact(**kwargs)
+            self.artefacts[r.Id] = (r,{})
     def new_artefact(self,**kwargs): # *largs
         #create the controller for the new artefact
         _r = kwargs['controller'](self,None,**kwargs)
@@ -125,66 +175,49 @@ class StoryApp(object):
         self.__setattr__(view, _r.newDialog(minv=True))
         self.view.toggle_view_current_Artefact(self.__getattribute__(view))
         return _r 
-
-    def load_children(self,id, type):
-        #TODO: STEVE refactor to get children from model of the artefact
-        for f in self.model.xmlFiles[type]:#artefact_types[type]['type']]:
-            Log.debug('only loading %s %s' % (type,f))
-            kwargs = {
-                'view_type':artefact_types[type]['view_type'],
-                'mini_view_type':artefact_types[type]['mini_view_type'],
-                'get_artefact':artefact_types[type]['get_artefact'],
-                'model':artefact_types[type]['model'],
-                'type':artefact_types[type]['type'],
-                'name':os.path.splitext(os.path.basename(f))[0],
-                'file':f,
-                'controller':artefact_types[type]['controller']
-            }
-            r = self.getArtefact(**kwargs)
-            self.artefacts[r.Id] = (r,{})
-                
-    def on_github_notification(self, ret):
-        msg = ret[1]
-        print("GOOGLE APP HOOK CCALLED ***************************************")
-        print("***********************************")
-        for c in msg['commits']:
-            for a in c['added']:
-                Log.debug('%s added by %s' % (a, c['author']['name']))
-            for m in c['modified']:
-                Log.debug('%s modified by %s' % (m, c['author']['name']))
-            for r in c['removed']:
-                Log.debug('%s removed by %s' % (r, c['author']['name']))
-
-    def get_new_random_position(self):
-        return (choice(self._x_range),choice(self._y_range))
+    def new_artefact_pressed(self,**kwargs): # *largs
+        _r = kwargs['controller'](self,None,**kwargs)
+#        self.__setattr__(view, _r.newDialog(minv=True))
+#        super(StoryApp,self).add_widget(self.__getattribute__(view))
+        return _r 
     #TODO: STEVE this group of new_XXX_pressed methods must be refactored
-#    def new_backlog_pressed(self): # *largs
-#        _b = self.new_artefact_pressed(StoryController,
+    def new_backlog_artefact(self,**kwargs):
+        if kwargs['type'] is STORIES:
+            kwargs['viewCurrent']   = 'currentBacklogView'
+            kwargs['type']          = BACKLOG
+            kwargs['current']       = 'current_backlog'
+            kwargs['container']     = ['backlog_list_layout', 'backlog_flow']
+            kwargs['callback']      = 'flow_backlog_select'
+        _b = self.new_artefact(**kwargs)
+#                                       StoryController,
 #                                       'currentBacklogView',
 #                                       model=StoryModel,
 #                                       mini_view_type=MinStoryView,
 #                                       view_type=StoryView,
 #                                       get_artefact='newBacklog',
-#                                       folder='backlog')
-#        self.artefacts[_b.Id] = (_b,{})
-#        return _b
-#    def new_project_pressed(self, *largs): #IGNORE:W0613
-#        _p = self.new_artefact_pressed(ProjectController,
+#                                       type='backlog')
+        #self.artefacts[_b.Id] = (_b,{})
+        self.current_backlog = self.artefacts[_b.Id] 
+        return _b
+    def new_project(self, **kwargs): 
+        _p = self.new_artefact_pressed(**kwargs)
+#                                       ProjectController,
 #                                       'currentProjectView',
 #                                       model=ProjectModel,
 #                                       mini_view_type=ProjectMinView,
 #                                       view_type=ProjectView,
 #                                       get_artefact='newProject')
-#        pobj = (_p, {})
-#        self.artefacts[_p.Id] = pobj
-#        self.current_project = pobj
-#        return _p
-#    def new_release_pressed(self, *largs): #IGNORE:W0613
-#        project = None if self.current_project is None \
-#                                        else self.current_project[0].Id
-#        if not project:
-#            return # Do not support releases in backlog now
-#        _r = self.new_artefact_pressed(ReleaseController,
+        pobj = (_p, {})
+        self.artefacts[_p.Id] = pobj
+        self.current_project = pobj
+        return _p
+    def new_release(self, **kwargs): 
+        project = None if self.current_project is None \
+                                        else self.current_project[0].Id
+        if not project:
+            return # Do not support releases in backlog now
+        _r = self.new_artefact_pressed(**kwargs)
+#                                       ReleaseController,
 #                                       'currentReleaseView',
 #                                       project=project if project else None,
 #                                       model=ReleaseModel,
@@ -194,21 +227,22 @@ class StoryApp(object):
 #                                                     else 'newBacklog',
 #                                       folder='releases' if project\
 #                                               else 'backlog')
-#        robj = (_r, {})
-#        self.artefacts[_r.Id] = robj
-#        if project:
-#            self.current_project[0].Children = _r.Id
-#            _r.Parent = project
-#            self.current_release = robj
-#        return _r
-#    def new_sprint_pressed(self, *largs): #IGNORE:W0613
-#        project = None if self.current_project is None \
-#                                        else self.current_project[0]
-#        release = None if self.current_release is None \
-#                        else self.current_release[0].Id
-#        if not release:
-#            return # No appropriate parent
-#        _s = self.new_artefact_pressed(SprintController,
+        robj = (_r, {})
+        self.artefacts[_r.Id] = robj
+        if project:
+            self.current_project[0].Children = _r.Id
+            _r.Parent = project
+            self.current_release = robj
+        return _r
+    def new_sprint(self, **kwargs): 
+        project = None if self.current_project is None \
+                                        else self.current_project[0]
+        release = None if self.current_release is None \
+                        else self.current_release[0].Id
+        if not release:
+            return # No appropriate parent
+        _s = self.new_artefact_pressed(**kwargs)
+#                                       SprintController,
 #                                       'currentSprintView',
 #                                       p_artefact=release,
 #                                       model=SprintModel,
@@ -220,20 +254,31 @@ class StoryApp(object):
 #                                       folder='sprints' if release or project\
 #                                              else 'backlog',
 #                                       release=release)
-#        sobj = (_s, {})
-#        self.artefacts[_s.Id] = sobj
-#        if release:
-#            self.current_release[0].Children = _s.Id
-#            _s.Parent = release
-#            self.current_sprint = sobj
-#        return _s
-#    def new_story_pressed(self, *largs): #IGNORE:W0613
+        sobj = (_s, {})
+        self.artefacts[_s.Id] = sobj
+        if release:
+            self.current_release[0].Children = _s.Id
+            _s.Parent = release
+            self.current_sprint = sobj
+        return _s
+    def new_story(self, **kwargs):
+        project = None
+        sprint = None
+        p = self.current_project
+        if p and len(p):
+            project = p[0]
 #        project = None if self.current_project is None \
 #                                        else self.current_project[0]
+        s = self.current_sprint
+        if s and len(s):
+            sprint = s[0]
 #        sprint = None if self.current_sprint is None \
 #                        else self.current_sprint[0]
-#        parent = sprint if sprint else project
-#        _s = self.new_artefact_pressed(StoryController,
+        parent = sprint if sprint else project
+        if not parent:
+            return self.new_backlog_artefact(**kwargs)
+        _s = self.new_artefact_pressed(**kwargs)
+#                                        StoryController,
 #                                       'currentStoryView',
 #                                        p_artefact=parent,
 #                                        project=project.Id if project else None,
@@ -244,29 +289,30 @@ class StoryApp(object):
 #                                                      else 'newBacklog',
 #                                        folder='stories' if parent\
 #                                                else 'backlog')
-#        sobj = (_s, {})
-#        if sprint:
-#            self.current_sprint[0].Children = _s.Id
-#            _s.Parent = sprint.Id
-#            self.artefacts[_s.Id] = sobj
-#            self.current_story = sobj
-#        elif not parent:
-#            self.artefacts[_s.Id] = sobj
-#        _s.register_observer(self)
-#        return _s
-#    def new_task_pressed(self, *largs): #IGNORE:W0613
-#        story = None if self.current_story is None \
-#                        else self.current_story[0]
-#        sprint = None if self.current_sprint is None \
-#                         else self.current_sprint[0]
-#        parent = None
-#        if story:
-#            parent = story
-#        elif sprint:
-#            parent = sprint
-#        if not parent:
-#            return # No appropriate parent
-#        _t = self.new_artefact_pressed(TaskController,
+        sobj = (_s, {})
+        if sprint:
+            self.current_sprint[0].Children = _s.Id
+            _s.Parent = sprint.Id
+            self.artefacts[_s.Id] = sobj
+            self.current_story = sobj
+        elif not parent:
+            self.artefacts[_s.Id] = sobj
+        _s.register_observer(self)
+        return _s
+    def new_task(self, **kwargs):
+        story = None if self.current_story is None \
+                        else self.current_story[0]
+        sprint = None if self.current_sprint is None \
+                         else self.current_sprint[0]
+        parent = None
+        if story:
+            parent = story
+        elif sprint:
+            parent = sprint
+        if not parent:
+            return # No appropriate parent
+        _t = self.new_artefact_pressed(**kwargs)
+#                                       TaskController,
 #                                       'currentTaskView',
 #                                       p_artefact=parent,
 #                                       model=TaskModel,
@@ -274,35 +320,30 @@ class StoryApp(object):
 #                                       mini_view_type=TaskMinView,
 #                                       get_artefact='newTask',
 #                                       folder='tasks')
-#        tobj = (_t, {})
-#        self.artefacts[_t.Id] = tobj
-#        if story:
-#            story.Children = _t.Id
-#            _t.Parent = story.Id
-#        elif sprint:
-#            sprint.Children = _t.Id
-#            _t.Parent = sprint.Id
-#        else:    
-#            self.artefacts[_t.Id] = tobj
-#        if story or sprint:
-#            self.current_task = tobj
-#        return _t
-    def new_artefact_pressed(self,ctrl,view, **kwargs): # *largs
-        _r = ctrl(self,None,**kwargs)
-#        self.__setattr__(view, _r.newDialog(minv=True))
-#        super(StoryApp,self).add_widget(self.__getattribute__(view))
-        return _r 
-    def getArtefact(self,**kwargs):
-        _p = kwargs.setdefault('controller', None)
-        if not isinstance(_p, ArtefactController):
-            _p = _p(self,kwargs.setdefault('file', None),**kwargs)
-        return _p
-    def remove_project_view(self,w):
-        super(StoryApp,self).remove_widget(w)
-    def add_new_artefact(self, ctrl, container, callback, ret):
-        return self.view.add_new_artefact(ctrl, container, callback, ret)
-    def update_story_btn_name(self,story):
-        return self.view.update_story_btn_name(story)
+        tobj = (_t, {})
+        self.artefacts[_t.Id] = tobj
+        if story:
+            story.Children = _t.Id
+            _t.Parent = story.Id
+        elif sprint:
+            sprint.Children = _t.Id
+            _t.Parent = sprint.Id
+        else:    
+            self.artefacts[_t.Id] = tobj
+        if story or sprint:
+            self.current_task = tobj
+        return _t
+    def on_github_notification(self, ret):
+        msg = ret[1]
+        print("GOOGLE APP HOOK CCALLED ***************************************")
+        print("***********************************")
+        for c in msg['commits']:
+            for a in c['added']:
+                Log.debug('%s added by %s' % (a, c['author']['name']))
+            for m in c['modified']:
+                Log.debug('%s modified by %s' % (m, c['author']['name']))
+            for r in c['removed']:
+                Log.debug('%s removed by %s' % (r, c['author']['name']))
     def trash(self,artefact,atype=None):
         if atype is None:# or type is 'stories':
             btn = self.buttons[artefact.Id]
@@ -319,38 +360,10 @@ class StoryApp(object):
                 del self.Artefacts[artefact.Id]
                 super(StoryApp,self).remove_widget(artefact.view)
         return
-    def list_button_pressed(self, btn):
-        ctrl = self.artefacts[btn.id][0]
-        view = ctrl.view
-        if view not in self.container.children:
-            super(StoryApp,self).add_widget(view)
-        else: ctrl.app_btn_pressed()
-    def fullscreen(self, *largs, **kwargs):
-        pass
     def unfullscreen(self, *largs, **kwargs):
         pass
-    def close(self,touch=None):
-        #close all the artefacts
-        for a in self.artefacts.values():
-            ctrl = a[0]
-            try:
-                ctrl.close()
-            except TypeError:
-                Log.debug('Unable to close %s' % ctrl)
-#        for b in self.backlog.values():
-#            b[0].close()
-        self.add_to_git()
-        AsyncHandler().shutdown()
-        #super(StoryAppView, self.view).close(touch)
-    def add_to_git(self):
-        AsyncHandler().save(None, 'Commit session edits')    
-    def container_reset_children(self,container):
-        f = self.__getattribute__(container)
-        x = len(f.children) -1
-        while x > 0:
-            w = f.children[x]
-            f.remove_widget(w) 
-            x = len(f.children) -1
+    def update_story_btn_name(self,story):
+        return self.view.update_story_btn_name(story)
     @property
     def width(self):
         return self.view.width

@@ -41,8 +41,14 @@ class ArtefactController(Subject,Observer):
         self.story_view_size = None
         self.origin_size = scale_tuple(self.root.size,0.25)
         self.isMinimal = True
-        self._mini_view_type = kwargs['mini_view_type']
-        self._view_type = kwargs['view_type']
+        self._type          = kwargs['type']
+        self._view_type     = kwargs['view_type']
+        self._mini_view_type= kwargs['mini_view_type']
+        self._model         = kwargs['model']
+        self._container     = kwargs.setdefault('container',[])
+        self._viewCurrent   = kwargs.setdefault('viewCurrent', "")
+        self._callback      = kwargs.setdefault('callback', None)
+        self._current       = kwargs.setdefault('current', None) 
         self._view_type_name = kwargs['view_type_name']
         self._p_artefact = kwargs.setdefault('p_artefact',None)
         self._x_range = range(int(self.root.x + int(minimal_size[0]/2)), 
@@ -55,14 +61,15 @@ class ArtefactController(Subject,Observer):
         if defn is None:
             self._name = ''
             self._description = ''
-    def save(self, touch=None): #IGNORE:W0613
+    def save(self, touch=None):
         try:
             self._model.save()
-        except Exception: #IGNORE:W0703
+        except Exception: 
             pass
         finally:
             if self.isNew:
-                self.view.add_new_artefact(self, )
+                self.root.add_new_artefact(self,self.container,self.callback,
+                                           self.artefacts[self.Id][1])
                 self.isNew = False
             
     def internalSave(self, fn):
@@ -116,18 +123,44 @@ class ArtefactController(Subject,Observer):
         self.root.add_widget(self,self.view)
     def get_new_random_position(self):
         return (choice(self._x_range),choice(self._y_range))
-    @property
-    def view(self):
-        if self._view is None:
-            self.newDialog(True)
-        return self._view
-    
+
     def get_image(self):
         return self._view_image
     def set_image(self, im):
         pass
     image = property(get_image, set_image)
-    
+    @property
+    def view(self):
+        if self._view is None:
+            self.newDialog(True)
+        return self._view
+    @property
+    def type(self):
+        return self._type
+    @property
+    def view_type(self):
+        return self._view_type
+    @property
+    def mini_view_type(self):
+        return self._mini_view_type
+    @property
+    def model(self):
+        return self._model
+    @property
+    def container(self):
+        return self._container
+    @property
+    def viewCurrent(self):
+        return self._viewCurrent
+    @property
+    def callback(self):
+        return self._callback
+    @property
+    def current(self):
+        return self._current 
+    @property
+    def artefacts(self):
+        return self.root.artefacts
     @property
     def Id(self): return self._model.Id
     @property

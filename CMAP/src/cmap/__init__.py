@@ -23,6 +23,7 @@ artefact_types = {
         {'type':BACKLOG,'view_type':StoryView, 'mini_view_type':MinStoryView, 
          'get_artefact':'newBacklog', 'model': StoryModel,
          'container':['backlog_list_layout', 'backlog_flow'], 
+         'callback':'flow_backlog_select',
          'viewCurrent':'viewCurrentBacklog', 'controller':StoryController, 
          'current':'current_backlog'},
     PROJECTS:
@@ -46,7 +47,7 @@ artefact_types = {
     STORIES:
         {'type':STORIES,'view_type':StoryView, 'mini_view_type':MinStoryView, 
          'get_artefact':'newStory', 'model': StoryModel,
-         'container':['story_flow'], 'callback':'flow_task_select', 
+         'container':['story_flow'], 'callback':'flow_story_select', 
         'viewCurrent':'viewCurrentStory', 'controller':StoryController, 
         'current':'current_story'},
     TASKS:
