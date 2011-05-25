@@ -438,22 +438,8 @@ class StoryAppView(MyInnerWindow):
             super(StoryAppView,self).remove_widget(artefact)
         else:
             super(StoryAppView,self).add_widget(artefact)
-    def trash(self,artefact,atype=None):
-        if atype is None:# or type is 'stories':
-            btn = self.buttons[artefact.Id]
-            lbl = self.labels[artefact.Id]
-            self.backlog_list_layout.remove_widget(btn)
-            self.story_flow.remove_widget(lbl)
-            self.remove_widget(artefact)
-            del self.artefacts[artefact.Id]
-        else:
-            if artefact.Id in self.artefacts:
-                dic = self.artefact[artefact.Id][1]
-                for l in dic.keys():
-                    self.__getattribute__(l).remove_widget(dic[l])
-                del self.artefact[artefact.Id]
-                super(StoryAppView,self).remove_widget(artefact.view)
-        return
+    def trash(self,artefact):
+        self.remove_widget(artefact)
     def unfullscreen(self, *largs, **kwargs):
         self.root_window.remove_widget(self)
         stopTouchApp()

@@ -178,8 +178,8 @@ class ScribbleText(MyTextArea):
         if self.autosize or self.autoheight:
             self.height = num * self.line_height + self.line_spacing * (num - 1)
         if (self.autosize or self.autowidth):
-            self.width = max(label.content_width for label in self.line_labels)
-            + 20
+            self.width = max(label.content_width for label in self.line_labels)\
+            + 30
 
     def on_press(self, touch):
         self.orig = Vector(self.to_window(*touch.pos))

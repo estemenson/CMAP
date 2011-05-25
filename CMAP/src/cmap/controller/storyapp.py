@@ -277,12 +277,12 @@ class StoryApp(object):
             self.remove_widget(artefact)
             del self.artefacts[artefact.Id]
         else:
-            if artefact.Id in self.Artefacts:
-                dic = self.Artefacts[artefact.Id][1]
+            if artefact.Id in self.artefacts:
+                dic = self.artefacts[artefact.Id][1]
                 for l in dic.keys():
                     self.__getattribute__(l).remove_widget(dic[l])
-                del self.Artefacts[artefact.Id]
-                super(StoryApp,self).remove_widget(artefact.view)
+                del self.artefacts[artefact.Id]
+                self.view.trash(artefact.view)
         return
     def unfullscreen(self, *largs, **kwargs):
         pass
