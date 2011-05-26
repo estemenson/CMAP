@@ -36,10 +36,11 @@ ScribbleCSS = '''
 }
 .scribbleKeyboardcss {
     bg-color: rgba(255,255,255,0);
-    border-color: rgb(100, 75, 200);
-    border-width: 2;
+    border-color: rgb(30,144,255);
+    border-width: 3;
     draw-background: 0;
-    draw-border: True;    
+    border-radius-precision: 100;
+    draw-border: 1;    
     font-size: 16;
 }
 .scribbleTextAreacss {
@@ -61,7 +62,7 @@ ScribbleCSS = '''
     draw-alpha-background: 0;
     draw-background: 0;
     border-width: 1;
-    border-color: rgb(100,100,100);
+    border-color: rgb(30,144,255);
     border-radius-precision: 1;
     draw-border: 0;
     selection-color: rgb(255, 142, 33);
@@ -159,7 +160,7 @@ class MySidePanel(MTSidePanel):
 
 class ScribbleText(MyTextArea):
     def __init__(self, **kwargs):
-        kwargs.setdefault('padding_x', 3)
+        kwargs.setdefault('padding_x', 2)
         kwargs.setdefault('autosize', True)
         kwargs.setdefault('cls', 'mytextinput')
         kwargs.setdefault('style',{'font-size': kwargs['font-size']})
@@ -179,7 +180,7 @@ class ScribbleText(MyTextArea):
             self.height = num * self.line_height + self.line_spacing * (num - 1)
         if (self.autosize or self.autowidth):
             self.width = max(label.content_width for label in self.line_labels)\
-            + 30
+            + self.style['font-size']
 
     def on_press(self, touch):
         self.orig = Vector(self.to_window(*touch.pos))
@@ -236,15 +237,19 @@ class ScribbleTextWidget(MTScatter):
         kwargs.setdefault('font-size',kwargs['size'][1]/1.1)
         self.cdata = kwargs.get('label','')
         del kwargs['size']
-        del kwargs['pos']
+        del kwargs['pos']# = (15,5)
+        kwargs['cls'] = 'mytextinput'
         self.label = ScribbleText(**kwargs)
         self.label.push_handlers(on_text_change=self.on_text_change)
         self.add_widget(self.label)
-        self.size = self.label.size
+        self.size = (self.label.width + 20, self.label.height +10)
         self.label.center = self.to_local(*self.center)
         self.register_event_type('on_text_change')
     def on_text_change(self,value):
         self.cdata = value.value
+        self.height = self.label.height +10
+        self.width = self.label.width +30
+        self.label.center = self.to_local(*self.center)
         self.parent.dispatch_event('on_text_change', self.to_dic())
         return True
     def to_dic(self):
@@ -265,21 +270,21 @@ class ScribbleTextWidget(MTScatter):
     def enable(self):
         self.label.show_keyboard()
 
-    def draw(self):
-        '''
-        set_color(.509, .407, .403, .95)
-        drawRoundedRectangle(size=self.size)
-        set_color(.298, .184, .192, .95)
-        drawRoundedRectangle(size=self.size, linewidth=2, style=GL_LINE_LOOP)
-        '''
-        self.width = max(20, self.label.width)
-        self.height = max(20,self.label.height)
-        #set_color(.435, .749, .996)
-        set_color(*self.style['bg-color'])
-        drawRoundedRectangle(size=self.size)
-        #set_color(.094, .572, .858)
-        set_color(*self.style['border-color'])
-        drawRoundedRectangle(size=self.size, linewidth=2, style=GL_LINE_LOOP)
+#    def draw(self):
+#        '''
+#        set_color(.509, .407, .403, .95)
+#        drawRoundedRectangle(size=self.size)
+#        set_color(.298, .184, .192, .95)
+#        drawRoundedRectangle(size=self.size, linewidth=2, style=GL_LINE_LOOP)
+#        '''
+#        self.width = max(20, self.label.width)# +20)
+#        self.height = max(20,self.label.height)
+#        #set_color(.435, .749, .996)
+#        set_color(*self.style['bg-color'])
+#        drawRoundedRectangle(size=self.size)
+#        #set_color(.094, .572, .858)
+#        set_color(*self.style['border-color'])
+#        drawRoundedRectangle(size=self.size, linewidth=2, style=GL_LINE_LOOP)
 class MyScribbleWidget(MTWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('cls', 'scribbleBordercss')
