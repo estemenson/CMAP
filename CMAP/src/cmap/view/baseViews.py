@@ -130,8 +130,16 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
     def fullscreen(self, *largs, **kwargs):
         self.isMinimal = not self.isMinimal
         self.ctrl.switch_view(self.isMinimal)
-        
-    
+    def on_transform(self, touch):
+        super(MinView, self).on_transform(touch)
+        self.ctrl.artefact_tranformed(self.size,self.pos)
+    def on_move(self, x, y):
+        super(MinView, self).on_move(x,y)
+        self.ctrl.artefact_tranformed(self.size,(x,y))
+
+    def on_resize(self, w, h):
+        super(MinView, self).on_resize(w,h)
+        self.ctrl.artefact_tranformed((w,h),self.pos)
     def _get_name(self):
         if self._name is None or not len(self._name): 
             return self.ctrl.Name

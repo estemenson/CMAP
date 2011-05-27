@@ -118,8 +118,15 @@ class StoryApp(object):
     def add_new_artefact(self, ctrl, container, callback, ret):
         _r = self.view.add_new_artefact(ctrl, container, callback, ret={})
     def add_to_git(self):
-        AsyncHandler().save(None, 'Commit session edits')    
+        AsyncHandler().save(None, 'Commit session edits')
+    def artefact_tranformed(self, id, size, pos):
+        #store the size and position of artefacts
+        ctrl = self.artefacts[id]
+        ctrl[1]['size'] = size
+        ctrl[1]['pos'] = pos
+        ctrl[1]['open'] = 'True'
     def close(self,touch=None):
+        self.model.close()
         #close all the artefacts
         for a in self.artefacts.values():
             ctrl = a[0]
@@ -170,10 +177,6 @@ class StoryApp(object):
         #create the controller for the new artefact
         _r = kwargs['controller'](self,None,**kwargs)
         self.artefacts[_r.Id] = (_r,{})
-        #view = kwargs['viewCurrent']
-        #create the view for the new artefact
-        #self.__setattr__(view, _r.newDialog(minv=True))
-        #self.view.toggle_view_current_Artefact(self.__getattribute__(view))
         self.view.toggle_view_current_Artefact(_r.newDialog(minv=True))
         return _r 
     #TODO: STEVE this group of new_XXX_pressed methods must be refactored

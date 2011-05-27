@@ -31,6 +31,7 @@ from cmap.controller.sprintController import SprintController
 from cmap.view.tasks.taskViews import TaskMinView, TaskView
 from cmap.model.taskModel import TaskModel
 from cmap.controller.taskController import TaskController
+from xml.dom import minidom
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -61,7 +62,7 @@ class StoryAppModel(object):
 
         self.get_local_artefacts()
         self.load_artefacts()
-        
+        self.get_view_data()
     def get_local_artefacts(self):
         '''
         Loads the file names of all local artefacts into a dictionary
@@ -78,9 +79,6 @@ class StoryAppModel(object):
             kwargs = artefact_types[type].copy()
             for artefact in self.xmlFiles[type]:
                 Log.debug('loading %s' % artefact)
-#                ctrl = self.controller.getArtefact(artefact, type['controller'],
-#                                        type['model'], type['get_artefact'], 
-#                    name=os.path.splitext(os.path.basename(artefact))[0])
                 kwargs['name'] =\
                             name=os.path.splitext(os.path.basename(artefact))[0]
                 kwargs['file'] = artefact
@@ -90,17 +88,55 @@ class StoryAppModel(object):
                                      kwargs['container'],
                                      kwargs['viewCurrent'],
                                      self.artefacts[ctrl.Id][1])
+    def get_view_data(self):
+        #retrieve information about size and position of artefacts
+        _file = os.path.join(self.datastore, 'storyApp.xml')
+        _new = False
+        if not os.path.exists(_file):
+            #just get the template
+            _file = os.path.join(self.datastore, '..','data','storyApp.xml')
+            _new = True
+        self.app_file = _file
+        self._dom = minidom.parse(self.app_file)
+        self._app = self._dom.getElementsByTagName('storyApp')[0] 
+        if _new: 
+            self._app.removeChild(self._app.firstChild)
+            self.app_file = os.path.join(self.datastore, 'storyApp.xml')
+            return
+        for element in [n for n in self._app.childNodes \
+                  if n.nodeType == minidom.Node.ELEMENT_NODE]:
+            self.parse(element)
+    def parse(self,node):
+        if node.hasAttribute('Id') and node.hasAttribute('pos') and\
+            node.hasAttribute('size') and node.hasAttribute('open'):
+            _id = node.getAttribute('Id')
+            self.artefacts[_id][1]['pos']= node.getAttribute('pos')
+            self.artefacts[_id][1]['size']= node.getAttribute('size')
+            _open = node.getAttribute('open')
+            self.artefacts[_id][1]['open']= _open
+            if _open == 'True':
+                print('We need to redisplay this artefact on startup %s' % _id)
+            else:
+                print('Artefact %s will reopen in old position next time user chooses to open it.' % _id)
+    #TODO: Steve need to see what need to be done in trash?
     def trash(self,artefact,atype=None):
         Log.debug('Need to trash artefact: %s' % artefact)
         return
     def close(self,touch=None):
-        pass
-#        #close all the artefacts
-#        for a in self.artefacts.values():
-#            a[0].close()
-#        for b in self.backlog.values():
-#            b[0].close()
-    
+        #persist data about open artefacts, their size and positions
+        for _id in self.artefacts:
+            _pos = self.artefacts[_id][1].get('pos')
+            if _pos:        
+            #if it has a position then it must have a size and open status    
+                _artefact = self._dom.createElement('Artefact')
+                _artefact.setAttribute('Id', _id)
+                _artefact.setAttribute('pos', str(_pos))
+                _artefact.setAttribute('size',\
+                                           str(self.artefacts[_id][1]['size']))
+                _artefact.setAttribute('open', self.artefacts[_id][1]['open'])
+                self._app.appendChild(_artefact)
+        with open(self.app_file, 'w') as f:
+            self._dom.writexml(f)
     @property        
     def artefacts(self):
         return self._artefacts

@@ -101,6 +101,8 @@ class ArtefactController(Subject,Observer):
         self.Model.add_scribble(scribble)
     def remove_scribble(self, ident):
         self.Model.remove_scribble(ident)
+    def artefact_tranformed(self,size,pos):
+        self.root.artefact_tranformed(self.Id, size, pos)
     def newDialog(self, minv):
         _p = (self._mini_view_type if minv else self._view_type)(self,self,
                             type_name=self._view_type_name,

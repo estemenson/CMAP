@@ -391,11 +391,9 @@ class StoryAppView(MyInnerWindow):
     def flow_pressed(self, flag, widget, *largs):
         _flag =  not self.__getattribute__(flag)
         self.__setattr__(flag, _flag)
-        if _flag:
-            super(StoryAppView,self).remove_widget(widget)
-        else:
+        if not _flag:
             widget.pos = self.get_new_random_position()
-            super(StoryAppView,self).add_widget(widget)
+        self.toggle_view_current_Artefact(widget)
     def fullscreen(self, *largs, **kwargs):
         super(StoryAppView,self).fullscreen()
         root_win = self.parent.children
@@ -435,9 +433,9 @@ class StoryAppView(MyInnerWindow):
         self.controller.new_task(**artefact_types[TASKS])
     def toggle_view_current_Artefact(self, artefact):
         if artefact in self.container.children:
-            super(StoryAppView,self).remove_widget(artefact)
+            self.remove_widget(artefact)
         else:
-            super(StoryAppView,self).add_widget(artefact)
+            self.add_widget(artefact)
     def trash(self,artefact):
         self.remove_widget(artefact)
     def unfullscreen(self, *largs, **kwargs):
@@ -451,47 +449,6 @@ class StoryAppView(MyInnerWindow):
             btn.label = story.Name
             self.check_btn_width(btn)
         return
-#
-#    def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
-#        self.view_current_Artefact(lbl, 'current_backlog',\
-#                                    'flow_backlog_select', 'backlog')
-#    def viewCurrentProject(self,lbl, *largs): #IGNORE:W0613
-#        self.view_current_Artefact(lbl, 'current_project',\
-#                                    'flow_projects_select', 'projects')
-#    def viewCurrentRelease(self,lbl, *largs): #IGNORE:W0613
-#        self.view_current_Artefact(lbl, 'current_release',\
-#                                    'flow_release_select', 'releases')
-#    def viewCurrentSprint(self,lbl, *largs): #IGNORE:W0613
-#        self.view_current_Artefact(lbl, 'current_sprint',\
-#                                    'flow_sprint_select', 'sprints')
-#    def viewCurrentStory(self,lbl, *largs): #IGNORE:W0613
-#        self.view_current_Artefact(lbl, 'current_story',\
-#                                    'flow_story_select', 'stories')
-#    def viewCurrentTask(self,lbl, *largs): #IGNORE:W0613
-#        self.view_current_Artefact(lbl, 'current_task',\
-#                                    'flow_task_select', 'tasks')
-#    def view_current_Artefact(self,lbl,curr,flow_select, container):
-#        try:
-#            #get the controller for this artefact
-#            _c = self.controller.__getattribute__(curr)[0]
-#        except Exception: #IGNORE:W0703
-#            _c = Dummy()
-#            _c.Id = ''
-#        idu = None
-#        idu =  lbl.Id if isinstance(lbl, ArtefactController)\
-#                      else lbl._id #IGNORE:W0212          
-#        if _c.Id != idu:
-#            #set current artefact to the one selected
-#            self.__getattribute__(flow_select)\
-#            (self.artefacts[lbl._id][0])
-#                            #(self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
-#            return #to avoid add then removing the same widget
-#        _view = _c.view
-#        if _view in self.container.children:
-#            super(StoryAppView,self).remove_widget(_view)
-#        else:
-#            super(StoryAppView,self).add_widget(_view)
-#    
     def viewCurrentBacklog(self,lbl, *largs): #IGNORE:W0613
         self.view_current_Artefact(lbl, 'current_backlog',\
                                     'flow_backlog_select', 'backlog')
@@ -526,11 +483,7 @@ class StoryAppView(MyInnerWindow):
             (self.artefacts[lbl._id][0])
                             #(self.__getattribute__(container)[lbl._id][0]) #IGNORE:W0212
             return #to avoid add then removing the same widget
-        _view = _c.view
-        if _view in self.container.children:
-            super(StoryAppView,self).remove_widget(_view)
-        else:
-            super(StoryAppView,self).add_widget(_view)
+        self.toggle_view_current_Artefact(_c.view)
     @property        
     def artefacts(self):
         return self.controller.artefacts
