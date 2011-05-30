@@ -90,19 +90,19 @@ class StoryAppModel(object):
                                      self.artefacts[ctrl.Id][1])
     def get_view_data(self):
         #retrieve information about size and position of artefacts
-        _file = os.path.join(self.datastore, 'storyApp.xml')
-        _new = False
-        if not os.path.exists(_file):
+        self.app_file = os.path.join(self.datastore, 'storyApp.xml')
+        if not os.path.exists(self.app_file):
             #just get the template
-            _file = os.path.join(self.datastore, '..','data','storyApp.xml')
-            _new = True
-        self.app_file = _file
-        self._dom = minidom.parse(self.app_file)
+            #_file = os.path.join(self.datastore, '..','data','storyApp.xml')
+            self._dom = minidom.parseString(
+'''<?xml version="1.0" encoding="UTF-8"?>
+<storyApp>
+</storyApp>
+'''
+)
+        else:
+            self._dom = minidom.parse(self.app_file)
         self._app = self._dom.getElementsByTagName('storyApp')[0] 
-        if _new: 
-            self._app.removeChild(self._app.firstChild)
-            self.app_file = os.path.join(self.datastore, 'storyApp.xml')
-            return
         for element in [n for n in self._app.childNodes \
                   if n.nodeType == minidom.Node.ELEMENT_NODE]:
             self.parse(element)
