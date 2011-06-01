@@ -49,6 +49,7 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         self._id = self.ctrl.Id
         kwargs['size'] = self.grid_size = minimal_size
         super(MinView,self).__init__(**kwargs)
+        print('center: %s, pos: %s' % (str(self.center), str(self.pos)))
         story_size = scale_tuple(self.grid_size, 0.2)
         self.story_view_size = None
         self._description = self.ctrl.Description
@@ -130,16 +131,18 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
     def fullscreen(self, *largs, **kwargs):
         self.isMinimal = not self.isMinimal
         self.ctrl.switch_view(self.isMinimal)
-    def on_transform(self, touch):
-        super(MinView, self).on_transform(touch)
-        self.ctrl.artefact_tranformed(self.size,self.pos)
-    def on_move(self, x, y):
-        super(MinView, self).on_move(x,y)
-        self.ctrl.artefact_tranformed(self.size,(x,y))
-
-    def on_resize(self, w, h):
-        super(MinView, self).on_resize(w,h)
-        self.ctrl.artefact_tranformed((w,h),self.pos)
+    def on_transform(self, touch, *largs, **kwargs):
+        self.ctrl.artefact_tranformed(size=self.size,pos=self.pos,
+                                      scale=self.scale,rotation=self.rotation)
+#    def on_move(self, x, y):
+#        #print('On_move')
+#        #super(MinView, self).on_move(x,y)
+#        self.ctrl.artefact_tranformed(self.size,(x,y))
+#
+#    def on_resize(self, w, h):
+#        #print('On_resize')
+#        #super(MinView, self).on_resize(w,h)
+#        self.ctrl.artefact_tranformed((w,h),self.pos)
     def _get_name(self):
         if self._name is None or not len(self._name): 
             return self.ctrl.Name
@@ -249,7 +252,7 @@ class TestController(object):
                               'actual':'0',
                               'owner':'owner',
                               'description':'description',
-                              'control_scale':0.7, 'cls':'type1css'}
+                              'control_scale':1.0, 'cls':'type1css'}
         if self.isMinimal:
             self.view = MinView(self.root,self, **kwargs) #IGNORE:W0142
             self.story_view_size = scale_tuple(self.view.grid_size,-0.001,-0.03)
@@ -287,7 +290,7 @@ if __name__ == '__main__':
                'actual':'0',
                'owner':'owner',
                'description':'description',
-               'control_scale':0.7,
+               'control_scale':1.0,
                'cls':'type1css'}
     c = TaskController(mw,  #IGNORE:W0142
                        None,

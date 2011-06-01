@@ -108,7 +108,8 @@ class StoryApp(object):
                 id = idu
                 _view = self.artefacts[id][0].view
                 _open = self.view.toggle_view_current_Artefact(_view)
-                self.artefact_changed(id, _view.size, _view.pos, _open)
+                self.artefact_changed(Id=id, size=_view.size, pos=_view.pos,
+                                      open=_open)
         except KeyError:
             pass
         if not idu:
@@ -121,9 +122,12 @@ class StoryApp(object):
         _r = self.view.add_new_artefact(ctrl, container, callback, ret)
     def add_to_git(self):
         AsyncHandler().save(None, 'Commit session edits')
-    def artefact_changed(self, id, size, pos, open='True'):
+    def artefact_changed(self, **kwargs):#id, size, pos, open='True'):
+        kwargs.setdefault('open', 'True')
+        kwargs.setdefault('scale', 1.0)
+        kwargs.setdefault('rotation', 0.0)
         #store the size and position of artefacts
-        self.model.artefact_changed(id, size, pos, open)
+        self.model.artefact_changed(**kwargs)
     def close(self,touch=None):
         self.model.close()
         #close all the artefacts

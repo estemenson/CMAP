@@ -61,7 +61,8 @@ y_ctrl_border_scale = -.2
 
 class MyInnerWindow(MTInnerWindow):
     def __init__(self, **kwargs):
-        ctrl_scale = kwargs.setdefault('control_scale', 1.0)
+        _scale = kwargs.setdefault('scale',1.0)
+        ctrl_scale = kwargs.setdefault('control_scale', _scale)
         self.btn_minimize = MTImageButton(filename=_minimize_icon_path,
                                             scale=ctrl_scale,
                                             cls='innerwindow-close')
@@ -86,9 +87,12 @@ class MyInnerWindow(MTInnerWindow):
         self.update_controls()
         
     def update_controls(self):
-        scaled_border = self.get_scaled_border()
+        scaled_border = self.get_scaled_border()#*self.scale
         center_x = self.width/ 2
-        center_y = - scaled_border 
+        center_y = (-scaled_border) * self.scale if self.scale == 1.0 else\
+                                                                self.scale *1.0
+        if self.scale < 1.0:
+            print('Scaled border = %f, scale:%f, control_scale:%f' % (scaled_border, self.scale, self.control_scale))
         if self.isMinimized:
             center_y = scaled_border
         ctrls  = self.controls.children
@@ -98,6 +102,8 @@ class MyInnerWindow(MTInnerWindow):
         start_pos_x = pos[0]
         for button in ctrls:
             button.scale = self.control_scale / self.scale
+            if button.scale < 1.0:
+                print('Scale: %f' % button.scale)
             #button.scale = self.scale * self.control_scale
             button.pos = start_pos_x,center_y - (button.height / (2*self.scale))
             try:
@@ -223,6 +229,7 @@ class MyInnerWindow(MTInnerWindow):
     
 class MyDragebleInnerWindow(MyInnerWindow):
     def __init__(self, **kwargs):
+        _scale = kwargs.setdefault('scale',1.0)
         self.drag_widget = MyDragableContainer(self,False)
         self.ctrl_buttons_width = None
 #        self.btn_save = MTImageButton(filename=_save_icon_path,
@@ -242,8 +249,9 @@ class MyDragebleInnerWindow(MyInnerWindow):
     
 class MyInnerWindowWithTrash(MyInnerWindow):
     def __init__(self, **kwargs):
+        _scale = kwargs.setdefault('scale',1.0)
         self.btn_trash = MTImageButton(filename=_trash_icon_path,
-                                            scale=1,
+                                            scale=_scale,
                                             cls='innerwindow-close')
         self.btn_trash.my_padding = 12
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size', 
@@ -262,9 +270,11 @@ class MyInnerWindowWithTrash(MyInnerWindow):
             
 class MyInnerWindowWithSaveAndTrash(MyInnerWindowWithTrash):
     def __init__(self, **kwargs):
+        _scale = kwargs.setdefault('scale',1.0)
+        kwargs.setdefault('control_scale', _scale)
         self.ctrl_buttons_width = None
         self.btn_save = MTImageButton(filename=_save_icon_path,
-                                            scale=1,
+                                            scale=_scale,
                                             cls='innerwindow-close')
         self.btn_save.my_padding = 5
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size',
@@ -347,7 +357,7 @@ if __name__ == '__main__':
 #                control_scale=0.7, cls='type1css')
 #    w.add_widget(t)
     cw = MyInnerWindowWithSaveAndTrash(size=(600,600), pos=(100,100), 
-                                      control_scale=1, cls='type1css')
+                                      control_scale=1.0, cls='type1css')
     #k = MTVKeyboard()
     #w.add_widget(k)
 #    cw = MyInnerWindowWithKeyboard(size=(600,600), pos=(100,100),

@@ -109,15 +109,19 @@ class StoryAppModel(object):
     def parse(self,node):
         if node.hasAttribute('Id') and node.hasAttribute('pos') and\
             node.hasAttribute('size') and node.hasAttribute('open'):
-            _id = node.getAttribute('Id')
-            _ctrl = self._artefacts[_id] 
-            _ctrl[1]['pos']= eval(node.getAttribute('pos'))
-            _ctrl[1]['size']= eval(node.getAttribute('size'))
-            _open = node.getAttribute('open')
-            _ctrl[1]['open']= _open
+            _id         = node.getAttribute('Id')
+            _ctrl       = self._artefacts[_id] 
+            _pos        = _ctrl[1]['pos']       = eval(node.getAttribute('pos'))
+            _size       = _ctrl[1]['size']      = eval(node.getAttribute('size'))
+            _scale      = _ctrl[1]['scale']     = eval(node.getAttribute('scale'))
+            _rotation   = _ctrl[1]['rotation']  = eval(\
+                                                node.getAttribute('rotation'))
+            _open       = _ctrl[1]['open']      = node.getAttribute('open')
+            
             self.controller.create_view_and_open(_ctrl[0],open=_open,
-                                                 size=_ctrl[1]['size'],
-                                                 pos=_ctrl[1]['pos'])
+                                                 size=_size,pos=_pos,
+                                                 scale=_scale,
+                                                 rotation=_rotation)
             if _open == 'True':
                 print('We need to redisplay this artefact on startup %s' % _id)
                 #self.controller.add_current_artefact(_ctrl[0]._type,_ctrl[0])
@@ -143,12 +147,15 @@ class StoryAppModel(object):
         if self._isDirty:
             with open(self.app_file, 'w') as f:
                 self._dom.writexml(f)
-    def artefact_changed(self, id, size, pos, open):
+    def artefact_changed(self, **kwargs):#id, size, pos, open):
         self._isDirty = True
-        ctrl = self._artefacts[id]
-        ctrl[1]['size'] = size
-        ctrl[1]['pos'] = pos
-        ctrl[1]['open'] = open
+        ctrl = self._artefacts[kwargs['Id']]
+        id = ctrl[0].Id
+        ctrl[1]['size'] = kwargs['size']
+        ctrl[1]['pos'] = kwargs['pos']
+        ctrl[1]['open'] = kwargs['open']
+        ctrl[1]['rotation'] = kwargs['rotation']
+        ctrl[1]['scale'] = kwargs['scale']
         #get this artefact from the dom
         #or create a new element
         _e = self.get_dom_artefact(id)
@@ -156,9 +163,11 @@ class StoryAppModel(object):
             _e = self._dom.createElement('Artefact')
             _e.setAttribute('Id', id)
             self._app.appendChild(_e)
-        _e.setAttribute('size', str(size))
-        _e.setAttribute('pos', str(pos))
-        _e.setAttribute('open', open)
+        _e.setAttribute('size', str(kwargs['size']))
+        _e.setAttribute('pos', str(kwargs['pos']))
+        _e.setAttribute('open', kwargs['open'])
+        _e.setAttribute('rotation', str(kwargs['rotation']))
+        _e.setAttribute('scale', str(kwargs['scale']))
     def get_dom_artefact(self, id):
         if 'pos' in self._artefacts[id][1]:
             for element in [n for n in self._app.childNodes \
