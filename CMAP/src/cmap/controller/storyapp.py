@@ -106,7 +106,6 @@ class StoryApp(object):
             if idu:
                 #add artefact to the view
                 id = idu
-                _wedd = self.artefacts[id]
                 _view = self.artefacts[id][0].view
                 _open = self.view.toggle_view_current_Artefact(_view)
                 self.artefact_changed(id, _view.size, _view.pos, _open)
