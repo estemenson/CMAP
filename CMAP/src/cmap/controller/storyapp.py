@@ -95,6 +95,7 @@ class StoryApp(object):
         kwargs['controller'] = self
         self.view = StoryAppView(**kwargs)
         self.model = StoryAppModel(**kwargs)
+        self.model.get_view_data()
     def add_current_artefact(self, type, artefact):
         type = artefact_types[type]
         idu,id  = None,None
@@ -105,8 +106,9 @@ class StoryApp(object):
             if idu:
                 #add artefact to the view
                 id = idu
-                self.view.toggle_view_current_Artefact(
-                                                    self.artefacts[id][0].view)
+                _view = self.artefacts[id][0].view
+                _open = self.view.toggle_view_current_Artefact(_view)
+                self.artefact_changed(id, _view.size, _view.pos, _open)
         except KeyError:
             pass
         if not idu:
@@ -116,15 +118,12 @@ class StoryApp(object):
         self.__setattr__(type['current'], self.artefacts[id])
         return id
     def add_new_artefact(self, ctrl, container, callback, ret):
-        _r = self.view.add_new_artefact(ctrl, container, callback, ret={})
+        _r = self.view.add_new_artefact(ctrl, container, callback, ret)
     def add_to_git(self):
         AsyncHandler().save(None, 'Commit session edits')
-    def artefact_tranformed(self, id, size, pos):
+    def artefact_changed(self, id, size, pos, open='True'):
         #store the size and position of artefacts
-        ctrl = self.artefacts[id]
-        ctrl[1]['size'] = size
-        ctrl[1]['pos'] = pos
-        ctrl[1]['open'] = 'True'
+        self.model.artefact_changed(id, size, pos, open)
     def close(self,touch=None):
         self.model.close()
         #close all the artefacts
@@ -173,11 +172,17 @@ class StoryApp(object):
             kwargs['file'] = f
             r = self.getArtefact(**kwargs)
             self.artefacts[r.Id] = (r,{})
+    def create_view_and_open(self,ctrl,**kwargs):
+        ctrl.newDialog(minv=True,**kwargs)
+        self.add_current_artefact(ctrl._type, ctrl)
     def new_artefact(self,**kwargs): # *largs
         #create the controller for the new artefact
         _r = kwargs['controller'](self,None,**kwargs)
         self.artefacts[_r.Id] = (_r,{})
-        self.view.toggle_view_current_Artefact(_r.newDialog(minv=True))
+        _view = _r.newDialog(minv=True)
+        _open = self.view.toggle_view_current_Artefact(_view)
+        self.artefact_changed(_r.Id, _view.size, _view.pos, _open)
+        
         return _r 
     #TODO: STEVE this group of new_XXX_pressed methods must be refactored
     def new_backlog_artefact(self,**kwargs):

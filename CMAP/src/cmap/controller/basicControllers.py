@@ -102,13 +102,16 @@ class ArtefactController(Subject,Observer):
     def remove_scribble(self, ident):
         self.Model.remove_scribble(ident)
     def artefact_tranformed(self,size,pos):
-        self.root.artefact_tranformed(self.Id, size, pos)
-    def newDialog(self, minv):
+        self.root.artefact_changed(self.Id, size, pos)
+    def newDialog(self, minv, **kwargs):
         _p = (self._mini_view_type if minv else self._view_type)(self,self,
                             type_name=self._view_type_name,
                             name=self.Name, id=self.Id)
         #if minv: _p.size = minimal_size  
-        _p.pos = self.get_new_random_position()
+        _p.pos = kwargs.get('pos', self.get_new_random_position())
+        _size = kwargs.get('size', None)
+        if _size:
+            _p.size = _size 
         self._view = _p
         return _p        
     def app_btn_pressed(self):
