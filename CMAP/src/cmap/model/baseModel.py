@@ -440,8 +440,8 @@ class BaseModel(Observer, Subject):
             AsyncHandler().rm(f)
             
     def close(self):
-        Log.debug('closing: %s' % join(self.datapath, self.file))
         self.save(True)
+        Log.debug('closing: %s' % join(self.datapath, self.file))
     def createFileName(self):
         self.file = '%s.xml' % self.Id
         self.dirty = True
