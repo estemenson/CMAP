@@ -434,8 +434,9 @@ class StoryAppView(MyInnerWindow):
     def toggle_view_current_Artefact(self, artefact):
         if artefact in self.container.children:
             self.remove_widget(artefact)
-        else:
-            self.add_widget(artefact)
+            return "False"
+        self.add_widget(artefact)
+        return "True"
     def trash(self,artefact):
         self.remove_widget(artefact)
     def unfullscreen(self, *largs, **kwargs):

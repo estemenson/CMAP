@@ -44,6 +44,7 @@ from glob     import glob
 class StoryAppModel(object):
     def __init__(self, **kwargs):
         self._artefacts = {}
+        self._isDirty = False
         self.controller = kwargs['controller']
         self.datastore = Config().datastore
         Log.debug('Path to repository: %s' % self.datastore)
@@ -62,7 +63,7 @@ class StoryAppModel(object):
 
         self.get_local_artefacts()
         self.load_artefacts()
-        self.get_view_data()
+        #self.get_view_data()
     def get_local_artefacts(self):
         '''
         Loads the file names of all local artefacts into a dictionary
@@ -83,11 +84,11 @@ class StoryAppModel(object):
                             name=os.path.splitext(os.path.basename(artefact))[0]
                 kwargs['file'] = artefact
                 ctrl = self.controller.getArtefact(**kwargs) 
-                self.artefacts[ctrl.Id] = (ctrl,{})
+                self._artefacts[ctrl.Id] = (ctrl,{})
                 self.controller.add_new_artefact(ctrl,
                                      kwargs['container'],
                                      kwargs['viewCurrent'],
-                                     self.artefacts[ctrl.Id][1])
+                                     self._artefacts[ctrl.Id][1])
     def get_view_data(self):
         #retrieve information about size and position of artefacts
         self.app_file = os.path.join(self.datastore, 'storyApp.xml')
@@ -95,27 +96,31 @@ class StoryAppModel(object):
             #just get the template
             #_file = os.path.join(self.datastore, '..','data','storyApp.xml')
             self._dom = minidom.parseString(
-'''<?xml version="1.0" encoding="UTF-8"?>
-<storyApp>
-</storyApp>
-'''
-)
+                                 '''<?xml version="1.0" encoding="UTF-8"?>
+                                <storyApp></storyApp>
+                                ''')
         else:
             self._dom = minidom.parse(self.app_file)
         self._app = self._dom.getElementsByTagName('storyApp')[0] 
         for element in [n for n in self._app.childNodes \
-                  if n.nodeType == minidom.Node.ELEMENT_NODE]:
+                   if n.nodeName == 'Artefact']:
+                  #if n.nodeType == minidom.Node.ELEMENT_NODE]:
             self.parse(element)
     def parse(self,node):
         if node.hasAttribute('Id') and node.hasAttribute('pos') and\
             node.hasAttribute('size') and node.hasAttribute('open'):
             _id = node.getAttribute('Id')
-            self.artefacts[_id][1]['pos']= node.getAttribute('pos')
-            self.artefacts[_id][1]['size']= node.getAttribute('size')
+            _ctrl = self._artefacts[_id] 
+            _ctrl[1]['pos']= eval(node.getAttribute('pos'))
+            _ctrl[1]['size']= eval(node.getAttribute('size'))
             _open = node.getAttribute('open')
-            self.artefacts[_id][1]['open']= _open
+            _ctrl[1]['open']= _open
+            self.controller.create_view_and_open(_ctrl[0],open=_open,
+                                                 size=_ctrl[1]['size'],
+                                                 pos=_ctrl[1]['pos'])
             if _open == 'True':
                 print('We need to redisplay this artefact on startup %s' % _id)
+                #self.controller.add_current_artefact(_ctrl[0]._type,_ctrl[0])
             else:
                 print('Artefact %s will reopen in old position next time user chooses to open it.' % _id)
     #TODO: Steve need to see what need to be done in trash?
@@ -124,19 +129,43 @@ class StoryAppModel(object):
         return
     def close(self,touch=None):
         #persist data about open artefacts, their size and positions
-        for _id in self.artefacts:
-            _pos = self.artefacts[_id][1].get('pos')
-            if _pos:        
-            #if it has a position then it must have a size and open status    
-                _artefact = self._dom.createElement('Artefact')
-                _artefact.setAttribute('Id', _id)
-                _artefact.setAttribute('pos', str(_pos))
-                _artefact.setAttribute('size',\
-                                           str(self.artefacts[_id][1]['size']))
-                _artefact.setAttribute('open', self.artefacts[_id][1]['open'])
-                self._app.appendChild(_artefact)
-        with open(self.app_file, 'w') as f:
-            self._dom.writexml(f)
+#        for _id in self._artefacts:
+#            _pos = self._artefacts[_id][1].get('pos')
+#            if _pos:        
+#            #if it has a position then it must have a size and open status    
+#                _artefact = self._dom.createElement('Artefact')
+#                _artefact.setAttribute('Id', _id)
+#                _artefact.setAttribute('pos', str(_pos))
+#                _artefact.setAttribute('size',\
+#                                           str(self._artefacts[_id][1]['size']))
+#                _artefact.setAttribute('open', self._artefacts[_id][1]['open'])
+#                self._app.appendChild(_artefact)
+        if self._isDirty:
+            with open(self.app_file, 'w') as f:
+                self._dom.writexml(f)
+    def artefact_changed(self, id, size, pos, open):
+        self._isDirty = True
+        ctrl = self._artefacts[id]
+        ctrl[1]['size'] = size
+        ctrl[1]['pos'] = pos
+        ctrl[1]['open'] = open
+        #get this artefact from the dom
+        #or create a new element
+        _e = self.get_dom_artefact(id)
+        if not _e:
+            _e = self._dom.createElement('Artefact')
+            _e.setAttribute('Id', id)
+            self._app.appendChild(_e)
+        _e.setAttribute('size', str(size))
+        _e.setAttribute('pos', str(pos))
+        _e.setAttribute('open', open)
+    def get_dom_artefact(self, id):
+        if 'pos' in self._artefacts[id][1]:
+            for element in [n for n in self._app.childNodes \
+                   if n.nodeName == 'Artefact']:
+                _id = element.getAttribute('Id')
+                if _id == id: return element
+        return None
     @property        
     def artefacts(self):
         return self._artefacts

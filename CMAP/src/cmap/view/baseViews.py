@@ -176,7 +176,10 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         try:
             blist = Storyapp().artefacts[self.Id][1]
             for im in blist:
-                blist[im].image = self._button_image
+                try:
+                    blist[im].image = self._button_image
+                except AttributeError:
+                    pass
         except KeyError:
             pass
 #        try:

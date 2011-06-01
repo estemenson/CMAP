@@ -263,11 +263,13 @@ class BaseModel(Observer, Subject):
             ce = self.dom.createElement('Children')
             ce.setAttribute('List', '')
             self._Model.appendChild(ce)
-        for c in ce.childNodes:
-            if c.nodeName == '#text':
-                continue
-            if c.hasAttribute('Id') and c.getAttribute('Id') == value:
-                return # Already in XML - don't duplicate
+        #TODO: STeve test this replacement for commented code below
+        if self.find_child(self,value, ce): return #already in xml just return
+#        for c in ce.childNodes:
+#            if c.nodeName == '#text':
+#                continue
+#            if c.hasAttribute('Id') and c.getAttribute('Id') == value:
+#                return # Already in XML - don't duplicate
         e = self.dom.createElement('Child')
         e.setAttribute('Id', value)
         ce.appendChild(e)
