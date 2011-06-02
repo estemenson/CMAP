@@ -19,6 +19,7 @@ from async                              import ON_GITHUBNOTIFICATION
 from cmap.model.storyappModel import StoryAppModel
 from cmap.view.storyappView import StoryAppView
 from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
+from pymt.ui.widgets.widget import MTWidget
 
 try:
     Log = Config().log.logger
@@ -283,21 +284,22 @@ class StoryApp(object):
                 Log.debug('%s modified by %s' % (m, c['author']['name']))
             for r in c['removed']:
                 Log.debug('%s removed by %s' % (r, c['author']['name']))
-    def trash(self,artefact,atype=None):
-        if atype is None:# or type is 'stories':
-            btn = self.buttons[artefact.Id]
-            lbl = self.labels[artefact.Id]
-            self.backlog_list_layout.remove_widget(btn)
-            self.story_flow.remove_widget(lbl)
-            self.remove_widget(artefact)
-            del self.artefacts[artefact.Id]
-        else:
-            if artefact.Id in self.artefacts:
-                dic = self.artefacts[artefact.Id][1]
-                for l in dic.keys():
-                    self.__getattribute__(l).remove_widget(dic[l])
-                del self.artefacts[artefact.Id]
-                self.view.trash(artefact.view)
+    def trash(self,id):#,atype=None):
+#        if atype is None:# or type is 'stories':
+#            btn = self.buttons[artefact.Id]
+#            lbl = self.labels[artefact.Id]
+#            self.backlog_list_layout.remove_widget(btn)
+#            self.story_flow.remove_widget(lbl)
+#            self.remove_widget(artefact)
+#            del self.artefacts[artefact.Id]
+#        else:
+        if id in self.artefacts:
+            dic = self.artefacts[id][1]
+            for l in dic.keys():
+                if isinstance(dic[l], MTWidget):
+                    #self.__getattribute__(l).remove_widget(_widget)
+                    self.view.trash(dic[l])
+            self.model.trash(id)
         return
     def unfullscreen(self, *largs, **kwargs):
         pass

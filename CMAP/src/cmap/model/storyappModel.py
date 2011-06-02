@@ -127,9 +127,12 @@ class StoryAppModel(object):
                 #self.controller.add_current_artefact(_ctrl[0]._type,_ctrl[0])
             else:
                 print('Artefact %s will reopen in old position next time user chooses to open it.' % _id)
-    #TODO: Steve need to see what need to be done in trash?
-    def trash(self,artefact,atype=None):
-        Log.debug('Need to trash artefact: %s' % artefact)
+    def trash(self,id):
+        Log.debug('Delete artefact: %s' % id)
+        _art = self.get_dom_artefact(id)
+        if _art:
+            self._app.removeChild(_art)
+        del self._artefacts[id]
         return
     def close(self,touch=None):
         #persist data about open artefacts, their size and positions

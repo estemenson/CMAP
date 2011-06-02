@@ -82,7 +82,7 @@ class ArtefactController(Subject,Observer):
         if self.Id:
             self._model.trash()
             from cmap.controller.storyapp import Storyapp
-            self.root.trash(self, Storyapp().artefacts)
+            self.root.trash(self.Id)
 #        for o in self.observers:
 #            try:
 #                o.trash(self.view)
