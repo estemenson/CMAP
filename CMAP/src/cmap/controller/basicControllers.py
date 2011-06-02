@@ -108,6 +108,8 @@ class ArtefactController(Subject,Observer):
         kwargs.setdefault('type_name', self._view_type_name)
         kwargs.setdefault('name',self.Name)
         kwargs.setdefault('id',self.Id)
+        #TODO: Steve - this seems to be a bug in PYMT we need to set
+        #the position after construction
         _pos = kwargs.pop('pos')
         _p = (self._mini_view_type if minv else self._view_type)(self,self,
                             **kwargs)
@@ -139,7 +141,7 @@ class ArtefactController(Subject,Observer):
     @property
     def view(self):
         if self._view is None:
-            self.newDialog(True)
+            self.newDialog(True, pos=self.get_new_random_position())
         return self._view
     @property
     def type(self):

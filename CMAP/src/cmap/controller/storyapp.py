@@ -109,7 +109,8 @@ class StoryApp(object):
                 _view = self.artefacts[id][0].view
                 _open = self.view.toggle_view_current_Artefact(_view)
                 self.artefact_changed(Id=id, size=_view.size, pos=_view.pos,
-                                      open=_open)
+                                      open=_open, scale=_view.scale,
+                                      rotation=_view.rotation)
         except KeyError:
             pass
         if not idu:
@@ -183,9 +184,11 @@ class StoryApp(object):
         #create the controller for the new artefact
         _r = kwargs['controller'](self,None,**kwargs)
         self.artefacts[_r.Id] = (_r,{})
-        _view = _r.newDialog(minv=True)
+        _view = _r.newDialog(minv=True, **kwargs)
         _open = self.view.toggle_view_current_Artefact(_view)
-        self.artefact_changed(_r.Id, _view.size, _view.pos, _open)
+        self.artefact_changed(Id=_r.Id, size=_view.size, pos=_view.pos, 
+                              open=_open, scale=_view.scale, 
+                              rotation=_view.rotation)
         
         return _r 
     #TODO: STEVE this group of new_XXX_pressed methods must be refactored

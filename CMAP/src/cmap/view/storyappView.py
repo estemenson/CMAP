@@ -427,8 +427,9 @@ class StoryAppView(MyInnerWindow):
         self.controller.new_release(**artefact_types[RELEASES])
     def new_sprint_pressed(self, *largs): 
         self.controller.new_sprint(**artefact_types[SPRINTS])
-    def new_story_pressed(self, *largs): 
-        self.controller.new_story(**artefact_types[STORIES])
+    def new_story_pressed(self, *largs, **kwargs): 
+        kwargs.update(artefact_types[STORIES])
+        self.controller.new_story(**kwargs)
     def new_task_pressed(self, *largs): 
         self.controller.new_task(**artefact_types[TASKS])
     def toggle_view_current_Artefact(self, artefact):

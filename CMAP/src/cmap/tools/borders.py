@@ -105,14 +105,18 @@ class MyInnerWindow(MTInnerWindow):
             if button.scale < 1.0:
                 print('Scale: %f' % button.scale)
             #button.scale = self.scale * self.control_scale
-            button.pos = start_pos_x,center_y - (button.height / (2*self.scale))
+            button.pos = (start_pos_x,
+                center_y - button.height / self.get_divisor())
             try:
                 my_padding = button.my_padding
             except Exception: #IGNORE:W0703
                 my_padding = button.my_padding = 5 # set a default
             start_pos_x += (button.width + my_padding)
                 
-       
+    def get_divisor(self, value=0.98):
+        if self.scale >= value:
+            return 2
+        return 0.9
     def minimize(self):
         if self.isMinimized:
             self.restore()
