@@ -438,8 +438,11 @@ class StoryAppView(MyInnerWindow):
             return "False"
         self.add_widget(artefact)
         return "True"
-    def trash(self,artefact):
-        self.remove_widget(artefact)
+    def trash(self,artefact, container=None):
+        if container:
+            self.__getattribute__(container).remove_widget(artefact)
+        else:
+            self.remove_widget(artefact)
     def unfullscreen(self, *largs, **kwargs):
         self.root_window.remove_widget(self)
         stopTouchApp()

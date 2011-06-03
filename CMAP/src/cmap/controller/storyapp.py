@@ -298,7 +298,7 @@ class StoryApp(object):
             for l in dic.keys():
                 if isinstance(dic[l], MTWidget):
                     #self.__getattribute__(l).remove_widget(_widget)
-                    self.view.trash(dic[l])
+                    self.view.trash(dic[l],l)
             self.model.trash(id)
         return
     def unfullscreen(self, *largs, **kwargs):
