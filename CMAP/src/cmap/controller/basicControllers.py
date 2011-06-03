@@ -129,7 +129,7 @@ class ArtefactController(Subject,Observer):
     def switch_view(self, minv):
         self.isMinimal = minv
         self.root.remove_widget(self.view)
-        self.root.add_widget(self,self.view)
+        self.root.add_widget(self.view)
     def get_new_random_position(self):
         return (choice(self._x_range),choice(self._y_range))
 

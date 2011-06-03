@@ -288,6 +288,7 @@ class ScribbleTextWidget(MTScatter):
 class MyScribbleWidget(MTWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('cls', 'scribbleBordercss')
+        self._fullscreen = kwargs.setdefault('fullscreen', False)
         super(MyScribbleWidget,self).__init__(**kwargs)
         self.session = uuid()
         self.is_pen_active = True
@@ -420,7 +421,8 @@ class MyScribbleWidget(MTWidget):
             if self.collide_point(touch.x, touch.y):
                 Log.debug('Scribble: on_touch_up: touch id:%s pos(%d,%d)' % 
                        (touch.id, touch.x,touch.y))
-                self.parent.parent.set_button_image()
+                if not self._fullscreen:
+                    self.parent.parent.set_button_image()
                 
                 idu = self.touch_keys[touch.id]
                 self.touch_positions[idu]['Cdata'].append(touch.pos)
@@ -432,6 +434,11 @@ class MyScribbleWidget(MTWidget):
                 self.dispatch_event('on_change',  #IGNORE:W0142
                                     *(idu,self.touch_positions))
             return True
+    def toggle_fullscreen(self):
+        self._fullscreen = not self._fullscreen
+        if self._fullscreen:
+            self.ctrls_container._corner_on_press()
+            self.ctrls_container._corner_on_press()
     def on_text_change(self,value):pass
     def drawTextInput(self,touch):
         start, pos = self.touch_time[touch.id]
@@ -561,7 +568,7 @@ class MyScribbleWidget(MTWidget):
             if self.potential_deleted_lines == k:
                 x = int(time.time()) % 2
                 if x == 0: 
-                     _colour = DELETED_LINE 
+                    _colour = DELETED_LINE 
                 else:
                     self.touch_positions[k]['Color'] = RED 
             set_color(*_colour)

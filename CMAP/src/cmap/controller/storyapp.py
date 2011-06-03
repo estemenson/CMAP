@@ -284,6 +284,8 @@ class StoryApp(object):
                 Log.debug('%s modified by %s' % (m, c['author']['name']))
             for r in c['removed']:
                 Log.debug('%s removed by %s' % (r, c['author']['name']))
+    def remove_widget(self, view):
+        self.view.remove_widget(view)
     def trash(self,id):#,atype=None):
 #        if atype is None:# or type is 'stories':
 #            btn = self.buttons[artefact.Id]

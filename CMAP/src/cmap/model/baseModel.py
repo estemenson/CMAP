@@ -264,7 +264,7 @@ class BaseModel(Observer, Subject):
             ce.setAttribute('List', '')
             self._Model.appendChild(ce)
         #TODO: STeve test this replacement for commented code below
-        if self.find_child(self,value, ce): return #already in xml just return
+        if self.find_child(value, ce): return #already in xml just return
 #        for c in ce.childNodes:
 #            if c.nodeName == '#text':
 #                continue

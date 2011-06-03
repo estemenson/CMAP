@@ -130,7 +130,16 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
             self.ctrl.remove_scribble(id)
     def fullscreen(self, *largs, **kwargs):
         self.isMinimal = not self.isMinimal
-        self.ctrl.switch_view(self.isMinimal)
+        #self.ctrl.switch_view(self.isMinimal)
+        super(MinView,self).fullscreen(*largs, **kwargs)
+        self.scribleWidget.size = self.size
+        self.scribleWidget.toggle_fullscreen()
+        #self.scribleWidget.center = self.center
+    def unfullscreen(self, *largs, **kwargs):
+        self.scribleWidget.toggle_fullscreen()
+        super(MinView,self).unfullscreen(*largs, **kwargs)
+        self.scribleWidget.size = self.grid_size
+        print('srible widget size: %s' % str(self.scribleWidget.size))
     def on_transform(self, touch, *largs, **kwargs):
         self.ctrl.artefact_tranformed(size=self.size,pos=self.pos,
                                       scale=self.scale,rotation=self.rotation)

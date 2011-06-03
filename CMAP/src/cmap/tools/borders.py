@@ -91,33 +91,37 @@ class MyInnerWindow(MTInnerWindow):
         center_x = self.width/ 2
         center_y = (-scaled_border) * self.scale if self.scale == 1.0 else\
                                                                 self.scale *1.0
-        if self.scale < 1.0:
-            print('Scaled border = %f, scale:%f, control_scale:%f' % (scaled_border, self.scale, self.control_scale))
-        if self.isMinimized:
-            center_y = scaled_border
+        btn_scale = self.control_scale / self.scale
         ctrls  = self.controls.children
+        if self.isMinimized:
+            btn_scale = 1.0#0.7
+            center_x += 35
+            center_y = scaled_border -23
         pos =(center_x-self.ctrls_buttons_size[0]/2 -
               (scaled_border/2*self.scale),# if self.scale != 1 else scaled_border,
                    center_y)
         start_pos_x = pos[0]
         for button in ctrls:
-            button.scale = self.control_scale / self.scale
+            button.scale = btn_scale
             if button.scale < 1.0:
                 print('Scale: %f' % button.scale)
             #button.scale = self.scale * self.control_scale
             button.pos = (start_pos_x,
                 center_y - button.height / self.get_divisor())
             try:
-                my_padding = button.my_padding
+                my_padding = button.my_padding# * btn_scale if self.isMinimized\
+                                              #             else 1
             except Exception: #IGNORE:W0703
                 my_padding = button.my_padding = 5 # set a default
-            start_pos_x += (button.width + my_padding)
+            start_pos_x += button.width + (my_padding * btn_scale * .4\
+                                                       if self.isMinimized\
+                                                       else 1)
                 
     def get_divisor(self, value=0.98):
         if self.scale >= value:
             return 2
         return 0.9
-    def minimize(self):
+    def minimize(self, *largs, **kargs):
         if self.isMinimized:
             self.restore()
         else: 
@@ -128,6 +132,7 @@ class MyInnerWindow(MTInnerWindow):
             self.old_size = self.size
             self.size = (self.ctrls_buttons_size[0] * self.scale,
                          self.ctrls_buttons_size[1] * self.scale)
+            self.update_controls()
             
 
     def get_minimize_pos(self):
@@ -144,7 +149,7 @@ class MyInnerWindow(MTInnerWindow):
         self.old_minimize_pos = self.pos
         self.pos = self.old_pos
         self.size = self.old_size
-        
+        self.update_controls()
         
     def fullscreen(self, *largs, **kwargs):
         if self.isMinimized:
@@ -180,12 +185,14 @@ class MyInnerWindow(MTInnerWindow):
 #            corners=(True, True, False, False)
         else:
             pos = (0,-scaled_border)
-            size=scale_tuple(self.size,-.1,-.5)
+            size=scale_tuple(self.size,-.1,-.8)
             l_pos = (size[0]/2, size[1] - 15 - scaled_border)
             corners=(True, True, True, True)
             drawLabel(label=self.minimized_label, pos=l_pos, 
-                      color=self.style.get('font-color'))
-            border_color=parse_color(self.style.get('min-border-color'))
+                      color=self.style.get('font-color', 
+                        parse_color(str('rgba(0,0,0,255)'))))
+            border_color=parse_color(self.style.get('min-border-color',
+                                        str('rgba(205,0,0,80)')))
             # draw control background
             drawRoundedRectangle(
                 pos=pos,
