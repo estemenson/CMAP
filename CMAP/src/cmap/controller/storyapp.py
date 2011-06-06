@@ -97,7 +97,7 @@ class StoryApp(object):
         self.view = StoryAppView(**kwargs)
         self.model = StoryAppModel(**kwargs)
         self.model.get_view_data()
-    def add_current_artefact(self, type, artefact):
+    def add_current_artefact(self, type, artefact, op='True'):
         type = artefact_types[type]
         idu,id  = None,None
         try:
@@ -108,7 +108,8 @@ class StoryApp(object):
                 #add artefact to the view
                 id = idu
                 _view = self.artefacts[id][0].view
-                _open = self.view.toggle_view_current_Artefact(_view)
+                _open = self.view.toggle_view_current_Artefact(_view) if\
+                            op == 'True' else op
                 self.artefact_changed(Id=id, size=_view.size, pos=_view.pos,
                                       open=_open, scale=_view.scale,
                                       rotation=_view.rotation)
@@ -128,22 +129,27 @@ class StoryApp(object):
         kwargs.setdefault('open', 'True')
         kwargs.setdefault('scale', 1.0)
         kwargs.setdefault('rotation', 0.0)
+        kwargs.setdefault('size', (600,400))
+        kwargs.setdefault('pos', (100,100))
         #store the size and position of artefacts
         self.model.artefact_changed(**kwargs)
-    def close(self,touch=None):
-        self.model.close()
-        #close all the artefacts
-        for a in self.artefacts.values():
-            ctrl = a[0]
-            try:
-                ctrl.close()
-            except TypeError:
-                Log.debug('Unable to close %s' % ctrl)
-#        for b in self.backlog.values():
-#            b[0].close()
-        self.add_to_git()
-        AsyncHandler().shutdown()
-        #super(StoryAppView, self.view).close(touch)
+#    def close(self,touch=None):
+#        self.model.close()
+#        #close all the artefacts
+#        for a in self.artefacts.values():
+#            ctrl = a[0]
+#            try:
+#                ctrl.close()
+#            except TypeError:
+#                Log.debug('Unable to close %s' % ctrl)
+##        for b in self.backlog.values():
+##            b[0].close()
+#        self.add_to_git()
+#        AsyncHandler().shutdown()
+    def close_artefact(self,**kwargs):
+        id = kwargs['Id']
+        self.model.artefact_changed(**kwargs)
+        self.view.toggle_view_current_Artefact(self.artefacts[id][0].view)
     def container_reset_children(self,container):
         f = self.__getattribute__(container)
         x = len(f.children) -1
@@ -151,8 +157,23 @@ class StoryApp(object):
             w = f.children[x]
             f.remove_widget(w) 
             x = len(f.children) -1
-    def fullscreen(self, *largs, **kwargs):
-        pass
+    def create_view_and_open(self,ctrl,**kwargs):
+        ctrl.newDialog(minv=True,**kwargs)
+        kwargs.setdefault('open', 'True')
+        self.add_current_artefact(ctrl._type, ctrl, kwargs['open'])
+    def exit(self,touch=None):
+        self.model.close()
+        #close all the artefacts
+        for a in self.artefacts.values():
+            ctrl = a[0]
+            try:
+                ctrl.exit()
+            except TypeError:
+                Log.debug('Unable to close %s' % ctrl)
+#        for b in self.backlog.values():
+#            b[0].close()
+        self.add_to_git()
+        AsyncHandler().shutdown()
     def getArtefact(self,**kwargs):
         _p = kwargs.setdefault('controller', None)
         if not isinstance(_p, ArtefactController):
@@ -178,9 +199,6 @@ class StoryApp(object):
             kwargs['file'] = f
             r = self.getArtefact(**kwargs)
             self.artefacts[r.Id] = (r,{})
-    def create_view_and_open(self,ctrl,**kwargs):
-        ctrl.newDialog(minv=True,**kwargs)
-        self.add_current_artefact(ctrl._type, ctrl)
     def new_artefact(self,**kwargs): # *largs
         #create the controller for the new artefact
         _r = kwargs['controller'](self,None,**kwargs)

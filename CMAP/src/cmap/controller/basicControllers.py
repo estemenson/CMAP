@@ -74,7 +74,12 @@ class ArtefactController(Subject,Observer):
             
     def internalSave(self, fn):
         self._model.internalSave(fn)
-    def close(self):
+    def close(self, **kwargs):
+        self.exit()
+        kwargs['open']  = 'False'
+        kwargs['Id']    = self.Id
+        self.root.close_artefact(**kwargs)
+    def exit(self):
         try:
             self._model.close()
         except Exception: pass #IGNORE:W0703

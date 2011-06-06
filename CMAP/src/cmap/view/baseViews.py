@@ -208,8 +208,9 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
             if not self.name: 
                 self.trash()
                 return
-            self.ctrl.close(self)
-        super(MinView, self).close(touch)
+        self.ctrl.close(size=self.size, pos=self.pos,
+                                     rotation=self.rotation, scale=self.scale)
+        #super(MinView, self).close(touch)
 
     def trash(self, touch=None, *largs, **kwargs):
         self.ctrl.trash()

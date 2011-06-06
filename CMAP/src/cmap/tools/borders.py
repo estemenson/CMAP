@@ -58,6 +58,8 @@ _save_icon_path = os.path.join(_iconPath,'save.png')
 #_maximize_icon_path = os.path.join(_iconPath,'maximize.png')
 x_ctrl_border_scale = -.1
 y_ctrl_border_scale = -.2
+default_btn_size = (48,48)
+default_btn_padding = default_btn_size[0] /9.6 
 
 class MyInnerWindow(MTInnerWindow):
     def __init__(self, **kwargs):
@@ -66,7 +68,7 @@ class MyInnerWindow(MTInnerWindow):
         self.btn_minimize = MTImageButton(filename=_minimize_icon_path,
                                             scale=ctrl_scale,
                                             cls='innerwindow-close')
-        self.btn_minimize.my_padding = 5
+        self.btn_minimize.my_padding = default_btn_padding
         self.isMinimized = False
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size', 
                                                          (0,48*ctrl_scale))
@@ -87,7 +89,7 @@ class MyInnerWindow(MTInnerWindow):
         self.update_controls()
         
     def update_controls(self):
-        scaled_border = self.get_scaled_border()#*self.scale
+        scaled_border = self.get_scaled_border()
         center_x = self.width/ 2
         center_y = (-scaled_border) * self.scale if self.scale == 1.0 else\
                                                                 self.scale *1.0
@@ -98,21 +100,17 @@ class MyInnerWindow(MTInnerWindow):
             center_x += 35
             center_y = scaled_border -23
         pos =(center_x-self.ctrls_buttons_size[0]/2 -
-              (scaled_border/2*self.scale),# if self.scale != 1 else scaled_border,
+              (scaled_border/2*self.scale),
                    center_y)
         start_pos_x = pos[0]
         for button in ctrls:
             button.scale = btn_scale
-            if button.scale < 1.0:
-                print('Scale: %f' % button.scale)
-            #button.scale = self.scale * self.control_scale
             button.pos = (start_pos_x,
                 center_y - button.height / self.get_divisor())
             try:
-                my_padding = button.my_padding# * btn_scale if self.isMinimized\
-                                              #             else 1
-            except Exception: #IGNORE:W0703
-                my_padding = button.my_padding = 5 # set a default
+                my_padding = button.my_padding
+            except Exception:
+                my_padding = button.my_padding = default_btn_padding
             start_pos_x += button.width + (my_padding * btn_scale * .4\
                                                        if self.isMinimized\
                                                        else 1)
@@ -264,7 +262,7 @@ class MyInnerWindowWithTrash(MyInnerWindow):
         self.btn_trash = MTImageButton(filename=_trash_icon_path,
                                             scale=_scale,
                                             cls='innerwindow-close')
-        self.btn_trash.my_padding = 12
+        self.btn_trash.my_padding = default_btn_padding *2.4
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size', 
                                                          (0,48))
         kwargs['ctrls_button_size'] = (sz[0] + self.btn_trash.width + \
@@ -287,7 +285,7 @@ class MyInnerWindowWithSaveAndTrash(MyInnerWindowWithTrash):
         self.btn_save = MTImageButton(filename=_save_icon_path,
                                             scale=_scale,
                                             cls='innerwindow-close')
-        self.btn_save.my_padding = 5
+        self.btn_save.my_padding = default_btn_padding
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size',
                                                          (0,48))
         kwargs['ctrls_button_size'] = (sz[0] + self.btn_save.width +

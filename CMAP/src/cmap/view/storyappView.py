@@ -207,7 +207,7 @@ class StoryAppView(MyInnerWindow):
                 btn.multiline = True
             btn.label = '\n'.join(_label.split('-'))
     def close(self,touch=None):
-        self.controller.close(touch)
+        self.controller.exit(touch)
         #close all the artefacts
 #        for a in self.artefacts.values():
 #            a[0].close()
