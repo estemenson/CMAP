@@ -15,8 +15,9 @@ import httplib
 
 import pymt.base
 import pymt.event
-from petaapan.utilities.gitmanager import GitManager, SAVE, COMMIT, MV, RM,\
-                                          GIT_RESPONSE, SHUTDOWN
+from petaapan.utilities.gitmanager import GitManager, SAVE, COMMIT, MV,\
+                                          RM, GIT_RESPONSE, SHUTDOWN,\
+                                          VERSION, EXEC_PATH
 from petaapan.publishsubscribeclient.fromCollaboration\
                import FROM_COLLABORATION, ServerManager
 from petaapan.publishsubscribeclient.toCollaboration\
@@ -30,9 +31,13 @@ ON_GITSHUTDOWN = 'on_gitshutdown'
 ON_GITCOMMIT = 'on_gitcommit'
 ON_GITMV = 'on_gitmv'
 ON_GITRM = 'on_gitrm'
+ON_GITVERSION = 'on_gitversion'
+ON_GITPATH = 'on_gitpath'
 ON_GITHUBNOTIFICATION = 'on_githubnotification'
 ON_SUBSCRIPTION_RESPONSE = 'on_subscriptionresponse'
 GIT_PUBLISHER = 'github'
+git_version = None
+git_path = None
 
 
 
@@ -41,7 +46,9 @@ SHUTDOWN_TIMEOUT = 15
 handler_mapper = {GIT_RESPONSE: {SAVE: ON_GITSAVE,
                                  COMMIT: ON_GITCOMMIT,
                                  MV: ON_GITMV,
-                                 RM: ON_GITRM},
+                                 RM: ON_GITRM,
+                                 VERSION: ON_GITVERSION,
+                                 EXEC_PATH: ON_GITPATH},
                   FROM_COLLABORATION:\
                                   {GITHUB_NOTIFICATION: ON_GITHUBNOTIFICATION},
                   TO_COLLABORATION:\
@@ -86,6 +93,8 @@ class Async(pymt.event.EventDispatcher):
         self.register_event_type(ON_GITCOMMIT)
         self.register_event_type(ON_GITMV)
         self.register_event_type(ON_GITRM)
+        self.register_event_type(ON_GITVERSION)
+        self.register_event_type(ON_GITPATH)
         self.register_event_type(ON_GITHUBNOTIFICATION)
         self.register_event_type(ON_SUBSCRIPTION_RESPONSE)
         # We will get notified from the main event loop on each loop
@@ -94,6 +103,8 @@ class Async(pymt.event.EventDispatcher):
         # Start the asynchronous processing threads
         if self._localrepo:
             self._git.start()
+            self._git.version()
+            self._git.exec_path()
         if not self._no_collaboration:
             self._collaborationFrom.start()
             self._collaborationTo.start()
@@ -145,6 +156,20 @@ class Async(pymt.event.EventDispatcher):
         Log.debug('Git rm completed - outstanding events %s'\
                    % self._outstanding_events)
         assert(self._outstanding_events >= 0)
+        self.logAsyncInfo(ret)
+        
+    def on_gitversion(self, ret):
+        self._outstanding_events -= 1
+        Log.debug('Git --version completed - outstanding events %s'\
+                  % self._outstanding_events)
+        assert(self._outstanding_events <= 0)
+        self.logAsyncInfo(ret)
+        
+    def on_gitpath(self, ret):
+        self._outstanding_events -= 1
+        Log.debug('Git --exec-path completed - outstanding events %s'\
+                  % self._outstanding_events)
+        assert(self._outstanding_events <= 0)
         self.logAsyncInfo(ret)
         
     def on_githubnotification(self, ret):
