@@ -160,19 +160,21 @@ class StoryAppModel(object):
         self._isDirty = True
         ctrl = self._artefacts[kwargs['Id']]
         id = ctrl[0].Id
-        _meta = ctrl[1].get('meta',{}) 
+        _meta = ctrl[1].get('meta')
+        #get this artefact from the dom
+        #or create a new element
+        _e = self.get_dom_artefact(id)
+        if not _e:
+            if not _meta:
+                _meta = ctrl[1]['meta'] = {} 
+            _e = self._dom.createElement('Artefact')
+            _e.setAttribute('Id', id)
+            self._app.appendChild(_e)
         _meta['size'] = kwargs['size']
         _meta['pos'] = kwargs['pos']
         _meta['open'] = kwargs['open']
         _meta['rotation'] = kwargs['rotation']
         _meta['scale'] = kwargs['scale']
-        #get this artefact from the dom
-        #or create a new element
-        _e = self.get_dom_artefact(id)
-        if not _e:
-            _e = self._dom.createElement('Artefact')
-            _e.setAttribute('Id', id)
-            self._app.appendChild(_e)
         _e.setAttribute('size', str(_meta['size']))
         _e.setAttribute('pos', str(_meta['pos']))
         if not isinstance(_meta['open'], type('')):

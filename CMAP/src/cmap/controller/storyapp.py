@@ -117,6 +117,7 @@ class StoryApp(object):
             pass
         if not idu:
             #create a new artefact
+            
             id = self.new_artefact(**type).Id
         #set the current artefact (appends to the list)
         self.__setattr__(type['current'], self.artefacts[id])
@@ -202,7 +203,7 @@ class StoryApp(object):
     def new_artefact(self,**kwargs): # *largs
         #create the controller for the new artefact
         _r = kwargs['controller'](self,None,**kwargs)
-        self.artefacts[_r.Id] = (_r,{})
+        self.artefacts[_r.Id] = (_r,{'meta':{}})
         _view = _r.newDialog(minv=True, **kwargs)
         _open = self.view.toggle_view_current_Artefact(_view)
         self.artefact_changed(Id=_r.Id, size=_view.size, pos=_view.pos, 
