@@ -10,6 +10,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from agileConfig import Config
 from cmap.tools.scrible import MyScribbleWidget
+from pymt.parser import parse_color
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -39,6 +40,22 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         if ctrl is None:
             ctrl = TestController(wnd,'minimal' if self.isMinimal else 'full')
         self.ctrl = ctrl
+        self.nudge_amount = .8
+        self.old_styles = None
+        self.colors_nudge = {
+                    'bg-color': parse_color(str('rgba(45, 150, 150, 255)')),
+                    'color': parse_color(str('rgba(45, 150, 150, 255)')),
+                    'border-color': parse_color(str('rgb(45, 150, 150)')),
+                    'bg-color-move': parse_color(str('rgb(45, 150, 150)')),
+                    'bg-color-full': parse_color(str('rgb(45, 150, 150)')),
+                    'min-border-color':parse_color(str('rgba(45,150,150,255)'))}
+        self.colors_orig = {
+                    'bg-color': parse_color(str('rgba(255, 255, 255, 175)')),
+                    'color': parse_color(str('rgba(192, 192, 192, 255)')),
+                    'border-color': parse_color(str('rgba(192,192,192,255)')),
+                    'bg-color-move': parse_color(str('rgba(0,175,0,175)')),
+                    'bg-color-full': parse_color(str('rgba(175,0 ,0 ,175)')),
+                    'min-border-color': parse_color(str('rgba(205,0 ,0 ,80)'))}
         try:
             self.isMinimal = True if self.isMinimal else False
         except Exception: #IGNORE:W0703
@@ -143,6 +160,20 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
     def on_transform(self, touch, *largs, **kwargs):
         self.ctrl.artefact_tranformed(size=self.size,pos=self.pos,
                                       scale=self.scale,rotation=self.rotation)
+    def on_touch_move(self, touch):
+        super(MinView, self).on_touch_move(touch)
+        #we need to send this move event to StoryApp
+        self.ctrl.moving(touch.dpos)
+    def nudge(self):
+        #for now we will cahnge the border color
+        self.apply_css(self.colors_nudge)
+        self.draw()
+    def nudge_reset(self):
+        self.apply_css(self.colors_orig)
+        self.draw()
+#        self.nudge_amount *= -1
+#        self.rotation += self.nudge_amount
+#        super(MinView,self).update()
 #    def on_move(self, x, y):
 #        #print('On_move')
 #        #super(MinView, self).on_move(x,y)

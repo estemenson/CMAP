@@ -68,10 +68,11 @@ class ArtefactController(Subject,Observer):
             pass
         finally:
             if self.isNew:
-                self.root.add_new_artefact(self,self.container,self.callback,
+                self.root.add_artefact_access(self,self.container,self.callback,
                                            self.artefacts[self.Id][1])
                 self.isNew = False
-            
+    def moving(self, pos):
+        self.root.artefact_moving(Id=self.Id, pos=pos)        
     def internalSave(self, fn):
         self._model.internalSave(fn)
     def close(self, **kwargs):

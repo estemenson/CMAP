@@ -38,7 +38,7 @@ except Exception: #IGNORE:W0703
     from petaapan.utilities.console_logger import ConsoleLogger
     Log = ConsoleLogger('AgiMan')
 from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
-import os.path
+from os.path import splitext, basename, join, exists
 from glob     import glob
 
 class StoryAppModel(object):
@@ -74,27 +74,25 @@ class StoryAppModel(object):
         for atype in artefact_types.keys():
             self.xmlFiles[atype] = []
             self.xmlFiles[atype].extend(glob(
-                                os.path.join(self.datastore, atype, '*.xml')))
+                                join(self.datastore, atype, '*.xml')))
     def load_artefacts(self):
         for type in artefact_types:
             kwargs = artefact_types[type].copy()
             for artefact in self.xmlFiles[type]:
                 Log.debug('loading %s' % artefact)
-                kwargs['name'] =\
-                            name=os.path.splitext(os.path.basename(artefact))[0]
+                kwargs['name'] = name=splitext(basename(artefact))[0]
                 kwargs['file'] = artefact
                 ctrl = self.controller.getArtefact(**kwargs) 
-                self._artefacts[ctrl.Id] = (ctrl,{})
-                self.controller.add_new_artefact(ctrl,
+                self._artefacts[ctrl.Id] = (ctrl,{'meta':{}})
+                self.controller.add_artefact_access(ctrl,
                                      kwargs['container'],
                                      kwargs['viewCurrent'],
                                      self._artefacts[ctrl.Id][1])
     def get_view_data(self):
-        #retrieve information about size and position of artefacts
-        self.app_file = os.path.join(self.datastore, 'storyApp.xml')
-        if not os.path.exists(self.app_file):
-            #just get the template
-            #_file = os.path.join(self.datastore, '..','data','storyApp.xml')
+        #retrieve the metadata about the application
+        self.app_file = join(self.datastore, 'storyApp.xml')
+        if not exists(self.app_file):
+            #create an skeleton xml
             self._dom = minidom.parseString(
                                  '''<?xml version="1.0" encoding="UTF-8"?>
                                 <storyApp></storyApp>
@@ -104,7 +102,6 @@ class StoryAppModel(object):
         self._app = self._dom.getElementsByTagName('storyApp')[0] 
         for element in [n for n in self._app.childNodes \
                    if n.nodeName == 'Artefact']:
-                  #if n.nodeType == minidom.Node.ELEMENT_NODE]:
             self.parse(element)
     def parse(self,node):
         if node.hasAttribute('Id') and node.hasAttribute('pos') and\

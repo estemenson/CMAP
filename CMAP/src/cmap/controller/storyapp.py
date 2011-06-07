@@ -97,33 +97,40 @@ class StoryApp(object):
         self.view = StoryAppView(**kwargs)
         self.model = StoryAppModel(**kwargs)
         self.model.get_view_data()
-    def add_current_artefact(self, type, artefact, op='True'):
-        type = artefact_types[type]
-        idu,id  = None,None
-        try:
-            #object exists get a reference
-            idu = artefact.Id if isinstance(artefact, ArtefactController)\
-                         else artefact._id #IGNORE:W0212
-            if idu:
-                #add artefact to the view
-                id = idu
-                _view = self.artefacts[id][0].view
-                _open = self.view.toggle_view_current_Artefact(_view) if\
-                            op == 'True' else op
-                self.artefact_changed(Id=id, size=_view.size, pos=_view.pos,
-                                      open=_open, scale=_view.scale,
-                                      rotation=_view.rotation)
-        except KeyError:
-            pass
-        if not idu:
+    def add_artefact(self, artefact=None, **kwargs):
+        '''
+        Create and / or just add an artifact to the main View. Metadata is
+        updated as well as current artefacts of the appropriate type
+        arguments:
+            artefact: an artefact that has an Id or _id property which is used 
+            to retrieve the artefact controller (could be the artefact 
+            controller but not necessarily)
+            kwargs: 
+                open: whether or not to add the artifacts view to the app
+                current: the container where all current artefacts of this type
+                are held 
+        '''
+        op = kwargs.setdefault('open','True')
+        #type = artefact_types[type]
+        id  = None
+        if artefact:
+            #if object exists get the id
+            id = artefact.Id if isinstance(artefact, ArtefactController)\
+                     else artefact._id #IGNORE:W0212
+        if not id:
             #create a new artefact
-            
-            id = self.new_artefact(**type).Id
+            id = self.new_artefact(**kwargs).Id
+        _view = self.artefacts[id][0].view
+        _open = self.view.toggle_view_current_Artefact(_view) if\
+                    op == 'True' else op
+        self.artefact_changed(Id=id, size=_view.size, pos=_view.pos,
+                              open=_open, scale=_view.scale,
+                              rotation=_view.rotation)
         #set the current artefact (appends to the list)
-        self.__setattr__(type['current'], self.artefacts[id])
+        self.__setattr__(kwargs['current'], self.artefacts[id])
         return id
-    def add_new_artefact(self, ctrl, container, callback, ret):
-        _r = self.view.add_new_artefact(ctrl, container, callback, ret)
+    def add_artefact_access(self, ctrl, container, callback, ret):
+        _r = self.view.add_artefact_access(ctrl, container, callback, ret)
     def add_to_git(self):
         AsyncHandler().save(None, 'Commit session edits')
     def artefact_changed(self, **kwargs):#id, size, pos, open='True'):
@@ -134,19 +141,32 @@ class StoryApp(object):
         kwargs.setdefault('pos', (100,100))
         #store the size and position of artefacts
         self.model.artefact_changed(**kwargs)
-#    def close(self,touch=None):
-#        self.model.close()
-#        #close all the artefacts
-#        for a in self.artefacts.values():
-#            ctrl = a[0]
-#            try:
-#                ctrl.close()
-#            except TypeError:
-#                Log.debug('Unable to close %s' % ctrl)
-##        for b in self.backlog.values():
-##            b[0].close()
-#        self.add_to_git()
-#        AsyncHandler().shutdown()
+    def artefact_moving(self, **kwargs):
+        '''
+        need to loop through all open artefacts to see if the one moving is 
+        intersecting with any currently open artefact, if it is then we need 
+        to check if it is reasonable for the dragged artefact to become a child 
+        of  the intersected artefact
+        '''
+        id = kwargs['Id']
+        pos = kwargs['pos']
+        from cmap.view.baseViews import MinView
+        for child in [c for c in self.view.container.children if\
+                                isinstance(c, MinView) and c.Id != id]:
+            box_pos, box_sz = child.bbox
+            if pos[0] >= box_pos[0] and pos[0] <= box_pos[0] + box_sz[0] and\
+                    pos[1] >= box_pos[1] and pos[1] <= box_pos[1] + box_sz[1]:
+                print('pos: %s bounding box: %s' % (str(pos), str(box_pos)))
+                child.nudge()
+                child.nudge_reset()
+    def check_position(self,**kwargs):
+        pos = kwargs.get('pos', None) 
+        if pos:
+            if pos[0] > self._x_range[-1]:
+                pos = (self._x_range[-1], pos[1])
+            if pos[1] > self._y_range[-1]:
+                pos =  (pos[0],self._y_range[-1])
+        return pos
     def close_artefact(self,**kwargs):
         id = kwargs['Id']
         self.model.artefact_changed(**kwargs)
@@ -160,8 +180,8 @@ class StoryApp(object):
             x = len(f.children) -1
     def create_view_and_open(self,ctrl,**kwargs):
         ctrl.newDialog(minv=True,**kwargs)
-        kwargs.setdefault('open', 'True')
-        self.add_current_artefact(ctrl._type, ctrl, kwargs['open'])
+        kwargs.update(artefact_types[ctrl._type])
+        self.add_artefact(ctrl, **kwargs)
     def exit(self,touch=None):
         self.model.close()
         #close all the artefacts
@@ -191,25 +211,22 @@ class StoryApp(object):
         if view not in self.container.children:
             super(StoryApp,self).add_widget(view)
         else: ctrl.app_btn_pressed()
-    def load_children(self,id, type):
+    def load_children(self,id, type):pass
         #TODO: STEVE refactor to get children from model of the artefact
-        for f in self.model.xmlFiles[type]:#artefact_types[type]['type']]:
-            Log.debug('only loading %s %s' % (type,f))
-            kwargs = artefact_types[type].copy()
-            kwargs['name'] = os.path.splitext(os.path.basename(f))[0]
-            kwargs['file'] = f
-            r = self.getArtefact(**kwargs)
-            self.artefacts[r.Id] = (r,{})
+#        for f in self.model.xmlFiles[type]:#artefact_types[type]['type']]:
+#            Log.debug('only loading %s %s' % (type,f))
+#            kwargs = artefact_types[type].copy()
+#            kwargs['name'] = os.path.splitext(os.path.basename(f))[0]
+#            kwargs['file'] = f
+#            r = self.getArtefact(**kwargs)
+#            self.artefacts[r.Id] = (r,{'meta':{}})
     def new_artefact(self,**kwargs): # *largs
         #create the controller for the new artefact
+        pos = self.check_position(**kwargs)
+        if pos: kwargs['pos'] = pos
         _r = kwargs['controller'](self,None,**kwargs)
+        _r.newDialog(True, **kwargs)
         self.artefacts[_r.Id] = (_r,{'meta':{}})
-        _view = _r.newDialog(minv=True, **kwargs)
-        _open = self.view.toggle_view_current_Artefact(_view)
-        self.artefact_changed(Id=_r.Id, size=_view.size, pos=_view.pos, 
-                              open=_open, scale=_view.scale, 
-                              rotation=_view.rotation)
-        
         return _r 
     #TODO: STEVE this group of new_XXX_pressed methods must be refactored
     def new_backlog_artefact(self,**kwargs):
@@ -218,23 +235,18 @@ class StoryApp(object):
             # no active sprint or release, we need to update the kwargs to 
             # reflect that it is backlog story
             kwargs.update(artefact_types[BACKLOG])
-        _b = self.new_artefact(**kwargs)
-        self.current_backlog = self.artefacts[_b.Id] 
-        return _b
-    def new_project(self, **kwargs): 
-        _p = self.new_artefact(**kwargs)
-        self.current_project = self.artefacts[_p.Id]
-        return _p
+        return self.artefacts[self.add_artefact(None, **kwargs)][0]
+    def new_project(self, **kwargs):
+        return self.artefacts[self.add_artefact(None, **kwargs)][0] 
     def new_release(self, **kwargs): 
         project = None if self.current_project is None \
                                         else self.current_project[0].Id
         if not project:
             return # Do not support releases in backlog now
-        _r = self.new_artefact(**kwargs)
+        _r = self.artefacts[self.add_artefact(None,**kwargs)][0]
         if project:
             project[0].Children = _r.Id
             _r.Parent = project[0].Id
-            self.current_release = self.artefacts[_r.Id]
         return _r
     def new_sprint(self, **kwargs): 
         project = None if self.current_project is None \
@@ -243,11 +255,10 @@ class StoryApp(object):
                         else self.current_release[0].Id
         if not release:
             return # No appropriate parent
-        _s = self.new_artefact(**kwargs)
+        _s = self.artefacts[self.add_artefact(None,**kwargs)][0]
         if release:
             release[0].Children = _s.Id
             _s.Parent = release[0].Id
-            self.current_sprint = self.artefacts[_s.Id]
         return _s
     def new_story(self, **kwargs):
         project = None
@@ -261,11 +272,12 @@ class StoryApp(object):
         parent = sprint if sprint else project
         if not parent:
             return self.new_backlog_artefact(**kwargs)
-        _s = self.new_artefact(**kwargs)
+        _s = self.artefacts[self.add_artefact(None, **kwargs)][0]
+#        _s = self.new_artefact(**kwargs)
+#        self.view.toggle_view_current_Artefact(_s.newDialog(True, **kwargs))
         if sprint:
             sprint[0].Children = _s.Id
             _s.Parent = sprint[0].Id
-            self.current_story = self.artefacts[_s.Id]
         _s.register_observer(self)
         return _s
     def new_task(self, **kwargs):
@@ -283,14 +295,13 @@ class StoryApp(object):
             parent = sprint
         else:
             return # No appropriate parent, we don't support this yet
-        _t = self.new_artefact(**kwargs)
+        _t = self.artefacts[self.add_artefact(None,**kwargs)][0]
         if story:
             story[0].Children = _t.Id
             _t.Parent = story[0].Id
         elif sprint:
             sprint[0].Children = _t.Id
             _t.Parent = sprint[0].Id
-        self.current_task = self.artefacts[_t.Id]
         return _t
     def on_github_notification(self, ret):
         msg = ret[1]

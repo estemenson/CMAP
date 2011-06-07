@@ -176,7 +176,7 @@ class StoryAppView(MyInnerWindow):
         self.main_ctlrs_container.add_widget(self.createNewStoryFlowButton())
         self.main_ctlrs_container.add_widget(self.createNewTaskFlowButton())
         self.canvas.add_widget(self.main_ctlrs_container)
-    def add_new_artefact(self, ctrl, container, callback, ret):
+    def add_artefact_access(self, ctrl, container, callback, ret):
         '''add a button to access the artifact in the appropriate container(s)
     :Parameters:
         `ctrl` : ArtefactController, A derived controller from the 
@@ -319,12 +319,12 @@ class StoryAppView(MyInnerWindow):
         self.canvas.add_widget(capture)
     def flow_backlog_select(self,btn,*largs):
         #make the selected backlog item the active one
-        self.controller.add_current_artefact('backlog',btn)
+        self.controller.add_artefact(btn,**artefact_types[BACKLOG])
     def flow_projects_select(self,btn,*largs):
         #we need to populate the releases flow with any release 
         #in the current project
-        self.load_children(self.controller.add_current_artefact('projects',btn),
-                           'releases')
+        self.load_children(
+          self.controller.add_artefact(btn,**artefact_types[PROJECTS]),RELEASES)
 #        self.container_reset_children('release_flow')
 #        self.container_reset_children('sprint_flow')
 #        self.container_reset_children('story_flow')
@@ -341,8 +341,8 @@ class StoryAppView(MyInnerWindow):
     def flow_release_select(self,btn,*largs):
         #we need to populate the sprint flow with any sprints already
         #in the current release
-        self.load_children(self.controller.add_current_artefact('releases',btn),
-                           'sprints')
+        self.load_children(
+           self.controller.add_artefact(btn,**artefact_types[RELEASES]),SPRINTS)
 #        self.container_reset_children('sprint_flow')
 #        self.container_reset_children('story_flow')
 #        self.container_reset_children('task_flow')
@@ -358,8 +358,8 @@ class StoryAppView(MyInnerWindow):
     def flow_sprint_select(self,btn,*largs):
         #we need to populate the story flow with any stories already
         #in the current sprint
-        self.load_children(self.controller.add_current_artefact('sprints',btn),
-                           'stories')
+        self.load_children(
+            self.controller.add_artefact(btn,**artefact_types[SPRINTS]),STORIES)
 #        self.container_reset_children('story_flow')
 #        self.container_reset_children('task_flow')
 #        if self.current_sprint and self.current_sprint[0].Children:
@@ -374,8 +374,8 @@ class StoryAppView(MyInnerWindow):
     def flow_story_select(self,btn,*largs):
         #we need to populate the task flow with any tasks already
         #in the current story
-        self.load_children(self.controller.add_current_artefact('stories',btn),
-                           'tasks')
+        self.load_children(
+            self.controller.add_artefact(btn,**artefact_types[STORIES]),TASKS)
 #        self.container_reset_children('task_flow')
 #        if self.current_story and self.current_story[0].Children:
 #            for task in self.current_story[0].Children:
@@ -387,7 +387,7 @@ class StoryAppView(MyInnerWindow):
 #                    Log.debug('Story: %s found a task: %s not in tasks' % \
 #                              (self.current_story[0].Name,task))
     def flow_task_select(self,btn,*largs):
-        self.controller.add_current_artefact('tasks',btn)
+        self.controller.add_artefact(btn,**artefact_types[TASKS])
     def flow_pressed(self, flag, widget, *largs):
         _flag =  not self.__getattribute__(flag)
         self.__setattr__(flag, _flag)
@@ -419,19 +419,24 @@ class StoryAppView(MyInnerWindow):
         else: ctrl.app_btn_pressed()
     def load_children(self, id, type):
         self.controller.load_children(id, type)
-    def new_backlog_pressed(self,*largs):
-        self.controller.new_backlog_artefact(**artefact_types[BACKLOG])
-    def new_project_pressed(self, *largs): 
-        self.controller.new_project(**artefact_types[PROJECTS])
-    def new_release_pressed(self, *largs): 
-        self.controller.new_release(**artefact_types[RELEASES])
-    def new_sprint_pressed(self, *largs): 
-        self.controller.new_sprint(**artefact_types[SPRINTS])
+    def new_backlog_pressed(self,*largs, **kwargs):
+        kwargs.update(artefact_types[BACKLOG])
+        self.controller.new_backlog_artefact(**kwargs)
+    def new_project_pressed(self, *largs, **kwargs): 
+        kwargs.update(artefact_types[PROJECTS])
+        self.controller.new_project(**kwargs)
+    def new_release_pressed(self, *largs, **kwargs):
+        kwargs.update(artefact_types[RELEASES])
+        self.controller.new_release(**kwargs)
+    def new_sprint_pressed(self, *largs, **kwargs):
+        kwargs.update(artefact_types[SPRINTS]) 
+        self.controller.new_sprint(**kwargs)
     def new_story_pressed(self, *largs, **kwargs): 
         kwargs.update(artefact_types[STORIES])
         self.controller.new_story(**kwargs)
-    def new_task_pressed(self, *largs): 
-        self.controller.new_task(**artefact_types[TASKS])
+    def new_task_pressed(self, *largs, **kwargs):
+        kwargs.update(artefact_types[TASKS]) 
+        self.controller.new_task(**kwargs)
     def toggle_view_current_Artefact(self, artefact):
         if artefact in self.container.children:
             self.remove_widget(artefact)

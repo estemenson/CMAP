@@ -47,6 +47,17 @@ InnerWindowCSS = '''
     border-width: 10;
     draw-border: True;    
 }
+.nudgecss {
+    bg-color: rgba(45, 150, 150, 255);
+    border-color: rgb(45, 150, 150);
+    border-width: 30;
+    draw-border: True;    
+    font-color: rgba(0,0,0,255);
+    draw-border: True;    
+    bg-color-move: rgb(45 ,150 ,150);
+    bg-color-full: rgb(145 ,180 ,150);
+    padding: 10;
+}
 '''
 
 css_add_sheet(InnerWindowCSS)
@@ -161,18 +172,20 @@ class MyInnerWindow(MTInnerWindow):
         if not self.isMinimized:
             # select color from number of touch
             if len(self._touches) == 0:
-                set_color(*self.style.get('bg-color'))
+                border_color = self.style.get('bg-color')
             elif len(self._touches) == 1:
                 border_color = self.style.get('bg-color-move') 
-                set_color(*border_color) #IGNORE:W0142
             else:
                 border_color = self.style.get('bg-color-full') 
-                set_color(*border_color) #IGNORE:W0142
+
+            set_color(*border_color)
 
             # draw border
             drawRoundedRectangle(
                 pos=(-scaled_border, -scaled_border*2*self.scale),
-                size=(self.width+scaled_border*2, self.height+scaled_border*3*self.scale),
+                size=(self.width+scaled_border*2, 
+                      self.height+scaled_border*3*self.scale),
+                color=border_color,
                 #size=(self.width+scaled_border*2, self.height+control_height*2),
                 radius=15. / self.scale
             )
