@@ -263,11 +263,13 @@ class BaseModel(Observer, Subject):
             ce = self.dom.createElement('Children')
             ce.setAttribute('List', '')
             self._Model.appendChild(ce)
-        for c in ce.childNodes:
-            if c.nodeName == '#text':
-                continue
-            if c.hasAttribute('Id') and c.getAttribute('Id') == value:
-                return # Already in XML - don't duplicate
+        #TODO: STeve test this replacement for commented code below
+        if self.find_child(value, ce): return #already in xml just return
+#        for c in ce.childNodes:
+#            if c.nodeName == '#text':
+#                continue
+#            if c.hasAttribute('Id') and c.getAttribute('Id') == value:
+#                return # Already in XML - don't duplicate
         e = self.dom.createElement('Child')
         e.setAttribute('Id', value)
         ce.appendChild(e)
@@ -373,7 +375,6 @@ class BaseModel(Observer, Subject):
     @property
     def ArtefactType(self):
         return self._dom.documentElement.nodeName
-        
     Id = property(_get_id, _set_id)    
     Name = property(_get_name, _set_name)
     TextFields = property(_get_text_widgets,_set_text_widgets)
@@ -435,11 +436,11 @@ class BaseModel(Observer, Subject):
         if self.file is None: return
         f = join(self.datapath, self.file)
         if exists(f):
-            AsyncHandler().rm(f)
+            AsyncHandler().rm(os.path.relpath(f, Config().datastore))
             
     def close(self):
-        Log.debug('closing: %s' % join(self.datapath, self.file))
         self.save(True)
+        Log.debug('closing: %s' % join(self.datapath, self.file))
     def createFileName(self):
         self.file = '%s.xml' % self.Id
         self.dirty = True

@@ -126,7 +126,7 @@ class Controls(MTWidget):
     def __init__(self,root=None,ctrls=None,**kwargs):
         self.ctrls_buttons_width = kwargs.setdefault('ctrls_button_width',0)
         self.ctrls_buttons_height = kwargs.setdefault('ctrls_button_heigth',0)
-        self.control_scale = kwargs.setdefault('control_scale',1)
+        self.control_scale = kwargs.setdefault('control_scale',1.0)
         self.scale = kwargs.setdefault('scale',1)
         #kwargs['cls'] = 'ctrlcss'
         

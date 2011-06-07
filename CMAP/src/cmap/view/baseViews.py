@@ -49,6 +49,7 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         self._id = self.ctrl.Id
         kwargs['size'] = self.grid_size = minimal_size
         super(MinView,self).__init__(**kwargs)
+        print('center: %s, pos: %s' % (str(self.center), str(self.pos)))
         story_size = scale_tuple(self.grid_size, 0.2)
         self.story_view_size = None
         self._description = self.ctrl.Description
@@ -129,9 +130,28 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
             self.ctrl.remove_scribble(id)
     def fullscreen(self, *largs, **kwargs):
         self.isMinimal = not self.isMinimal
-        self.ctrl.switch_view(self.isMinimal)
-        
-    
+        #self.ctrl.switch_view(self.isMinimal)
+        super(MinView,self).fullscreen(*largs, **kwargs)
+        self.scribleWidget.size = self.size
+        self.scribleWidget.toggle_fullscreen()
+        #self.scribleWidget.center = self.center
+    def unfullscreen(self, *largs, **kwargs):
+        self.scribleWidget.toggle_fullscreen()
+        super(MinView,self).unfullscreen(*largs, **kwargs)
+        self.scribleWidget.size = self.grid_size
+        print('srible widget size: %s' % str(self.scribleWidget.size))
+    def on_transform(self, touch, *largs, **kwargs):
+        self.ctrl.artefact_tranformed(size=self.size,pos=self.pos,
+                                      scale=self.scale,rotation=self.rotation)
+#    def on_move(self, x, y):
+#        #print('On_move')
+#        #super(MinView, self).on_move(x,y)
+#        self.ctrl.artefact_tranformed(self.size,(x,y))
+#
+#    def on_resize(self, w, h):
+#        #print('On_resize')
+#        #super(MinView, self).on_resize(w,h)
+#        self.ctrl.artefact_tranformed((w,h),self.pos)
     def _get_name(self):
         if self._name is None or not len(self._name): 
             return self.ctrl.Name
@@ -168,7 +188,10 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         try:
             blist = Storyapp().artefacts[self.Id][1]
             for im in blist:
-                blist[im].image = self._button_image
+                try:
+                    blist[im].image = self._button_image
+                except AttributeError:
+                    pass
         except KeyError:
             pass
 #        try:
@@ -185,8 +208,9 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
             if not self.name: 
                 self.trash()
                 return
-            self.ctrl.close(self)
-        super(MinView, self).close(touch)
+        self.ctrl.close(size=self.size, pos=self.pos,
+                                     rotation=self.rotation, scale=self.scale)
+        #super(MinView, self).close(touch)
 
     def trash(self, touch=None, *largs, **kwargs):
         self.ctrl.trash()
@@ -238,7 +262,7 @@ class TestController(object):
                               'actual':'0',
                               'owner':'owner',
                               'description':'description',
-                              'control_scale':0.7, 'cls':'type1css'}
+                              'control_scale':1.0, 'cls':'type1css'}
         if self.isMinimal:
             self.view = MinView(self.root,self, **kwargs) #IGNORE:W0142
             self.story_view_size = scale_tuple(self.view.grid_size,-0.001,-0.03)
@@ -276,7 +300,7 @@ if __name__ == '__main__':
                'actual':'0',
                'owner':'owner',
                'description':'description',
-               'control_scale':0.7,
+               'control_scale':1.0,
                'cls':'type1css'}
     c = TaskController(mw,  #IGNORE:W0142
                        None,

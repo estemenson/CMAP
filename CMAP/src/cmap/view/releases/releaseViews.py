@@ -164,7 +164,7 @@ class TestController(object):
                               actual='0',
                               owner='owner',
                               description='description',
-                              control_scale=0.7, cls='type1css')
+                              control_scale=1.0, cls='type1css')
             self.story_view_size = scale_tuple(self.view.grid_size,-0.001,-0.03)
             self.view.pos = (275,265)
         else:
@@ -178,7 +178,7 @@ class TestController(object):
                               actual='0',
                               owner='owner',
                               description='description',
-                              control_scale=0.7, cls='type1css')
+                              control_scale=1.0, cls='type1css')
             self.story_view_size = scale_tuple(self.view.grid_size,0.07)
             self.view.pos = (75,65)
         self.view.size = self.story_view_size

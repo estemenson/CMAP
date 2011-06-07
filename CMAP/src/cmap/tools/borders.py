@@ -58,14 +58,17 @@ _save_icon_path = os.path.join(_iconPath,'save.png')
 #_maximize_icon_path = os.path.join(_iconPath,'maximize.png')
 x_ctrl_border_scale = -.1
 y_ctrl_border_scale = -.2
+default_btn_size = (48,48)
+default_btn_padding = default_btn_size[0] /9.6 
 
 class MyInnerWindow(MTInnerWindow):
     def __init__(self, **kwargs):
-        ctrl_scale = kwargs.setdefault('control_scale', 1.0)
+        _scale = kwargs.setdefault('scale',1.0)
+        ctrl_scale = kwargs.setdefault('control_scale', _scale)
         self.btn_minimize = MTImageButton(filename=_minimize_icon_path,
                                             scale=ctrl_scale,
                                             cls='innerwindow-close')
-        self.btn_minimize.my_padding = 5
+        self.btn_minimize.my_padding = default_btn_padding
         self.isMinimized = False
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size', 
                                                          (0,48*ctrl_scale))
@@ -88,26 +91,35 @@ class MyInnerWindow(MTInnerWindow):
     def update_controls(self):
         scaled_border = self.get_scaled_border()
         center_x = self.width/ 2
-        center_y = - scaled_border 
-        if self.isMinimized:
-            center_y = scaled_border
+        center_y = (-scaled_border) * self.scale if self.scale == 1.0 else\
+                                                                self.scale *1.0
+        btn_scale = self.control_scale / self.scale
         ctrls  = self.controls.children
+        if self.isMinimized:
+            btn_scale = 1.0#0.7
+            center_x += 35
+            center_y = scaled_border -23
         pos =(center_x-self.ctrls_buttons_size[0]/2 -
-              (scaled_border/2*self.scale),# if self.scale != 1 else scaled_border,
+              (scaled_border/2*self.scale),
                    center_y)
         start_pos_x = pos[0]
         for button in ctrls:
-            button.scale = self.control_scale / self.scale
-            #button.scale = self.scale * self.control_scale
-            button.pos = start_pos_x,center_y - (button.height / (2*self.scale))
+            button.scale = btn_scale
+            button.pos = (start_pos_x,
+                center_y - button.height / self.get_divisor())
             try:
                 my_padding = button.my_padding
-            except Exception: #IGNORE:W0703
-                my_padding = button.my_padding = 5 # set a default
-            start_pos_x += (button.width + my_padding)
+            except Exception:
+                my_padding = button.my_padding = default_btn_padding
+            start_pos_x += button.width + (my_padding * btn_scale * .4\
+                                                       if self.isMinimized\
+                                                       else 1)
                 
-       
-    def minimize(self):
+    def get_divisor(self, value=0.98):
+        if self.scale >= value:
+            return 2
+        return 0.9
+    def minimize(self, *largs, **kargs):
         if self.isMinimized:
             self.restore()
         else: 
@@ -118,6 +130,7 @@ class MyInnerWindow(MTInnerWindow):
             self.old_size = self.size
             self.size = (self.ctrls_buttons_size[0] * self.scale,
                          self.ctrls_buttons_size[1] * self.scale)
+            self.update_controls()
             
 
     def get_minimize_pos(self):
@@ -134,7 +147,7 @@ class MyInnerWindow(MTInnerWindow):
         self.old_minimize_pos = self.pos
         self.pos = self.old_pos
         self.size = self.old_size
-        
+        self.update_controls()
         
     def fullscreen(self, *largs, **kwargs):
         if self.isMinimized:
@@ -170,12 +183,14 @@ class MyInnerWindow(MTInnerWindow):
 #            corners=(True, True, False, False)
         else:
             pos = (0,-scaled_border)
-            size=scale_tuple(self.size,-.1,-.5)
+            size=scale_tuple(self.size,-.1,-.8)
             l_pos = (size[0]/2, size[1] - 15 - scaled_border)
             corners=(True, True, True, True)
             drawLabel(label=self.minimized_label, pos=l_pos, 
-                      color=self.style.get('font-color'))
-            border_color=parse_color(self.style.get('min-border-color'))
+                      color=self.style.get('font-color', 
+                        parse_color(str('rgba(0,0,0,255)'))))
+            border_color=parse_color(self.style.get('min-border-color',
+                                        str('rgba(205,0,0,80)')))
             # draw control background
             drawRoundedRectangle(
                 pos=pos,
@@ -223,6 +238,7 @@ class MyInnerWindow(MTInnerWindow):
     
 class MyDragebleInnerWindow(MyInnerWindow):
     def __init__(self, **kwargs):
+        _scale = kwargs.setdefault('scale',1.0)
         self.drag_widget = MyDragableContainer(self,False)
         self.ctrl_buttons_width = None
 #        self.btn_save = MTImageButton(filename=_save_icon_path,
@@ -242,10 +258,11 @@ class MyDragebleInnerWindow(MyInnerWindow):
     
 class MyInnerWindowWithTrash(MyInnerWindow):
     def __init__(self, **kwargs):
+        _scale = kwargs.setdefault('scale',1.0)
         self.btn_trash = MTImageButton(filename=_trash_icon_path,
-                                            scale=1,
+                                            scale=_scale,
                                             cls='innerwindow-close')
-        self.btn_trash.my_padding = 12
+        self.btn_trash.my_padding = default_btn_padding *2.4
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size', 
                                                          (0,48))
         kwargs['ctrls_button_size'] = (sz[0] + self.btn_trash.width + \
@@ -262,11 +279,13 @@ class MyInnerWindowWithTrash(MyInnerWindow):
             
 class MyInnerWindowWithSaveAndTrash(MyInnerWindowWithTrash):
     def __init__(self, **kwargs):
+        _scale = kwargs.setdefault('scale',1.0)
+        kwargs.setdefault('control_scale', _scale)
         self.ctrl_buttons_width = None
         self.btn_save = MTImageButton(filename=_save_icon_path,
-                                            scale=1,
+                                            scale=_scale,
                                             cls='innerwindow-close')
-        self.btn_save.my_padding = 5
+        self.btn_save.my_padding = default_btn_padding
         sz = self.ctrls_buttons_size = kwargs.setdefault('ctrls_button_size',
                                                          (0,48))
         kwargs['ctrls_button_size'] = (sz[0] + self.btn_save.width +
@@ -347,7 +366,7 @@ if __name__ == '__main__':
 #                control_scale=0.7, cls='type1css')
 #    w.add_widget(t)
     cw = MyInnerWindowWithSaveAndTrash(size=(600,600), pos=(100,100), 
-                                      control_scale=1, cls='type1css')
+                                      control_scale=1.0, cls='type1css')
     #k = MTVKeyboard()
     #w.add_widget(k)
 #    cw = MyInnerWindowWithKeyboard(size=(600,600), pos=(100,100),

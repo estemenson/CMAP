@@ -74,7 +74,12 @@ class ArtefactController(Subject,Observer):
             
     def internalSave(self, fn):
         self._model.internalSave(fn)
-    def close(self):
+    def close(self, **kwargs):
+        self.exit()
+        kwargs['open']  = 'False'
+        kwargs['Id']    = self.Id
+        self.root.close_artefact(**kwargs)
+    def exit(self):
         try:
             self._model.close()
         except Exception: pass #IGNORE:W0703
@@ -82,7 +87,7 @@ class ArtefactController(Subject,Observer):
         if self.Id:
             self._model.trash()
             from cmap.controller.storyapp import Storyapp
-            self.root.trash(self, Storyapp().artefacts)
+            self.root.trash(self.Id)
 #        for o in self.observers:
 #            try:
 #                o.trash(self.view)
@@ -101,12 +106,20 @@ class ArtefactController(Subject,Observer):
         self.Model.add_scribble(scribble)
     def remove_scribble(self, ident):
         self.Model.remove_scribble(ident)
-    def newDialog(self, minv):
+    def artefact_tranformed(self,**kwargs):
+        kwargs['Id'] = self.Id
+        self.root.artefact_changed(**kwargs)
+    def newDialog(self, minv, **kwargs):
+        kwargs.setdefault('type_name', self._view_type_name)
+        kwargs.setdefault('name',self.Name)
+        kwargs.setdefault('id',self.Id)
+        kwargs.setdefault('pos', self.get_new_random_position())
+        #TODO: Steve - this seems to be a bug in PYMT we need to set
+        #the position after construction
+        _pos = kwargs.pop('pos')
         _p = (self._mini_view_type if minv else self._view_type)(self,self,
-                            type_name=self._view_type_name,
-                            name=self.Name, id=self.Id)
-        #if minv: _p.size = minimal_size  
-        _p.pos = self.get_new_random_position()
+                            **kwargs)
+        _p.pos = _pos
         self._view = _p
         return _p        
     def app_btn_pressed(self):
@@ -120,7 +133,7 @@ class ArtefactController(Subject,Observer):
     def switch_view(self, minv):
         self.isMinimal = minv
         self.root.remove_widget(self.view)
-        self.root.add_widget(self,self.view)
+        self.root.add_widget(self.view)
     def get_new_random_position(self):
         return (choice(self._x_range),choice(self._y_range))
 

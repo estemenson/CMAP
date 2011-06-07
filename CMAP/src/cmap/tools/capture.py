@@ -44,7 +44,7 @@ class MyCaptureWidget(CaptureGesture):
                 self.StoryApp.flow_pressed('sprint_flow_open',
                                         self.StoryApp.dragable_sprint_flow)
             elif best[1].label in ['New Story']:
-                self.StoryApp.new_story_pressed(None)
+                self.StoryApp.new_story_pressed(None, pos=gesture.strokes[0].screenpoints[-1])
             elif best[1].label in ['Releases','Releases1', 'Releases2']:
                 self.StoryApp.flow_pressed('releases_flow_open',
                                         self.StoryApp.dragable_release_flow)

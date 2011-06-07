@@ -44,7 +44,7 @@ class StoryController(ArtefactController):
                               actual=self._model.ActualFinish ,
                               owner=self._model.Owner,
                               description=self._model.Description,
-                              control_scale=0.7, cls='type1css')
+                              control_scale=1.0, cls='type1css')
             self.story_view_size = scale_tuple(self.view.grid_size,-0.001,-0.03)
         else:
             self._view = StoryView(self.root,self, 
@@ -57,7 +57,7 @@ class StoryController(ArtefactController):
                               actual=self._model.ActualFinish ,
                               owner=self._model.Owner,
                               description=self._model.Description,
-                              control_scale=0.7, cls='type1css')
+                              control_scale=1.0, cls='type1css')
             self.story_view_size = scale_tuple(self.view.grid_size,0.15,.03)
         self.view.size = self.story_view_size
         if pos is not None:

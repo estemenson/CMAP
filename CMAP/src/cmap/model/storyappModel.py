@@ -31,6 +31,7 @@ from cmap.controller.sprintController import SprintController
 from cmap.view.tasks.taskViews import TaskMinView, TaskView
 from cmap.model.taskModel import TaskModel
 from cmap.controller.taskController import TaskController
+from xml.dom import minidom
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -43,6 +44,7 @@ from glob     import glob
 class StoryAppModel(object):
     def __init__(self, **kwargs):
         self._artefacts = {}
+        self._isDirty = False
         self.controller = kwargs['controller']
         self.datastore = Config().datastore
         Log.debug('Path to repository: %s' % self.datastore)
@@ -61,7 +63,7 @@ class StoryAppModel(object):
 
         self.get_local_artefacts()
         self.load_artefacts()
-        
+        #self.get_view_data()
     def get_local_artefacts(self):
         '''
         Loads the file names of all local artefacts into a dictionary
@@ -78,29 +80,115 @@ class StoryAppModel(object):
             kwargs = artefact_types[type].copy()
             for artefact in self.xmlFiles[type]:
                 Log.debug('loading %s' % artefact)
-#                ctrl = self.controller.getArtefact(artefact, type['controller'],
-#                                        type['model'], type['get_artefact'], 
-#                    name=os.path.splitext(os.path.basename(artefact))[0])
                 kwargs['name'] =\
                             name=os.path.splitext(os.path.basename(artefact))[0]
                 kwargs['file'] = artefact
                 ctrl = self.controller.getArtefact(**kwargs) 
-                self.artefacts[ctrl.Id] = (ctrl,{})
+                self._artefacts[ctrl.Id] = (ctrl,{})
                 self.controller.add_new_artefact(ctrl,
                                      kwargs['container'],
                                      kwargs['viewCurrent'],
-                                     self.artefacts[ctrl.Id][1])
-    def trash(self,artefact,atype=None):
-        Log.debug('Need to trash artefact: %s' % artefact)
+                                     self._artefacts[ctrl.Id][1])
+    def get_view_data(self):
+        #retrieve information about size and position of artefacts
+        self.app_file = os.path.join(self.datastore, 'storyApp.xml')
+        if not os.path.exists(self.app_file):
+            #just get the template
+            #_file = os.path.join(self.datastore, '..','data','storyApp.xml')
+            self._dom = minidom.parseString(
+                                 '''<?xml version="1.0" encoding="UTF-8"?>
+                                <storyApp></storyApp>
+                                ''')
+        else:
+            self._dom = minidom.parse(self.app_file)
+        self._app = self._dom.getElementsByTagName('storyApp')[0] 
+        for element in [n for n in self._app.childNodes \
+                   if n.nodeName == 'Artefact']:
+                  #if n.nodeType == minidom.Node.ELEMENT_NODE]:
+            self.parse(element)
+    def parse(self,node):
+        if node.hasAttribute('Id') and node.hasAttribute('pos') and\
+            node.hasAttribute('size') and node.hasAttribute('open'):
+            _id         = node.getAttribute('Id')
+            _ctrl       = self._artefacts[_id] 
+            _meta       = _ctrl[1]['meta']      = {}
+            self._getNodeAttributes(_meta, node,[('pos'     ,(100,100)),
+                                                 ('size'    ,(600,400)),
+                                                 ('scale'   ,1.0),
+                                                 ('rotation',0.0)])
+            _meta['open']      = node.getAttribute('open')
+            
+            self.controller.create_view_and_open(_ctrl[0],open=_meta['open'],
+                                                 size=_meta['size'],
+                                                 pos=_meta['pos'],
+                                                 scale=_meta['scale'],
+                                                 rotation=_meta['rotation'])
+    def _getNodeAttributes(self, _dic,node, _list):
+        for attr in _list:
+            try:
+                _value = eval(node.getAttribute(attr[0]))
+                if _value:
+                    _dic[attr[0]] = _value
+                else:  
+                    _dic[attr[0]] = attr[1]
+            except Exception:
+                _dic[attr[0]] = attr[1]
+    def trash(self,id):
+        Log.debug('Delete artefact: %s' % id)
+        _art = self.get_dom_artefact(id)
+        if _art:
+            self._app.removeChild(_art)
+        del self._artefacts[id]
         return
     def close(self,touch=None):
-        pass
-#        #close all the artefacts
-#        for a in self.artefacts.values():
-#            a[0].close()
-#        for b in self.backlog.values():
-#            b[0].close()
-    
+        #persist data about open artefacts, their size and positions
+#        for _id in self._artefacts:
+#            _pos = self._artefacts[_id][1].get('pos')
+#            if _pos:        
+#            #if it has a position then it must have a size and open status    
+#                _artefact = self._dom.createElement('Artefact')
+#                _artefact.setAttribute('Id', _id)
+#                _artefact.setAttribute('pos', str(_pos))
+#                _artefact.setAttribute('size',\
+#                                           str(self._artefacts[_id][1]['size']))
+#                _artefact.setAttribute('open', self._artefacts[_id][1]['open'])
+#                self._app.appendChild(_artefact)
+        if self._isDirty:
+            with open(self.app_file, 'w') as f:
+                self._dom.writexml(f)
+    def artefact_changed(self, **kwargs):#id, size, pos, open):
+        self._isDirty = True
+        ctrl = self._artefacts[kwargs['Id']]
+        id = ctrl[0].Id
+        _meta = ctrl[1].get('meta')
+        #get this artefact from the dom
+        #or create a new element
+        _e = self.get_dom_artefact(id)
+        if not _e:
+            if not _meta:
+                _meta = ctrl[1]['meta'] = {} 
+            _e = self._dom.createElement('Artefact')
+            _e.setAttribute('Id', id)
+            self._app.appendChild(_e)
+        _meta['size'] = kwargs['size']
+        _meta['pos'] = kwargs['pos']
+        _meta['open'] = kwargs['open']
+        _meta['rotation'] = kwargs['rotation']
+        _meta['scale'] = kwargs['scale']
+        _e.setAttribute('size', str(_meta['size']))
+        _e.setAttribute('pos', str(_meta['pos']))
+        if not isinstance(_meta['open'], type('')):
+            print('Open is: %s' % _meta['open'])
+        _e.setAttribute('open', _meta['open'])
+        _e.setAttribute('rotation', str(_meta['rotation']))
+        _e.setAttribute('scale', str(_meta['scale']))
+    def get_dom_artefact(self, id):
+        if 'meta' in self._artefacts[id][1]:
+            for element in [n for n in self._app.childNodes \
+                   if n.nodeName == 'Artefact']:
+                _id = element.getAttribute('Id')
+                if _id == id: return element
+        return None
     @property        
     def artefacts(self):
         return self._artefacts
