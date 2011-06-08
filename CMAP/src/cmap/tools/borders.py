@@ -34,7 +34,7 @@ InnerWindowCSS = '''
     bg-color: rgba(192, 192, 192, 255);
     border-width: 30;
     border-color: rgba(192,192,192,255);
-    min-border-color:rgba(205,0,0,80);
+    min-border-color: rgba(205,0,0,80);
     font-color: rgba(0,0,0,255);
     draw-border: True;    
     bg-color-move: rgb(45 ,150 ,150);
@@ -85,7 +85,7 @@ class MyInnerWindow(MTInnerWindow):
                                                          (0,48*ctrl_scale))
         kwargs['ctrls_button_size'] = (sz[0] + (3* self.btn_minimize.width) + \
                                     2* self.btn_minimize.my_padding , sz[1])
-        self.ctrls_buttons_size = kwargs['ctrls_button_size'] 
+        self.ctrls_buttons_size = kwargs['ctrls_button_size']
         super(MyInnerWindow,self).__init__(**kwargs)
         self.minimized_label =kwargs.setdefault('minimized_label','test label')
         self.old_pos = self.pos
@@ -97,8 +97,19 @@ class MyInnerWindow(MTInnerWindow):
         btn = self.controls.children.pop()
         self.controls.add_widget(self.btn_minimize)
         self.controls.add_widget(btn)
+        self.print_colors('\nInnerWindow colors after init\n') 
         self.update_controls()
-        
+    def print_colors(self, str='\n\n'):
+        try:
+            border = 'border-color: %s\n' % self.style['border-color']
+        except: border = 'border-color: None\n'
+        bg = 'bg-color: %s\nbg-color-move: %s\nbg-color-full: %s\n' %\
+                (self.style['bg-color'], self.style['bg-color-move'],
+                 self.style['bg-color-full'])
+        try:
+            min = 'min-border-color: %s\n' % self.style['min-border-color']
+        except:min = 'min-border-color: None\n'
+        Log.debug('%s%s%s%s' % (str, border, bg, min))
     def update_controls(self):
         scaled_border = self.get_scaled_border()
         center_x = self.width/ 2
@@ -202,8 +213,8 @@ class MyInnerWindow(MTInnerWindow):
             drawLabel(label=self.minimized_label, pos=l_pos, 
                       color=self.style.get('font-color', 
                         parse_color(str('rgba(0,0,0,255)'))))
-            border_color=parse_color(self.style.get('min-border-color',
-                                        str('rgba(205,0,0,80)')))
+            border_color=self.style.get('min-border-color',
+                                        parse_color(str('rgba(205,0,0,80)')))
             # draw control background
             drawRoundedRectangle(
                 pos=pos,

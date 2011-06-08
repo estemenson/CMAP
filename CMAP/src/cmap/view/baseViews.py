@@ -43,16 +43,14 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         self.nudge_amount = .8
         self.old_styles = None
         self.colors_nudge = {
-                    'bg-color': parse_color(str('rgba(45, 150, 150, 255)')),
-                    'color': parse_color(str('rgba(45, 150, 150, 255)')),
                     'border-color': parse_color(str('rgb(45, 150, 150)')),
+                    'bg-color': parse_color(str('rgba(45, 150, 150, 255)')),
                     'bg-color-move': parse_color(str('rgb(45, 150, 150)')),
                     'bg-color-full': parse_color(str('rgb(45, 150, 150)')),
                     'min-border-color':parse_color(str('rgba(45,150,150,255)'))}
         self.colors_orig = {
-                    'bg-color': parse_color(str('rgba(255, 255, 255, 175)')),
-                    'color': parse_color(str('rgba(192, 192, 192, 255)')),
                     'border-color': parse_color(str('rgba(192,192,192,255)')),
+                    'bg-color': parse_color(str('rgba(255, 255, 255, 175)')),
                     'bg-color-move': parse_color(str('rgba(0,175,0,175)')),
                     'bg-color-full': parse_color(str('rgba(175,0 ,0 ,175)')),
                     'min-border-color': parse_color(str('rgba(205,0 ,0 ,80)'))}
@@ -166,10 +164,15 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         self.ctrl.moving(touch.dpos)
     def nudge(self):
         #for now we will cahnge the border color
+        self.print_colors('\nbefore applying nudge colors\n')
         self.apply_css(self.colors_nudge)
+        self.print_colors('\nafter applying nudge colors\n')
         self.draw()
+
     def nudge_reset(self):
+        self.print_colors('\nbefore reset to original colors\n')
         self.apply_css(self.colors_orig)
+        self.print_colors('\nafter reset to original colors\n')
         self.draw()
 #        self.nudge_amount *= -1
 #        self.rotation += self.nudge_amount

@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 
 from agileConfig import Config
 from random import choice
+from pymt.parser import parse_color
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
@@ -115,6 +116,7 @@ class ArtefactController(Subject,Observer):
         kwargs.setdefault('name',self.Name)
         kwargs.setdefault('id',self.Id)
         kwargs.setdefault('pos', self.get_new_random_position())
+        kwargs.setdefault('cls', 'type1css')
         #TODO: Steve - this seems to be a bug in PYMT we need to set
         #the position after construction
         _pos = kwargs.pop('pos')
