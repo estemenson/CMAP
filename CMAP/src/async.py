@@ -15,7 +15,7 @@ import httplib
 
 import pymt.base
 import pymt.event
-from petaapan.utilities.gitmanager import GitManager, SAVE, COMMIT, MV,\
+from petaapan.dvcs.gitmanager import GitManager, SAVE, COMMIT, MV,\
                                           RM, GIT_RESPONSE, SHUTDOWN,\
                                           VERSION, EXEC_PATH
 from petaapan.publishsubscribeclient.fromCollaboration\
@@ -23,7 +23,7 @@ from petaapan.publishsubscribeclient.fromCollaboration\
 from petaapan.publishsubscribeclient.toCollaboration\
                import TO_COLLABORATION, SUBSCRIPTION_RESPONSE,\
                          ToCollaboration
-from petaapan.publishsubscribeserver.pssDef import GITHUB_NOTIFICATION
+from petaapan.publishsubscribe.pssDef import GITHUB_NOTIFICATION
 from agileConfig import Config
 Log = Config().log.logger
 
@@ -113,19 +113,22 @@ class Async(pymt.event.EventDispatcher):
 
     
     def logAsyncInfo(self, ret):
+        '''
+          ret is guaranteed to contain at least an empty list for both stdout and stderr
+          '''
         if ret is None:
             return
         msg = ret[1]
         # Log stdout messages
-        if len(msg) <= 1 or not msg[1]:
-            return
+#JG        if len(msg) <= 1 or not msg[1]:
+#JG            return
 #JG        if msg[1]:
 #JG            for l in msg[1]:
 #JG              Log.info(l)
+        # Log stdout messages
         [Log.info(l)  for l in msg[1]]
         # Log stderr messages
-        if len(msg) >= 3 and msg[2]:
-            [lambda l: (Log.info(l) if msg[0] == 0 else Log.error(l)) for l in msg[2]]
+        [lambda l: (Log.info(l) if msg[0] == 0 else Log.error(l)) for l in msg[2]]
 #JG            for l in msg[2]:
 #JG                if msg[0] == 0:
 #JG                    Log.info(l)
