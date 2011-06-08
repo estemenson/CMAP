@@ -164,28 +164,15 @@ class MinView(MyInnerWindowWithSaveAndTrash):#MyInnerWindowWithKeyboard):
         self.ctrl.moving(touch.dpos)
     def nudge(self):
         #for now we will cahnge the border color
-        self.print_colors('\nbefore applying nudge colors\n')
+        #self.print_colors('\nbefore applying nudge colors\n')
         self.apply_css(self.colors_nudge)
-        self.print_colors('\nafter applying nudge colors\n')
-        self.draw()
+        #self.print_colors('\nafter applying nudge colors\n')
 
     def nudge_reset(self):
-        self.print_colors('\nbefore reset to original colors\n')
+        #self.print_colors('\nbefore reset to original colors\n')
         self.apply_css(self.colors_orig)
-        self.print_colors('\nafter reset to original colors\n')
-        self.draw()
-#        self.nudge_amount *= -1
-#        self.rotation += self.nudge_amount
-#        super(MinView,self).update()
-#    def on_move(self, x, y):
-#        #print('On_move')
-#        #super(MinView, self).on_move(x,y)
-#        self.ctrl.artefact_tranformed(self.size,(x,y))
-#
-#    def on_resize(self, w, h):
-#        #print('On_resize')
-#        #super(MinView, self).on_resize(w,h)
-#        self.ctrl.artefact_tranformed((w,h),self.pos)
+        #self.print_colors('\nafter reset to original colors\n')
+
     def _get_name(self):
         if self._name is None or not len(self._name): 
             return self.ctrl.Name
