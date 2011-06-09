@@ -12,7 +12,7 @@ from agileConfig import Config
 try:
     Log = Config().log.logger
 except Exception:
-    from petaapan.utilities.console_logger import ConsoleLogger
+    from petaapan.logger.console_logger import ConsoleLogger
     Log = ConsoleLogger('CMAP')
 
 from pymt.ui.window import MTWindow

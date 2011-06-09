@@ -18,15 +18,16 @@ from agileConfig                        import Config, AsyncHandler
 from async                              import ON_GITHUBNOTIFICATION
 from cmap.model.storyappModel import StoryAppModel
 from cmap.view.storyappView import StoryAppView
-from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
+from cmap import BACKLOG, PROJECTS, RELEASES, SPRINTS, STORIES,\
+                         TASKS, artefact_types
 from pymt.ui.widgets.widget import MTWidget
 
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
-    from petaapan.utilities.console_logger\
+    from petaapan.logger.console_logger\
                                         import ConsoleLogger
-    Log = ConsoleLogger('AgiMan')
+    Log = ConsoleLogger('CMAP')
     
     
 # Gives access to the StoryApp controller from anywhere in the application

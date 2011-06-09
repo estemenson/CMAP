@@ -14,7 +14,7 @@ from __future__ import unicode_literals
 import sys
 import pprint
 pprint.pprint(sys.path)
-from petaapan.utilities.console_logger import ConsoleLogger
+from petaapan.logger.console_logger import ConsoleLogger
 Log = ConsoleLogger('CMAP')
 
 

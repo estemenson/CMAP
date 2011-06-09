@@ -16,7 +16,7 @@ from random import choice
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
-    from petaapan.utilities.console_logger import ConsoleLogger
+    from petaapan.logger.console_logger import ConsoleLogger
     Log = ConsoleLogger('CMAP')
 
 

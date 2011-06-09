@@ -17,7 +17,7 @@ from pymt.ui.widgets.scatter import MTScatter
 try:
     Log = Config().log.logger
 except Exception:
-    from petaapan.utilities.console_logger import ConsoleLogger
+    from petaapan.logger.console_logger import ConsoleLogger
     Log = ConsoleLogger('CMAP')
 from cmap.tools.borders import MyInnerWindowWithSaveAndTrash
 from cmap.tools.myTools import get_min_screen_size, scale_tuple

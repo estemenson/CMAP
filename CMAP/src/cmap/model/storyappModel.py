@@ -35,7 +35,7 @@ from xml.dom import minidom
 try:
     Log = Config().log.logger
 except Exception: #IGNORE:W0703
-    from petaapan.utilities.console_logger import ConsoleLogger
+    from petaapan.logger.console_logger import ConsoleLogger
     Log = ConsoleLogger('AgiMan')
 from cmap import BACKLOG,PROJECTS,RELEASES,SPRINTS,STORIES,TASKS,artefact_types
 import os.path
