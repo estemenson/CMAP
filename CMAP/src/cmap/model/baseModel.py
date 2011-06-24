@@ -425,13 +425,9 @@ class BaseModel(Observer, Subject):
             except Exception: #IGNORE:W0703
                 pass
     def listData(self, target, atype):
-        ret = []
         from cmap.controller.storyapp import Storyapp
-        for c in target:
-            aro = Storyapp().artefacts[c]
-            if aro.ArtefactType == atype:
-                ret.append(c)
-        return ret
+        return [c for c in target if \
+                                Storyapp().artefacts[c].ArtefactType == atype]
     def trash(self):
         if self.file is None: return
         f = join(self.datapath, self.file)
