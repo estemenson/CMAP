@@ -281,7 +281,7 @@ class BaseModel(Observer, Subject):
             self._Scribbles[idu] = {}
         for k,v in value.iteritems():
             if not k in ['Id','Dom']:
-                if k in ['Color', 'Cdata'] and isinstance(v, unicode):
+                if k in ['Color', 'CDATA'] and isinstance(v, unicode):
                     self._Scribbles[idu][k] = eval(v)
                 else:
                     self._Scribbles[idu][k] = v
@@ -300,7 +300,7 @@ class BaseModel(Observer, Subject):
             e.setAttribute('Id', idu)
             ce.appendChild(e)
         scrib.setAttribute('Color', str(value['Color']))
-        s = str(value['Cdata'])
+        s = str(value['CDATA'])
         if scrib.firstChild:
             scrib.firstChild.data = s
         else:
@@ -342,7 +342,7 @@ class BaseModel(Observer, Subject):
         scrib.setAttribute('Font-Size', str(value['Font-Size']))
         scrib.setAttribute('size', str(value['size']))
         scrib.setAttribute('pos', str(value['pos']))
-        s = value['Cdata']
+        s = value['CDATA']
         if scrib.firstChild:
             scrib.firstChild.data = s
         else:
@@ -417,7 +417,7 @@ class BaseModel(Observer, Subject):
                     value = c.firstChild.data
                 else:
                     if not c.firstChild : continue
-                    value = {'Dom': True, 'Cdata': c.firstChild.data}
+                    value = {'Dom': True, 'CDATA': c.firstChild.data}
                     for a in c._attrs: #IGNORE:W0212
                         value[a]=c.getAttribute(a)
             try:

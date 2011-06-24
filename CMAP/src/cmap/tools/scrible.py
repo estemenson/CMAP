@@ -257,7 +257,7 @@ class ScribbleTextWidget(MTScatter):
                 'Id':self.Id,
                 'Color': self.label.color,  
                 'Font-Size':self.label.font_size,
-                'Cdata':self.cdata, 
+                'CDATA':self.cdata, 
                 'pos':self.pos,
                 'size':self.size
                 }
@@ -318,7 +318,7 @@ class MyScribbleWidget(MTWidget):
                 args['size']=eval(txt['size'])
                 args['color']=txt['Color']
                 args['font-size']=eval(txt['Font-Size'])
-                args['label']=txt['Cdata']
+                args['label']=txt['CDATA']
                 stw = ScribbleTextWidget(**args) #IGNORE:W0142
                 stw.push_handlers(on_transform=curry(self.on_transform,stw))
                 self.add_widget(stw)
@@ -393,7 +393,7 @@ class MyScribbleWidget(MTWidget):
                        (touch.id, touch.x,touch.y))
             idu = self.touch_keys[touch.id] = uuid()
             self.touch_positions[idu]= {'Id':idu, 'Color':self.current_color,
-                                       'Cdata':[touch.pos]}
+                                       'CDATA':[touch.pos]}
             self.touch_positions[idu]['moved'] = 0
             return True
     def on_touch_move(self, touch):
@@ -401,7 +401,7 @@ class MyScribbleWidget(MTWidget):
             if self.collide_point(touch.x, touch.y):
                 idu = self.touch_keys[touch.id]
                 try:
-                    self.touch_positions[idu]['Cdata'].append(touch.pos)
+                    self.touch_positions[idu]['CDATA'].append(touch.pos)
                     Log.debug('Scribble: on_touch_move: touch id:%s id:%s @ pos(%d,%d)' % 
                        (touch.id, idu, touch.x,touch.y))
                 except Exception: #IGNORE:W0703
@@ -425,7 +425,7 @@ class MyScribbleWidget(MTWidget):
                     self.parent.parent.set_button_image()
                 
                 idu = self.touch_keys[touch.id]
-                self.touch_positions[idu]['Cdata'].append(touch.pos)
+                self.touch_positions[idu]['CDATA'].append(touch.pos)
                 if self.is_pen_active:
                     if self.drawTextInput(touch):
                         del self.touch_positions[idu]
@@ -450,11 +450,11 @@ class MyScribbleWidget(MTWidget):
             distance = Vector.distance( Vector(pos.sx, pos.sy),
                                         Vector(touch.osxpos, touch.osypos))
             Log.debug('Screen coordinate Distance:%f vs %f' % (distance,self.press_and_hold_distance))
-            _l = len(self.touch_positions[idu]['Cdata'])
+            _l = len(self.touch_positions[idu]['CDATA'])
             Log.debug('Num points:%d' % _l)
             _vd = Vector.distance(\
-                            Vector(*self.touch_positions[idu]['Cdata'][0]),\
-                            Vector(*self.touch_positions[idu]['Cdata'][_l-1]))
+                            Vector(*self.touch_positions[idu]['CDATA'][0]),\
+                            Vector(*self.touch_positions[idu]['CDATA'][_l-1]))
             Log.debug('touch distance :%f and %d' % (_vd, int(_vd)))
             if distance <= self.press_and_hold_distance and\
                         (_l < self.travel_limit or int(_vd) < self.travel_limit):                                            
@@ -476,14 +476,14 @@ class MyScribbleWidget(MTWidget):
             if self.touch_positions[k]['Color'] is self.bg_color:
                 continue
             d_list = []
-            for v in self.touch_positions[k]['Cdata']:
+            for v in self.touch_positions[k]['CDATA']:
                 if self.should_delete((x,y), v):
                     d_list.append(v)
             for v in  d_list: 
-                self.touch_positions[k]['Cdata'].remove(v)
+                self.touch_positions[k]['CDATA'].remove(v)
                 self.dispatch_event('on_change',  #IGNORE:W0142
                                     *(k,self.touch_positions))
-            if not self.touch_positions[k]['Cdata']:
+            if not self.touch_positions[k]['CDATA']:
                 del self.touch_positions[k]
                 self.dispatch_event('on_change', #IGNORE:W0142
                                     *(k,self.touch_positions)) 
@@ -515,7 +515,7 @@ class MyScribbleWidget(MTWidget):
         _del = False
         k = None
         for k in self.touch_positions.keys():
-            for v in self.touch_positions[k]['Cdata']:
+            for v in self.touch_positions[k]['CDATA']:
                 if self.should_delete(pos, v):
                     _del = True
                     break
@@ -560,7 +560,11 @@ class MyScribbleWidget(MTWidget):
                 d_txt.style['border-color'] = b_col
         _del_list = []
         for k in self.touch_positions.keys():
-            _points = self.touch_positions[k]['Cdata']
+            try:
+                _points = self.touch_positions[k]['CDATA']
+            except KeyError:
+                Log.debug('KeyError id: %s' % k)
+                continue
             if not len(_points):
                 _del_list.append(k)
                 continue
